@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0B0B0F;
+  --bg-card: #15151C;
+  --pink: #FF4D6A;
+  --purple: #9B6DFF;
+  --blue: #4D9AFF;
+  --teal: #00D4AA;
+  --yellow: #FFD700;
+  --gray: #8E8E9A;
+  --light-gray: #55556A;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-card: var(--bg-card);
+  --color-pink: var(--pink);
+  --color-purple: var(--purple);
+  --color-blue: var(--blue);
+  --color-teal: var(--teal);
+  --color-yellow: var(--yellow);
+  --color-gray: var(--gray);
+  --color-light-gray: var(--light-gray);
+  --font-sans: var(--font-poppins);
+}
+
+body {
+  background: var(--bg);
+  color: #ededed;
+  font-family: var(--font-poppins), sans-serif;
+}
