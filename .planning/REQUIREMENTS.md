@@ -17,13 +17,13 @@
 
 ### Fan Capture
 
-- [ ] **CAPT-01**: Fan scans QR → lands on `/collect/[slug]` → enters email → collected in under 10 seconds
-- [ ] **CAPT-02**: Collection recorded in Supabase with correct performer, capture method
-- [ ] **CAPT-03**: Fan tier updates correctly (1st scan = network, 3rd = early_access, 5th = secret, 10th = inner_circle)
-- [ ] **CAPT-04**: Repeat scan by same email shows updated tier, not duplicate collection
-- [ ] **CAPT-05**: Collect page has OG meta tags for social sharing preview
-- [ ] **CAPT-06**: Email is normalized (lowercase, trimmed) before storage
-- [ ] **CAPT-07**: QR code endpoint (`/api/qr/[slug]`) generates high-contrast scannable codes (white bg, dark modules)
+- [x] **CAPT-01**: Fan scans QR → lands on `/collect/[slug]` → enters email → collected in under 10 seconds
+- [x] **CAPT-02**: Collection recorded in Supabase with correct performer, capture method
+- [x] **CAPT-03**: Fan tier updates correctly (1st scan = network, 3rd = early_access, 5th = secret, 10th = inner_circle)
+- [x] **CAPT-04**: Repeat scan by same email shows updated tier, not duplicate collection
+- [x] **CAPT-05**: Collect page has OG meta tags for social sharing preview
+- [x] **CAPT-06**: Email is normalized (lowercase, trimmed) before storage
+- [x] **CAPT-07**: QR code endpoint (`/api/qr/[slug]`) generates high-contrast scannable codes (white bg, dark modules)
 
 ### Performer Dashboard
 
@@ -103,13 +103,13 @@
 | AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Complete |
 | AUTH-07 | Phase 4 | Pending |
-| CAPT-01 | Phase 2 | Pending |
-| CAPT-02 | Phase 2 | Pending |
-| CAPT-03 | Phase 2 | Pending |
-| CAPT-04 | Phase 2 | Pending |
-| CAPT-05 | Phase 2 | Pending |
-| CAPT-06 | Phase 2 | Pending |
-| CAPT-07 | Phase 2 | Pending |
+| CAPT-01 | Phase 2 | Complete |
+| CAPT-02 | Phase 2 | Complete |
+| CAPT-03 | Phase 2 | Complete |
+| CAPT-04 | Phase 2 | Complete |
+| CAPT-05 | Phase 2 | Complete |
+| CAPT-06 | Phase 2 | Complete |
+| CAPT-07 | Phase 2 | Complete |
 | DASH-01 | Phase 3 | Pending |
 | DASH-02 | Phase 3 | Pending |
 | DASH-03 | Phase 3 | Pending |
