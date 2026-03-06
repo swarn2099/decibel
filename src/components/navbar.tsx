@@ -14,8 +14,10 @@ export function Navbar() {
   const searchParams = useSearchParams();
   const [user, setUser] = useState<{ email?: string } | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const [query, setQuery] = useState("");
+  const initialQ = pathname === "/" ? (searchParams.get("q") || "") : "";
+  const [query, setQuery] = useState(initialQ);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const isPushingRef = useRef(false);
 
   useEffect(() => {
     const supabase = createSupabaseBrowser();
@@ -25,10 +27,16 @@ export function Navbar() {
     });
   }, []);
 
-  // Sync local state from URL on mount / navigation
+  // Only sync from URL when user navigates (not when we push)
   useEffect(() => {
+    if (isPushingRef.current) {
+      isPushingRef.current = false;
+      return;
+    }
     if (pathname === "/") {
       setQuery(searchParams.get("q") || "");
+    } else {
+      setQuery("");
     }
   }, [pathname, searchParams]);
 
@@ -36,6 +44,7 @@ export function Navbar() {
     setQuery(value);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
+      isPushingRef.current = true;
       const params = new URLSearchParams();
       if (value) params.set("q", value);
       const qs = params.toString();
@@ -44,7 +53,7 @@ export function Navbar() {
       } else {
         router.push(qs ? `/?${qs}` : "/");
       }
-    }, 200);
+    }, 300);
   }
 
   if (HIDDEN_ROUTES.some((r) => pathname.startsWith(r))) return null;
