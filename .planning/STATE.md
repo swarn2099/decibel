@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
-**Current focus:** Phase 1: Auth & Security
+**Current focus:** Phase 2: Fan Capture
 
 ## Current Position
 
@@ -76,9 +76,10 @@ None yet.
 - [Phase 1]: Magic link deliverability to Gmail/Outlook must be tested before demo — may need custom SMTP
 - [Phase 1]: RLS policies written but not yet applied — need DB password or Supabase CLI login to deploy
 - [Phase 1]: /api/claim security hole — RESOLVED in 01-01 (session-based identity)
+- [Phase 1]: Dashboard queries switched to admin client — RESOLVED in 01-01
 
 ## Session Continuity
 
-Last session: 2026-03-06T08:14:31Z
-Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
-Resume file: .planning/phases/01-auth-security/01-02-SUMMARY.md
+Last session: 2026-03-06
+Stopped at: Phase 1 complete, ready to plan Phase 2
+Resume file: None

@@ -29,8 +29,8 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 - [ ] Repeat scan handling — show updated tier, no duplicate collections
 - [ ] OG meta tags for social sharing on collect page
 - [ ] Performer dashboard (`/dashboard`) — fan count, tier breakdown, recent scans
-- [ ] Performer auth via Supabase magic link
-- [ ] Performer profile claiming flow
+- [ ] Performer auth via Supabase magic link (infrastructure done, needs live test)
+- [ ] Performer profile claiming flow (secured in Phase 1)
 - [ ] Fan list with search/filter by tier on dashboard
 - [ ] Scan-over-time chart (last 90 days) on dashboard
 - [ ] Message composer — select tier, write, preview, send
@@ -38,7 +38,7 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 - [ ] "Go Live" button — mark performer as live at a venue
 - [ ] Fan profile page — logged-in fans see collected artists, tier badges, scan history
 - [ ] Fan settings page — account management
-- [ ] Logout functionality for both fans and performers
+- [ ] Logout functionality for both fans and performers (performer logout done in Phase 1)
 - [ ] Demo/production readiness — all flows working end-to-end
 
 ### Out of Scope
@@ -77,8 +77,10 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 | EDMTrain as primary event source | RA/DICE/Google all block scraping; EDMTrain has schema.org markup | ✓ Good |
 | SoundCloud widget API for enrichment | No auth needed, returns avatar/bio/followers | ✓ Good |
 | Email as fan identifier (no account required) | Minimal friction for first-time scan | — Pending |
-| Supabase magic link for performer auth | No password management, fits the vibe | — Pending |
+| Supabase magic link for performer auth | No password management, fits the vibe | ✓ Good |
+| Admin client for dashboard queries | Bypasses RLS, simpler than per-user policies with server-side auth check | ✓ Good |
+| Session-based identity in /api/claim | Never trust form-submitted user_id | ✓ Good |
 | Stub message delivery for v1 | Real SendGrid integration adds complexity, not needed for demo | — Pending |
 
 ---
-*Last updated: 2026-03-06 after initialization*
+*Last updated: 2026-03-06 after Phase 1 (Auth & Security)*
