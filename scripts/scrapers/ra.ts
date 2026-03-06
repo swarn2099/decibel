@@ -1,7 +1,6 @@
 import { chromium } from "playwright";
 import { getSupabase, slugify, namesMatch, log, logError } from "./utils";
 
-// Chicago venues on RA — these are RA club IDs/slugs
 const RA_VENUES: { name: string; raSlug: string; dbSlug: string }[] = [
   { name: "Smartbar", raSlug: "smartbar", dbSlug: "smartbar" },
   { name: "Soundbar", raSlug: "soundbar-chicago", dbSlug: "soundbar" },
@@ -18,12 +17,11 @@ export async function scrapeRA() {
   let browser;
   try {
     browser = await chromium.launch({ headless: true });
-    const page = await browser.newPage();
-
-    // Set a reasonable user agent
-    await page.setExtraHTTPHeaders({
-      "Accept-Language": "en-US,en;q=0.9",
+    const context = await browser.newContext({
+      userAgent:
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
     });
+    const page = await context.newPage();
 
     let totalEvents = 0;
     let newPerformers = 0;
@@ -32,40 +30,89 @@ export async function scrapeRA() {
       log("ra", `Scraping: ${venue.name}`);
 
       try {
-        // Navigate to venue's past events
+        // Try past events page
         await page.goto(`https://ra.co/clubs/${venue.raSlug}/past-events`, {
           waitUntil: "domcontentloaded",
           timeout: 30000,
         });
+        await page.waitForTimeout(4000);
 
-        await page.waitForTimeout(3000);
+        // Scroll to load content
+        for (let i = 0; i < 3; i++) {
+          await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+          await page.waitForTimeout(2000);
+        }
 
-        // Extract event data from the page
+        // Extract events — RA uses varied markup, so cast a wide net
         const events = await page.evaluate(() => {
-          const results: { title: string; date: string; artists: string[] }[] = [];
+          const results: { artists: string[]; date: string; title: string }[] = [];
 
-          // RA uses various selectors — try common patterns
-          const eventElements = document.querySelectorAll("[data-testid='event-item'], li[class*='event'], article");
+          // Strategy 1: Look for event links with artist names
+          const allLinks = document.querySelectorAll("a[href*='/events/']");
+          const seenHrefs = new Set<string>();
 
-          eventElements.forEach((el) => {
-            const title = el.querySelector("h3, h4, [class*='title']")?.textContent?.trim() || "";
-            const date = el.querySelector("time, [class*='date']")?.textContent?.trim() || "";
+          allLinks.forEach((link) => {
+            const href = link.getAttribute("href") || "";
+            if (seenHrefs.has(href)) return;
+            seenHrefs.add(href);
 
-            // Artists are typically in links or specific elements
-            const artistEls = el.querySelectorAll("a[href*='/dj/'], [class*='artist'], [class*='lineup'] a");
-            const artists = Array.from(artistEls)
-              .map((a) => a.textContent?.trim() || "")
-              .filter((a) => a.length > 0 && a.length < 50);
+            const container = link.closest("li, article, div[class*='event'], div[class*='Event']") || link.parentElement;
+            if (!container) return;
 
-            if (artists.length > 0 || title) {
-              results.push({ title, date, artists: artists.length > 0 ? artists : [title] });
+            const title = link.textContent?.trim() || "";
+
+            // Look for date in the container or nearby
+            const dateEl = container.querySelector("time, [datetime]");
+            const date = dateEl?.getAttribute("datetime") || dateEl?.textContent?.trim() || "";
+
+            // Look for artist/DJ names — typically in separate elements
+            const artistEls = container.querySelectorAll("a[href*='/dj/'], a[href*='/artist/']");
+            let artists: string[] = [];
+
+            if (artistEls.length > 0) {
+              artists = Array.from(artistEls)
+                .map((a) => a.textContent?.trim() || "")
+                .filter((a) => a.length > 1 && a.length < 60);
+            }
+
+            // If no artist links found, try to parse from title
+            if (artists.length === 0 && title) {
+              // Common patterns: "Artist1, Artist2" or "Artist1 b2b Artist2"
+              const parts = title
+                .split(/[,&]|b2b|\|/)
+                .map((s) => s.trim())
+                .filter((s) => s.length > 1 && s.length < 60);
+              if (parts.length > 0) artists = parts;
+            }
+
+            if (artists.length > 0 || title.length > 2) {
+              results.push({
+                artists: artists.length > 0 ? artists : [title],
+                date,
+                title,
+              });
             }
           });
 
-          return results.slice(0, 30); // Last 30 events
+          // Strategy 2: Look for lineup-style lists
+          if (results.length === 0) {
+            const textBlocks = document.querySelectorAll("p, span, div");
+            textBlocks.forEach((el) => {
+              const text = el.textContent?.trim() || "";
+              // Look for comma-separated lists of names that look like lineups
+              if (text.includes(",") && text.length > 10 && text.length < 500) {
+                const names = text.split(",").map((n) => n.trim()).filter((n) => n.length > 1 && n.length < 50);
+                if (names.length >= 2) {
+                  results.push({ artists: names, date: "", title: text.slice(0, 100) });
+                }
+              }
+            });
+          }
+
+          return results.slice(0, 40);
         });
 
-        // Get venue ID from our DB
+        // Get venue ID
         const { data: dbVenue } = await supabase
           .from("venues")
           .select("id")
@@ -73,7 +120,7 @@ export async function scrapeRA() {
           .single();
 
         if (!dbVenue) {
-          log("ra", `Venue ${venue.name} not found in DB — skipping`);
+          log("ra", `Venue ${venue.name} not in DB — skipping`);
           continue;
         }
 
@@ -81,7 +128,9 @@ export async function scrapeRA() {
           for (const artistName of event.artists) {
             if (!artistName || artistName.length < 2) continue;
 
-            // Find or create performer
+            // Skip common non-artist strings
+            if (/^\d+$/.test(artistName) || /ticket|rsvp|free|sold out/i.test(artistName)) continue;
+
             const { data: existing } = await supabase
               .from("performers")
               .select("id, name")
@@ -109,9 +158,7 @@ export async function scrapeRA() {
               newPerformers++;
             }
 
-            // Parse date — try common formats
-            const eventDate = parseRADate(event.date);
-
+            const eventDate = parseDate(event.date);
             if (eventDate) {
               const { error: evErr } = await supabase.from("events").insert({
                 performer_id: performerId,
@@ -135,7 +182,7 @@ export async function scrapeRA() {
         logError("ra", `Failed to scrape ${venue.name}`, err);
       }
 
-      await page.waitForTimeout(2000); // Rate limit
+      await page.waitForTimeout(3000);
     }
 
     log("ra", `Done. ${totalEvents} events, ${newPerformers} new performers.`);
@@ -144,23 +191,33 @@ export async function scrapeRA() {
   }
 }
 
-function parseRADate(dateStr: string): string | null {
+function parseDate(dateStr: string): string | null {
   if (!dateStr) return null;
 
   try {
     const d = new Date(dateStr);
-    if (!isNaN(d.getTime())) {
-      return d.toISOString().split("T")[0];
-    }
+    if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
   } catch {
     // ignore
   }
 
-  // Try extracting date patterns
-  const match = dateStr.match(/(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+(\d{4})/i);
-  if (match) {
-    const d = new Date(`${match[2]} ${match[1]}, ${match[3]}`);
-    if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
+  // Try various patterns
+  const patterns = [
+    /(\d{4})-(\d{2})-(\d{2})/,
+    /(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+(\d{4})/i,
+    /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+(\d{1,2}),?\s+(\d{4})/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = dateStr.match(pattern);
+    if (match) {
+      try {
+        const d = new Date(match[0]);
+        if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
+      } catch {
+        continue;
+      }
+    }
   }
 
   return null;
