@@ -129,7 +129,11 @@ Plans:
   3. Running the Product Teaser script produces a 1080x1080 PNG phone mockup card plus a caption .txt file
   4. Running the weekly batch generator produces 5-7 posts (mix of 2-3 spotlights, 1 roundup, 1-2 teasers) in a single output directory
   5. All image generation uses React components rendered to PNG via Playwright screenshot
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01-PLAN.md — Test and fix individual content generators (spotlight, roundup, teaser)
+- [ ] 07-02-PLAN.md — Weekly batch generator with dated output directory
 
 ## Progress
 
@@ -144,4 +148,4 @@ Phases execute in numeric order: 5 -> 6 -> 7
 | 4. Fan Profile + Polish | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 5. Shareable Collection Cards | 1/2 | In Progress|  | - |
 | 6. City Leaderboard | v1.1 | 0/1 | Not started | - |
-| 7. Content Generator | v1.1 | 0/? | Not started | - |
+| 7. Content Generator | v1.1 | 0/2 | Not started | - |
