@@ -76,7 +76,7 @@ Plans:
 
 </details>
 
-### 🚧 v1.1 Growth Mechanics + Content Engine (In Progress)
+### v1.1 Growth Mechanics + Content Engine (In Progress)
 
 **Milestone Goal:** Add viral sharing, gamification, and automated content generation to drive organic growth.
 
@@ -99,7 +99,11 @@ Plans:
   2. Sharing the card URL on Twitter/Instagram/iMessage renders a correct 1200x630 OG image preview with artist photos in a grid layout
   3. Card visually matches Decibel dark aesthetic (dark bg, brand accent colors, Poppins font)
   4. Fan can copy and share the card URL and social preview renders correctly on at least two major platforms
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Card page + dynamic OG image generation
+- [ ] 05-02-PLAN.md — Share button UX + social preview verification
 
 ### Phase 6: City Leaderboard
 **Goal**: Fans and performers compete on a public leaderboard that gamifies attendance and builds community
@@ -127,7 +131,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 5 → 6 → 7
+Phases execute in numeric order: 5 -> 6 -> 7
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -135,6 +139,6 @@ Phases execute in numeric order: 5 → 6 → 7
 | 2. Fan Capture | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 3. Performer Dashboard | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 4. Fan Profile + Polish | v1.0 | 2/2 | Complete | 2026-03-06 |
-| 5. Shareable Collection Cards | v1.1 | 0/? | Not started | - |
+| 5. Shareable Collection Cards | v1.1 | 0/2 | Planning | - |
 | 6. City Leaderboard | v1.1 | 0/? | Not started | - |
 | 7. Content Generator | v1.1 | 0/? | Not started | - |
