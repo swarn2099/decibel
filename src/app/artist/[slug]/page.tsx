@@ -82,7 +82,9 @@ function formatTime(timeStr: string): string {
 }
 
 function getSoundCloudEmbedUrl(profileUrl: string): string {
-  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(profileUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
+  // Normalize: strip www. prefix — the widget doesn't resolve www.soundcloud.com
+  const normalizedUrl = profileUrl.replace("www.soundcloud.com", "soundcloud.com");
+  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(normalizedUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
 }
 
 async function getPerformer(slug: string): Promise<Performer | null> {

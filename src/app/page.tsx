@@ -1,11 +1,12 @@
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { PerformerGrid } from "@/components/performer-grid";
+import { SearchBar } from "@/components/search-bar";
 import Link from "next/link";
 import { Calendar, MapPin, Clock, ExternalLink } from "lucide-react";
 
 export const revalidate = 300;
 
-function getNextWeekendRange(): { friday: string; sunday: string; label: string } {
+function getNextWeekendRange(): { friday: string; saturday: string; label: string } {
   const now = new Date();
   const day = now.getDay(); // 0=Sun, 5=Fri, 6=Sat
   // Find next Friday (or today if it's Fri/Sat)
@@ -18,8 +19,8 @@ function getNextWeekendRange(): { friday: string; sunday: string; label: string 
 
   const friday = new Date(now);
   friday.setDate(now.getDate() + daysToFri);
-  const sunday = new Date(friday);
-  sunday.setDate(friday.getDate() + 2);
+  const saturday = new Date(friday);
+  saturday.setDate(friday.getDate() + 1);
 
   const fmt = (d: Date) => d.toISOString().split("T")[0];
   const monthDay = (d: Date) =>
@@ -27,8 +28,8 @@ function getNextWeekendRange(): { friday: string; sunday: string; label: string 
 
   return {
     friday: fmt(friday),
-    sunday: fmt(sunday),
-    label: `${monthDay(friday)} – ${monthDay(sunday)}`,
+    saturday: fmt(saturday),
+    label: `${monthDay(friday)} – ${monthDay(saturday)}`,
   };
 }
 
@@ -49,7 +50,7 @@ interface WeekendEvent {
 export default async function Home() {
   const supabase = await createSupabaseServer();
 
-  const { friday, sunday, label: weekendLabel } = getNextWeekendRange();
+  const { friday, saturday, label: weekendLabel } = getNextWeekendRange();
 
   const [{ data: performers }, { data: rawEvents }] = await Promise.all([
     supabase
@@ -62,7 +63,7 @@ export default async function Home() {
       .from("events")
       .select("id, event_date, start_time, external_url, performer:performers(name, slug, photo_url), venue:venues(name)")
       .gte("event_date", friday)
-      .lte("event_date", sunday)
+      .lte("event_date", saturday)
       .order("event_date", { ascending: true })
       .limit(20),
   ]);
@@ -97,6 +98,7 @@ export default async function Home() {
           The more you show up, the more you get in.
         </p>
         <div className="flex h-1 w-24 rounded-full bg-gradient-to-r from-pink to-purple" />
+        <SearchBar className="mx-auto mt-2" />
       </div>
 
       {/* Weekend Shows */}
