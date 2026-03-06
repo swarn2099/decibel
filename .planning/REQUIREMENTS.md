@@ -12,7 +12,7 @@
 - [x] **AUTH-03**: Performer can log out from dashboard
 - [x] **AUTH-04**: Dashboard routes are protected — unauthenticated users redirect to login
 - [x] **AUTH-05**: Performer claim flow verifies session identity (fix `/api/claim` security hole)
-- [ ] **AUTH-06**: RLS policies added for collections, fan_tiers, and messages tables
+- [x] **AUTH-06**: RLS policies added for collections, fan_tiers, and messages tables
 - [ ] **AUTH-07**: Fan can log in via magic link to view their profile
 
 ### Fan Capture
@@ -101,7 +101,7 @@
 | AUTH-03 | Phase 1 | Complete |
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
-| AUTH-06 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Complete |
 | AUTH-07 | Phase 4 | Pending |
 | CAPT-01 | Phase 2 | Pending |
 | CAPT-02 | Phase 2 | Pending |

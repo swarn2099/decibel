@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-06T08:04:05.266Z"
-last_activity: 2026-03-06 — Completed 01-01 auth hardening
+stopped_at: Completed 01-02-PLAN.md (Phase 1 complete)
+last_updated: "2026-03-06T08:14:31Z"
+last_activity: 2026-03-06 — Completed 01-02 RLS policies
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 0
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
@@ -25,25 +25,25 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 
 ## Current Position
 
-Phase: 1 of 4 (Auth & Security)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-03-06 — Completed 01-01 auth hardening
+Phase: 1 of 4 (Auth & Security) -- COMPLETE
+Plan: 2 of 2 in current phase (phase complete)
+Status: Phase 1 Complete
+Last activity: 2026-03-06 — Completed 01-02 RLS policies
 
-Progress: [█████░░░░░] 50%
+Progress: [██████████░░░░░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4min
-- Total execution time: 0.07 hours
+- Total plans completed: 2
+- Average duration: 6.5min
+- Total execution time: 0.22 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-auth-security | 1 | 4min | 4min |
+| 01-auth-security | 2 | 13min | 6.5min |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -63,6 +63,9 @@ Recent decisions affecting current work:
 - [Roadmap]: Phase 4 depends on Phase 1 only (not Phase 3) — fan profile is a parallel track
 - [01-01]: Admin client for all dashboard data queries since RLS policies don't exist yet
 - [01-01]: Session-based identity extraction in API routes via getUser() — never trust form data
+- [01-02]: Permissive INSERT on collections/fan_tiers for Phase 2 fan capture flow
+- [01-02]: Messages INSERT restricted to performer owners only
+- [01-02]: Migration file for RLS deployment when DB credentials available
 
 ### Pending Todos
 
@@ -71,11 +74,11 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 1]: Magic link deliverability to Gmail/Outlook must be tested before demo — may need custom SMTP
-- [Phase 1]: RLS policies missing for collections/fan_tiers/messages — will cause empty dashboard if not fixed
+- [Phase 1]: RLS policies written but not yet applied — need DB password or Supabase CLI login to deploy
 - [Phase 1]: /api/claim security hole — RESOLVED in 01-01 (session-based identity)
 
 ## Session Continuity
 
-Last session: 2026-03-06T08:05:01Z
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-auth-security/01-01-SUMMARY.md
+Last session: 2026-03-06T08:14:31Z
+Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Resume file: .planning/phases/01-auth-security/01-02-SUMMARY.md
