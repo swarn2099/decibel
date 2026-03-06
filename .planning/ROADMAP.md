@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Unauthenticated user visiting /dashboard is redirected to /auth/login
   4. Performer can only claim a profile that matches their authenticated email — claiming another performer's profile fails
   5. Database queries scoped by RLS return only rows the authenticated user owns (collections, fan_tiers, messages)
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 01-01-PLAN.md — Security hardening: fix claim route, switch dashboard to admin client, add logout
@@ -91,7 +91,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Auth & Security | 0/2 | Not started | - |
+| 1. Auth & Security | 1/2 | In Progress|  |
 | 2. Fan Capture | 0/2 | Not started | - |
 | 3. Performer Dashboard | 0/3 | Not started | - |
 | 4. Fan Profile + Polish | 0/2 | Not started | - |

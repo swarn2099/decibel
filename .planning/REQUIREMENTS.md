@@ -7,11 +7,11 @@
 
 ### Auth & Security
 
-- [ ] **AUTH-01**: Performer can sign in via Supabase magic link (email)
-- [ ] **AUTH-02**: Performer session persists across browser refresh
-- [ ] **AUTH-03**: Performer can log out from dashboard
-- [ ] **AUTH-04**: Dashboard routes are protected — unauthenticated users redirect to login
-- [ ] **AUTH-05**: Performer claim flow verifies session identity (fix `/api/claim` security hole)
+- [x] **AUTH-01**: Performer can sign in via Supabase magic link (email)
+- [x] **AUTH-02**: Performer session persists across browser refresh
+- [x] **AUTH-03**: Performer can log out from dashboard
+- [x] **AUTH-04**: Dashboard routes are protected — unauthenticated users redirect to login
+- [x] **AUTH-05**: Performer claim flow verifies session identity (fix `/api/claim` security hole)
 - [ ] **AUTH-06**: RLS policies added for collections, fan_tiers, and messages tables
 - [ ] **AUTH-07**: Fan can log in via magic link to view their profile
 
@@ -96,11 +96,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Pending |
 | AUTH-07 | Phase 4 | Pending |
 | CAPT-01 | Phase 2 | Pending |

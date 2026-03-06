@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-03-06T07:19:39.959Z"
-last_activity: 2026-03-06 — Roadmap created
+status: executing
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-03-06T08:04:05.266Z"
+last_activity: 2026-03-06 — Completed 01-01 auth hardening
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
   percent: 0
 ---
 
@@ -26,24 +26,24 @@ See: .planning/PROJECT.md (updated 2026-03-06)
 ## Current Position
 
 Phase: 1 of 4 (Auth & Security)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-03-06 — Roadmap created
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-03-06 — Completed 01-01 auth hardening
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: -
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 4min
+- Total execution time: 0.07 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-auth-security | 1 | 4min | 4min |
 
 **Recent Trend:**
 - Last 5 plans: -
@@ -61,6 +61,8 @@ Recent decisions affecting current work:
 - [Roadmap]: Auth-first build order — everything downstream depends on performer auth and RLS
 - [Roadmap]: DEMO-03/DEMO-04 (animations, toasts) assigned to Phase 2 with capture flow, not Phase 4 polish
 - [Roadmap]: Phase 4 depends on Phase 1 only (not Phase 3) — fan profile is a parallel track
+- [01-01]: Admin client for all dashboard data queries since RLS policies don't exist yet
+- [01-01]: Session-based identity extraction in API routes via getUser() — never trust form data
 
 ### Pending Todos
 
@@ -70,10 +72,10 @@ None yet.
 
 - [Phase 1]: Magic link deliverability to Gmail/Outlook must be tested before demo — may need custom SMTP
 - [Phase 1]: RLS policies missing for collections/fan_tiers/messages — will cause empty dashboard if not fixed
-- [Phase 1]: /api/claim accepts any user_id without verification — security hole
+- [Phase 1]: /api/claim security hole — RESOLVED in 01-01 (session-based identity)
 
 ## Session Continuity
 
-Last session: 2026-03-06T07:19:39.954Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-auth-security/01-CONTEXT.md
+Last session: 2026-03-06T08:05:01Z
+Stopped at: Completed 01-01-PLAN.md
+Resume file: .planning/phases/01-auth-security/01-01-SUMMARY.md
