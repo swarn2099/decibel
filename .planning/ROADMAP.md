@@ -148,4 +148,4 @@ Phases execute in numeric order: 5 -> 6 -> 7
 | 4. Fan Profile + Polish | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 5. Shareable Collection Cards | 1/2 | In Progress|  | - |
 | 6. City Leaderboard | v1.1 | 0/1 | Not started | - |
-| 7. Content Generator | v1.1 | 0/2 | Not started | - |
+| 7. Content Generator | 1/2 | In Progress|  | - |
