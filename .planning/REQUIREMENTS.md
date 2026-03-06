@@ -32,11 +32,11 @@
 - [ ] **DASH-03**: Dashboard has scan-over-time chart (last 90 days)
 - [ ] **DASH-04**: Fan list is searchable and filterable by tier
 - [ ] **DASH-05**: Performer can download their QR code as print-ready PNG
-- [ ] **DASH-06**: Performer can compose message — select target tier, write subject + body, preview
-- [ ] **DASH-07**: Messages are saved to database (delivery stubbed for v1, labeled as draft/preview)
+- [x] **DASH-06**: Performer can compose message — select target tier, write subject + body, preview
+- [x] **DASH-07**: Messages are saved to database (delivery stubbed for v1, labeled as draft/preview)
 - [ ] **DASH-08**: "Go Live" button marks performer as live at a venue (select from venue list)
 - [ ] **DASH-09**: Performer can claim their pre-built profile from the dashboard
-- [ ] **DASH-10**: Dashboard has intentional empty states (not broken-looking when no fans yet)
+- [x] **DASH-10**: Dashboard has intentional empty states (not broken-looking when no fans yet)
 
 ### Fan Profile
 
@@ -115,11 +115,11 @@
 | DASH-03 | Phase 3 | Pending |
 | DASH-04 | Phase 3 | Pending |
 | DASH-05 | Phase 3 | Pending |
-| DASH-06 | Phase 3 | Pending |
-| DASH-07 | Phase 3 | Pending |
+| DASH-06 | Phase 3 | Complete |
+| DASH-07 | Phase 3 | Complete |
 | DASH-08 | Phase 3 | Pending |
 | DASH-09 | Phase 3 | Pending |
-| DASH-10 | Phase 3 | Pending |
+| DASH-10 | Phase 3 | Complete |
 | FAN-01 | Phase 4 | Pending |
 | FAN-02 | Phase 4 | Pending |
 | FAN-03 | Phase 4 | Pending |
