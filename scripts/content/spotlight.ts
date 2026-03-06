@@ -2,7 +2,7 @@ import { getSupabase, log } from "../scrapers/utils";
 import { renderToImage, saveCaption, wrapInTemplate } from "./renderer";
 import { resolve } from "path";
 
-export async function generateSpotlight(performerSlug: string) {
+export async function generateSpotlight(performerSlug: string, outputDir?: string) {
   const supabase = getSupabase();
 
   const { data: performer } = await supabase
@@ -70,7 +70,8 @@ export async function generateSpotlight(performerSlug: string) {
   `);
 
   const date = new Date().toISOString().split("T")[0];
-  const outputPath = resolve(process.cwd(), `content/output/${date}-spotlight-${performerSlug}.png`);
+  const baseDir = outputDir || resolve(process.cwd(), "content/output");
+  const outputPath = resolve(baseDir, `${date}-spotlight-${performerSlug}.png`);
 
   await renderToImage(html, outputPath);
 

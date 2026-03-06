@@ -33,7 +33,7 @@ const FEATURES: Record<string, { title: string; subtitle: string; description: s
   },
 };
 
-export async function generateTeaser(featureName: string) {
+export async function generateTeaser(featureName: string, outputDir?: string) {
   const feature = FEATURES[featureName];
   if (!feature) {
     log("teaser", `Unknown feature: ${featureName}. Options: ${Object.keys(FEATURES).join(", ")}`);
@@ -68,7 +68,8 @@ export async function generateTeaser(featureName: string) {
   `);
 
   const date = new Date().toISOString().split("T")[0];
-  const outputPath = resolve(process.cwd(), `content/output/${date}-teaser-${featureName}.png`);
+  const baseDir = outputDir || resolve(process.cwd(), "content/output");
+  const outputPath = resolve(baseDir, `${date}-teaser-${featureName}.png`);
 
   await renderToImage(html, outputPath);
   saveCaption(outputPath, feature.caption);

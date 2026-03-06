@@ -2,7 +2,7 @@ import { getSupabase, log } from "../scrapers/utils";
 import { renderToImage, saveCaption, wrapInTemplate } from "./renderer";
 import { resolve } from "path";
 
-export async function generateRoundup(daysBack = 7) {
+export async function generateRoundup(daysBack = 7, outputDir?: string) {
   const supabase = getSupabase();
 
   const since = new Date();
@@ -78,7 +78,8 @@ export async function generateRoundup(daysBack = 7) {
   `);
 
   const date = new Date().toISOString().split("T")[0];
-  const outputPath = resolve(process.cwd(), `content/output/${date}-roundup.png`);
+  const baseDir = outputDir || resolve(process.cwd(), "content/output");
+  const outputPath = resolve(baseDir, `${date}-roundup.png`);
 
   await renderToImage(html, outputPath);
 
