@@ -47,18 +47,18 @@
 
 ### Settings & Account
 
-- [ ] **SETT-01**: Fan can access settings page from their profile
-- [ ] **SETT-02**: Fan can update their display name
-- [ ] **SETT-03**: Both fans and performers can log out
-- [ ] **SETT-04**: Settings page follows dark underground aesthetic
+- [x] **SETT-01**: Fan can access settings page from their profile
+- [x] **SETT-02**: Fan can update their display name
+- [x] **SETT-03**: Both fans and performers can log out
+- [x] **SETT-04**: Settings page follows dark underground aesthetic
 
 ### Polish & Demo Readiness
 
-- [ ] **DEMO-01**: All pages follow Decibel dark aesthetic (bg #0B0B0F, brand colors, Poppins)
+- [x] **DEMO-01**: All pages follow Decibel dark aesthetic (bg #0B0B0F, brand colors, Poppins)
 - [x] **DEMO-02**: Tier colors are consistent: pink (network), purple (early_access), blue (secret), teal (inner_circle)
 - [x] **DEMO-03**: Animations on collect page (button press, confirmation reveal) using motion
 - [x] **DEMO-04**: Toast notifications for user actions (sonner)
-- [ ] **DEMO-05**: `npm run build` passes with zero errors
+- [x] **DEMO-05**: `npm run build` passes with zero errors
 
 ## v2 Requirements
 
@@ -124,15 +124,15 @@
 | FAN-02 | Phase 4 | Complete |
 | FAN-03 | Phase 4 | Complete |
 | FAN-04 | Phase 4 | Complete |
-| SETT-01 | Phase 4 | Pending |
-| SETT-02 | Phase 4 | Pending |
-| SETT-03 | Phase 4 | Pending |
-| SETT-04 | Phase 4 | Pending |
-| DEMO-01 | Phase 4 | Pending |
+| SETT-01 | Phase 4 | Complete |
+| SETT-02 | Phase 4 | Complete |
+| SETT-03 | Phase 4 | Complete |
+| SETT-04 | Phase 4 | Complete |
+| DEMO-01 | Phase 4 | Complete |
 | DEMO-02 | Phase 4 | Complete |
 | DEMO-03 | Phase 2 | Complete |
 | DEMO-04 | Phase 2 | Complete |
-| DEMO-05 | Phase 4 | Pending |
+| DEMO-05 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 37 total

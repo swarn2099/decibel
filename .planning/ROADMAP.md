@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Auth & Security** - Performer magic link auth, protected routes, RLS policies, claim flow lockdown
 - [x] **Phase 2: Fan Capture** - QR scan to email collection with tier progression, repeat handling, and feedback UX (completed 2026-03-06)
 - [x] **Phase 3: Performer Dashboard** - Fan analytics, scan charts, fan list, message composer, QR download, Go Live (completed 2026-03-06)
-- [ ] **Phase 4: Fan Profile + Polish** - Fan login, collection view, settings, logout, and demo-ready aesthetic pass
+- [x] **Phase 4: Fan Profile + Polish** - Fan login, collection view, settings, logout, and demo-ready aesthetic pass (completed 2026-03-06)
 
 ## Phase Details
 
@@ -77,7 +77,7 @@ Plans:
   3. Fan can access settings, update their display name, and log out
   4. Every page in the app uses Decibel dark aesthetic (bg #0B0B0F, brand colors, Poppins font) with consistent tier colors (pink/purple/blue/teal)
   5. `npm run build` passes with zero errors
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 04-01-PLAN.md — Shared tier constants, auth flow updates, fan profile page with collection grid and scan history
@@ -93,4 +93,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Auth & Security | 1/2 | In Progress|  |
 | 2. Fan Capture | 2/2 | Complete   | 2026-03-06 |
 | 3. Performer Dashboard | 2/2 | Complete   | 2026-03-06 |
-| 4. Fan Profile + Polish | 1/2 | In Progress|  |
+| 4. Fan Profile + Polish | 2/2 | Complete   | 2026-03-06 |
