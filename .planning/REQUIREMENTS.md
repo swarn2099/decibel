@@ -19,10 +19,10 @@ Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phas
 ### Scene Map
 
 - [ ] **MAP-01**: Interactive map page at /map with dark theme styling
-- [ ] **MAP-02**: Every venue rendered as a dot sized/colored by activity level
-- [ ] **MAP-03**: Tapping a venue shows popup with name, upcoming shows, top performers
-- [ ] **MAP-04**: Genre filter allows filtering venues by genre (house, techno, bass, etc.)
-- [ ] **MAP-05**: "Tonight" mode shows only venues with events today with pulsing animation
+- [x] **MAP-02**: Every venue rendered as a dot sized/colored by activity level
+- [x] **MAP-03**: Tapping a venue shows popup with name, upcoming shows, top performers
+- [x] **MAP-04**: Genre filter allows filtering venues by genre (house, techno, bass, etc.)
+- [x] **MAP-05**: "Tonight" mode shows only venues with events today with pulsing animation
 - [ ] **MAP-06**: Map is fully mobile responsive
 
 ### Scraper Pipeline
@@ -63,10 +63,10 @@ Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phas
 | BUG-05 | Phase 8 | Complete |
 | BUG-06 | Phase 8 | Complete |
 | MAP-01 | Phase 9 | Pending |
-| MAP-02 | Phase 9 | Pending |
-| MAP-03 | Phase 9 | Pending |
-| MAP-04 | Phase 9 | Pending |
-| MAP-05 | Phase 9 | Pending |
+| MAP-02 | Phase 9 | Complete |
+| MAP-03 | Phase 9 | Complete |
+| MAP-04 | Phase 9 | Complete |
+| MAP-05 | Phase 9 | Complete |
 | MAP-06 | Phase 9 | Pending |
 | SCRP-01 | Phase 10 | Pending |
 | SCRP-02 | Phase 10 | Pending |
