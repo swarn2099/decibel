@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Growth Mechanics + Content Engine
-status: completed
-stopped_at: Milestone v1.1 archived
-last_updated: "2026-03-06T21:15:00.000Z"
-last_activity: 2026-03-06 — Completed and archived v1.1 milestone
+milestone: v1.2
+milestone_name: Polish, Map, and Pipeline Fixes
+status: defining_requirements
+stopped_at: Defining requirements
+last_updated: "2026-03-06T22:00:00.000Z"
+last_activity: 2026-03-06 — Milestone v1.2 started
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v1.2
 
 ## Current Position
 
-Milestone v1.1 complete and archived.
-All 7 phases (13 plans) shipped.
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-06 — Milestone v1.2 started
 
 ## Accumulated Context
 
@@ -47,5 +47,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Milestone v1.1 archived
+Stopped at: Milestone v1.2 — defining requirements
 Resume file: None

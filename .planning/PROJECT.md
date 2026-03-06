@@ -32,7 +32,35 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 
 ### Active
 
-(None — ready for next milestone planning)
+#### Bug Fixes
+- [ ] Fix Instagram link double-URL bug on artist profiles
+- [ ] Fan count showing bare "0" — show "0 fans" or hide when zero
+- [ ] Empty sections (Tracks, etc.) still show headings — hide when no data
+- [ ] Leaderboard showing raw emails instead of display names
+- [ ] Leaderboard tier badges need brand colors (pink/purple/blue/teal)
+- [ ] "Collect" button needs to be dominant CTA (larger, full-width mobile, branded)
+
+#### Scene Map
+- [ ] Interactive map at /map with dark theme (Mapbox or Google Maps)
+- [ ] Venue dots sized/colored by activity level
+- [ ] Venue popup: name, upcoming shows, top performers
+- [ ] Genre filter (house, techno, bass, etc.)
+- [ ] "Tonight" mode with pulsing animation for active venues
+- [ ] Mobile responsive map
+
+#### Scraper Pipeline
+- [ ] Fix event-name-as-artist entries in DB
+- [ ] Normalize Instagram handles (usernames not full URLs)
+- [ ] Scraper coverage for additional Chicago venues
+
+## Current Milestone: v1.2 Polish, Map, and Pipeline Fixes
+
+**Goal:** Fix UI bugs and data quality issues, add an interactive venue map, and improve scraper pipeline reliability.
+
+**Target features:**
+- Bug fixes across artist profiles, leaderboard, and CTA
+- Interactive dark-themed Scene Map at /map
+- Scraper data quality improvements
 
 ### Out of Scope
 
@@ -84,4 +112,4 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 | RA GraphQL + DICE API for event scraping | 5x more events than EDMTrain alone, no Playwright needed | ✓ Good |
 
 ---
-*Last updated: 2026-03-06 after v1.1 milestone*
+*Last updated: 2026-03-06 after v1.2 milestone start*
