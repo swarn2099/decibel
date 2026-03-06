@@ -31,7 +31,7 @@
 
 **Milestone Goal:** Fix UI bugs and data quality issues, add an interactive venue map, and improve scraper pipeline reliability.
 
-- [ ] **Phase 8: Bug Fixes** - Fix visual bugs across artist profiles, leaderboard, and CTA styling
+- [x] **Phase 8: Bug Fixes** - Fix visual bugs across artist profiles, leaderboard, and CTA styling (completed 2026-03-06)
 - [ ] **Phase 9: Scene Map** - Interactive dark-themed venue map at /map with filtering and mobile support
 - [ ] **Phase 10: Scraper Pipeline** - Clean data quality issues and expand venue coverage
 
@@ -47,7 +47,7 @@
   3. Empty content sections (Tracks, etc.) are not visible on artist profiles when there is no data
   4. Leaderboard shows display names for fans, never raw email addresses
   5. "Collect" button on artist pages is visually dominant — larger, full-width on mobile, uses brand accent color
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 08-01-PLAN.md — Fix artist profile bugs and leaderboard display issues
@@ -95,6 +95,6 @@ Phases 8, 9, and 10 are independent and can execute in any order.
 | 5. Shareable Collection Cards | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 6. City Leaderboard | v1.1 | 1/1 | Complete | 2026-03-06 |
 | 7. Content Generator | v1.1 | 2/2 | Complete | 2026-03-06 |
-| 8. Bug Fixes | v1.2 | 0/1 | In progress | - |
+| 8. Bug Fixes | 1/1 | Complete   | 2026-03-06 | - |
 | 9. Scene Map | v1.2 | 0/? | Not started | - |
 | 10. Scraper Pipeline | v1.2 | 0/? | Not started | - |

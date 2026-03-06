@@ -9,12 +9,12 @@ Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phas
 
 ### Bug Fixes
 
-- [ ] **BUG-01**: Artist profile Instagram links display correctly (username, not double-URL)
-- [ ] **BUG-02**: Fan count shows "0 fans" label or hides when zero (no bare "0")
-- [ ] **BUG-03**: Empty sections (Tracks, etc.) are hidden when no data exists
-- [ ] **BUG-04**: Leaderboard displays fan display names instead of raw emails
-- [ ] **BUG-05**: Leaderboard tier badges use brand colors (pink/purple/blue/teal)
-- [ ] **BUG-06**: "Collect" button is dominant CTA (larger, full-width on mobile, branded color)
+- [x] **BUG-01**: Artist profile Instagram links display correctly (username, not double-URL)
+- [x] **BUG-02**: Fan count shows "0 fans" label or hides when zero (no bare "0")
+- [x] **BUG-03**: Empty sections (Tracks, etc.) are hidden when no data exists
+- [x] **BUG-04**: Leaderboard displays fan display names instead of raw emails
+- [x] **BUG-05**: Leaderboard tier badges use brand colors (pink/purple/blue/teal)
+- [x] **BUG-06**: "Collect" button is dominant CTA (larger, full-width on mobile, branded color)
 
 ### Scene Map
 
@@ -56,12 +56,12 @@ Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phas
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | Phase 8 | Pending |
-| BUG-02 | Phase 8 | Pending |
-| BUG-03 | Phase 8 | Pending |
-| BUG-04 | Phase 8 | Pending |
-| BUG-05 | Phase 8 | Pending |
-| BUG-06 | Phase 8 | Pending |
+| BUG-01 | Phase 8 | Complete |
+| BUG-02 | Phase 8 | Complete |
+| BUG-03 | Phase 8 | Complete |
+| BUG-04 | Phase 8 | Complete |
+| BUG-05 | Phase 8 | Complete |
+| BUG-06 | Phase 8 | Complete |
 | MAP-01 | Phase 9 | Pending |
 | MAP-02 | Phase 9 | Pending |
 | MAP-03 | Phase 9 | Pending |
