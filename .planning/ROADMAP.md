@@ -45,11 +45,11 @@ Plans:
   3. QR codes generated at /api/qr/[slug] are high-contrast (white background, dark modules) and scannable in low-light conditions
   4. Sharing a /collect/[slug] link on social media shows performer name, photo, and branded description via OG meta tags
   5. Collection confirmation includes animation feedback (button press, reveal) and toast notifications for actions
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
+- [ ] 02-01-PLAN.md — Install deps, fix QR colors, enhance OG meta with Twitter card
+- [ ] 02-02-PLAN.md — Motion animations on collect button/reveal + sonner toast notifications
 
 ### Phase 3: Performer Dashboard
 **Goal**: A claimed performer can view their fan analytics, manage their audience, compose messages, and control their live status — the demo centerpiece
