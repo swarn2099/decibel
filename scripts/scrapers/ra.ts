@@ -6,7 +6,7 @@
  * Chicago area ID: 17
  * Key filter: listingDate (not date) for date range queries
  */
-import { getSupabase, slugify, namesMatch, log, logError, isNonArtistName } from "./utils";
+import { getSupabase, slugify, namesMatch, log, logError, isNonArtistName, normalizeInstagramHandle } from "./utils";
 
 const RA_GRAPHQL = "https://ra.co/graphql";
 const CHICAGO_AREA_ID = 17;
@@ -289,7 +289,7 @@ export async function scrapeRA() {
           : `https://soundcloud.com/${artist.soundcloud}`;
       }
       if (artist.instagram && !existing.instagram_handle) {
-        updates.instagram_handle = artist.instagram.replace(/^@/, "");
+        updates.instagram_handle = normalizeInstagramHandle(artist.instagram);
       }
       if (artist.image && !existing.photo_url) updates.photo_url = artist.image;
 
@@ -320,7 +320,7 @@ export async function scrapeRA() {
           city: "Chicago",
           genres: [...allGenres].slice(0, 5) || ["electronic"],
           soundcloud_url: scUrl,
-          instagram_handle: artist.instagram?.replace(/^@/, "") || null,
+          instagram_handle: artist.instagram ? normalizeInstagramHandle(artist.instagram) : null,
           ra_url: raUrl,
           photo_url: artist.image || null,
           claimed: false,
@@ -338,7 +338,7 @@ export async function scrapeRA() {
             city: "Chicago",
             genres: [...allGenres].slice(0, 5) || ["electronic"],
             soundcloud_url: scUrl,
-            instagram_handle: artist.instagram?.replace(/^@/, "") || null,
+            instagram_handle: artist.instagram ? normalizeInstagramHandle(artist.instagram) : null,
             ra_url: raUrl,
             photo_url: artist.image || null,
             claimed: false,
