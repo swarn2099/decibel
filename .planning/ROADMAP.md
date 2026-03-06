@@ -62,11 +62,11 @@ Plans:
   3. Selecting a genre filter narrows visible venues to only those hosting events in that genre
   4. Toggling "Tonight" mode shows only venues with events today, with pulsing animation on active dots
   5. Map is fully usable on mobile — pan, zoom, tap markers, and read popups without horizontal scroll or overlap
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
+- [ ] 09-01-PLAN.md — Geocode venues and create map data API endpoint
+- [ ] 09-02-PLAN.md — Build interactive map page with Leaflet, filters, and mobile support
 
 ### Phase 10: Scraper Pipeline
 **Goal**: Performer data in the database is clean and scraper coverage expands to more Chicago venues
@@ -95,6 +95,6 @@ Phases 8, 9, and 10 are independent and can execute in any order.
 | 5. Shareable Collection Cards | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 6. City Leaderboard | v1.1 | 1/1 | Complete | 2026-03-06 |
 | 7. Content Generator | v1.1 | 2/2 | Complete | 2026-03-06 |
-| 8. Bug Fixes | 1/1 | Complete   | 2026-03-06 | - |
-| 9. Scene Map | v1.2 | 0/? | Not started | - |
+| 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
+| 9. Scene Map | v1.2 | 0/2 | Not started | - |
 | 10. Scraper Pipeline | v1.2 | 0/? | Not started | - |
