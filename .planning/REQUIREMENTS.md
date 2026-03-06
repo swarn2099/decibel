@@ -56,8 +56,8 @@
 
 - [ ] **DEMO-01**: All pages follow Decibel dark aesthetic (bg #0B0B0F, brand colors, Poppins)
 - [ ] **DEMO-02**: Tier colors are consistent: pink (network), purple (early_access), blue (secret), teal (inner_circle)
-- [ ] **DEMO-03**: Animations on collect page (button press, confirmation reveal) using motion
-- [ ] **DEMO-04**: Toast notifications for user actions (sonner)
+- [x] **DEMO-03**: Animations on collect page (button press, confirmation reveal) using motion
+- [x] **DEMO-04**: Toast notifications for user actions (sonner)
 - [ ] **DEMO-05**: `npm run build` passes with zero errors
 
 ## v2 Requirements
@@ -130,8 +130,8 @@
 | SETT-04 | Phase 4 | Pending |
 | DEMO-01 | Phase 4 | Pending |
 | DEMO-02 | Phase 4 | Pending |
-| DEMO-03 | Phase 2 | Pending |
-| DEMO-04 | Phase 2 | Pending |
+| DEMO-03 | Phase 2 | Complete |
+| DEMO-04 | Phase 2 | Complete |
 | DEMO-05 | Phase 4 | Pending |
 
 **Coverage:**
