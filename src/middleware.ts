@@ -26,8 +26,14 @@ export async function middleware(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protect dashboard routes
-  if (req.nextUrl.pathname.startsWith("/dashboard") && !user) {
+  // Protect dashboard, profile, and settings routes
+  const path = req.nextUrl.pathname;
+  if (
+    (path.startsWith("/dashboard") ||
+      path.startsWith("/profile") ||
+      path.startsWith("/settings")) &&
+    !user
+  ) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
@@ -35,5 +41,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/settings/:path*"],
 };

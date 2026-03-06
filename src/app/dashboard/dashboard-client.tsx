@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Download, Eye, FileText, LogOut, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { toast } from "sonner";
+import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
 
 type Performer = {
   id: string;
@@ -31,20 +32,6 @@ type ScanRow = {
   created_at: string;
   fans: { email: string; name: string | null };
   venues: { name: string } | null;
-};
-
-const TIER_COLORS: Record<string, { text: string; bg: string }> = {
-  network: { text: "text-pink", bg: "bg-pink/10" },
-  early_access: { text: "text-purple", bg: "bg-purple/10" },
-  secret: { text: "text-blue", bg: "bg-blue/10" },
-  inner_circle: { text: "text-teal", bg: "bg-teal/10" },
-};
-
-const TIER_LABELS: Record<string, string> = {
-  network: "Network",
-  early_access: "Early Access",
-  secret: "Secret",
-  inner_circle: "Inner Circle",
 };
 
 type Tab = "overview" | "fans" | "messages";

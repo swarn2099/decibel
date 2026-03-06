@@ -9,7 +9,7 @@ export default function LoginPage() {
             DECIBEL
           </span>
         </h1>
-        <p className="mb-8 text-center text-sm text-gray">Performer Dashboard</p>
+        <p className="mb-8 text-center text-sm text-gray">Sign In</p>
         <LoginForm />
       </div>
     </main>
