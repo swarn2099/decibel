@@ -84,7 +84,7 @@ Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
 - [x] **CONT-02**: Scene Roundup script generates weekly recap card from scraped event data
 - [x] **CONT-03**: Product Teaser script generates phone mockup showing Decibel features
 - [x] **CONT-04**: Each content type outputs PNG image + caption .txt file
-- [ ] **CONT-05**: Weekly batch generator produces 5-7 posts (2-3 spotlights, 1 roundup, 1-2 teasers)
+- [x] **CONT-05**: Weekly batch generator produces 5-7 posts (2-3 spotlights, 1 roundup, 1-2 teasers)
 - [x] **CONT-06**: All images use React components rendered via Playwright screenshot
 
 ## v2 Requirements
@@ -172,7 +172,7 @@ Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
 | CONT-02 | Phase 7 | Complete |
 | CONT-03 | Phase 7 | Complete |
 | CONT-04 | Phase 7 | Complete |
-| CONT-05 | Phase 7 | Pending |
+| CONT-05 | Phase 7 | Complete |
 | CONT-06 | Phase 7 | Complete |
 
 **Coverage:**
