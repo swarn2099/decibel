@@ -12,61 +12,59 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 
 ### Validated
 
-- ✓ Next.js 15 + TypeScript + Tailwind project setup — Phase 0
-- ✓ Supabase database schema (performers, fans, venues, events, collections, fan_tiers, messages) — Phase 1
-- ✓ Event-based scraper pipeline (EDMTrain → SoundCloud enrichment) — Phase 4
-- ✓ 429 performers, 474 events, 68 venues in production DB — Phase 4
-- ✓ Instagram content generator (spotlight, roundup, teaser, weekly batch) — Phase 5
-- ✓ Outreach agent (target selection, message generator, follow-ups) — Phase 6
-- ✓ Public artist profile pages (`/artist/[slug]`) with SoundCloud embed, upcoming shows — Bonus
-- ✓ Homepage with performer grid and search bar — Bonus
-- ✓ Dark underground aesthetic (Nerve movie vibe) with brand design tokens — Phase 0
-
-### Validated (v1.1)
-
-- ✓ Shareable fan collection card page (`/fan/[id]/card`) with artist grid and tier badges — Phase 5
-- ✓ Dynamic OG image generation (1200×630) for social sharing previews — Phase 5
-- ✓ Copy-to-clipboard share button + Share on X (Twitter intent) — Phase 5
+- ✓ Next.js 15 + TypeScript + Tailwind project setup — v1.0
+- ✓ Supabase database schema (performers, fans, venues, events, collections, fan_tiers, messages) — v1.0
+- ✓ Event-based scraper pipeline (EDMTrain + RA GraphQL + DICE API) — v1.0
+- ✓ 2,164 performers, 5,722 events, 355 venues in production DB — v1.0
+- ✓ Public artist profile pages (`/artist/[slug]`) with SoundCloud embed, upcoming shows — v1.0
+- ✓ Homepage with performer grid, search bar, "This Weekend" section — v1.0
+- ✓ Dark underground aesthetic (Nerve movie vibe) with brand design tokens — v1.0
+- ✓ Fan auth flow (magic link login, profile, settings) — v1.0
+- ✓ QR-based fan capture with tier progression — v1.0
+- ✓ Performer dashboard with fan analytics, messaging, go-live — v1.0
+- ✓ Performer auth (magic link + claim flow with session identity) — v1.0
+- ✓ RLS policies for collections, fan_tiers, messages — v1.0
+- ✓ Shareable fan collection card (`/fan/[id]/card`) with OG image generation — v1.1
+- ✓ Copy-to-clipboard share button + Share on X (Twitter intent) — v1.1
+- ✓ Public leaderboard with fan/performer rankings and time filters — v1.1
+- ✓ Content generator pipeline (DJ Spotlight, Scene Roundup, Product Teaser) — v1.1
+- ✓ Weekly batch generator producing 5-7 branded Instagram posts — v1.1
 
 ### Active
 
-## Current Milestone: v1.1 Growth Mechanics + Content Engine
-
-**Goal:** Add viral sharing, gamification, and automated content generation to drive organic growth.
-
-**Target features:**
-- ~~Shareable collection cards (OG image generation for social sharing)~~ ✓ Phase 5
-- City leaderboard (top fans, top performers, time filters)
-- Content generator (DJ Spotlight, Scene Roundup, Product Teaser — automated Instagram pipeline)
+(None — ready for next milestone planning)
 
 ### Out of Scope
 
-- React Native mobile app — not in PRD phases, future milestone
+- React Native mobile app — not in current scope, future milestone
 - SMS OTP auth — future milestone
 - Location-based passive detection — future milestone (requires mobile app)
 - Email receipt parsing (AXS, DICE, Eventbrite) — future milestone
-- Real-time fan count via Supabase Realtime — nice-to-have, not blocking v1
-- SendGrid email delivery for messages — can stub for v1, real delivery later
-- Payments/credits — explicitly off
+- Real-time fan count via Supabase Realtime — nice-to-have
+- SendGrid email delivery for messages — stubbed for now, real delivery later
+- Payments/credits — explicitly off per product rules
+- Song requests / tipping — anti-features for underground scene
 
 ## Context
 
-- **Database**: 429 performers with rich data (303 photos, 132 bios, 325 follower counts, 97+ genres) from EDMTrain + SoundCloud widget API
+- **Codebase**: ~7,200 LOC TypeScript/TSX
+- **Database**: 2,164 performers, 5,722 events, 355 venues (EDMTrain + RA + DICE scrapers)
 - **Deployed**: Live on Vercel at decibel-swarn-singhs-projects.vercel.app
 - **Supabase**: Project dgpbzfjsppubzztnszrv, service role key in `.env.local`
-- **Existing routes**: `/`, `/artist/[slug]`, `/collect/[slug]`, `/dashboard`, `/auth/login`
-- **Existing APIs**: `/api/collect`, `/api/qr/[slug]`, `/api/claim`, `/api/go-live`, `/api/messages`
+- **Routes**: `/`, `/artist/[slug]`, `/collect/[slug]`, `/dashboard`, `/profile`, `/settings`, `/leaderboard`, `/fan/[id]/card`, `/auth/login`
+- **APIs**: `/api/collect`, `/api/qr/[slug]`, `/api/claim`, `/api/go-live`, `/api/messages`, `/api/settings`
+- **Content pipeline**: `scripts/content/` — spotlight, roundup, teaser generators + weekly batch
+- **Scrapers**: `scripts/scrapers/` — EDMTrain, RA GraphQL, DICE API, SoundCloud enrichment
 - **Design tokens**: bg=#0B0B0F, pink=#FF4D6A, purple=#9B6DFF, blue=#4D9AFF, teal=#00D4AA, yellow=#FFD700
 - **Font**: Poppins via next/font/google
-- **Scraping**: SoundCloud widget API client_id `nIjtjiYnjkOhMyh5xrbqEW12DxeJVnic`, EDMTrain schema.org markup
+- **Milestones shipped**: v1.0 MVP (Phases 1-4), v1.1 Growth Mechanics (Phases 5-7)
 
 ## Constraints
 
-- **Tech stack**: Next.js 15, TypeScript, Tailwind, Supabase — already established
-- **Timeline**: Must be demo/production ready by tomorrow (2026-03-07)
+- **Tech stack**: Next.js 15, TypeScript, Tailwind, Supabase — established
 - **Design**: Dark underground aesthetic — no generic AI/corporate looks
 - **Fan cost**: Always free. Never charge fans.
-- **Capture speed**: QR scan → collection must complete in under 5 seconds, no app install
+- **Capture speed**: QR scan -> collection must complete in under 5 seconds, no app install
 
 ## Key Decisions
 
@@ -81,6 +79,9 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 | Stub message delivery for v1 | Real SendGrid integration adds complexity, not needed for demo | — Pending |
 | Inline createClient in OG image route | supabase-admin.ts uses server-only, incompatible with Edge runtime | ✓ Good |
 | System sans-serif in OG images | Avoids Poppins font fetch failures, simpler | ✓ Good |
+| Pre-fetch all leaderboard time periods server-side | Instant client-side toggle, no loading states | ✓ Good |
+| Optional outputDir param on content generators | Keeps standalone usage unchanged while enabling batch orchestration | ✓ Good |
+| RA GraphQL + DICE API for event scraping | 5x more events than EDMTrain alone, no Playwright needed | ✓ Good |
 
 ---
-*Last updated: 2026-03-06 after Phase 5*
+*Last updated: 2026-03-06 after v1.1 milestone*
