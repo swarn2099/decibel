@@ -60,6 +60,33 @@
 - [x] **DEMO-04**: Toast notifications for user actions (sonner)
 - [x] **DEMO-05**: `npm run build` passes with zero errors
 
+## v1.1 Requirements
+
+Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
+
+### Sharing
+
+- [ ] **SHARE-01**: Fan can view a branded collection card at `/fan/[id]/card` showing collected artists, tier badges, and total count
+- [ ] **SHARE-02**: Collection card renders as 1200x630 OG image for social media preview
+- [ ] **SHARE-03**: Card uses Decibel dark aesthetic with artist photos in a grid layout
+- [ ] **SHARE-04**: Fan can share their collection card URL and it previews correctly on social platforms
+
+### Leaderboard
+
+- [ ] **LEAD-01**: Public leaderboard page at `/leaderboard` showing top fans by collection count
+- [ ] **LEAD-02**: Leaderboard shows top performers by fan count
+- [ ] **LEAD-03**: User can filter leaderboard by time period (weekly/monthly/all-time)
+- [ ] **LEAD-04**: Leaderboard displays with Decibel dark aesthetic and gamification feel
+
+### Content
+
+- [ ] **CONT-01**: DJ Spotlight script generates 1080x1080 branded card with performer photo, stats, genres
+- [ ] **CONT-02**: Scene Roundup script generates weekly recap card from scraped event data
+- [ ] **CONT-03**: Product Teaser script generates phone mockup showing Decibel features
+- [ ] **CONT-04**: Each content type outputs PNG image + caption .txt file
+- [ ] **CONT-05**: Weekly batch generator produces 5-7 posts (2-3 spotlights, 1 roundup, 1-2 teasers)
+- [ ] **CONT-06**: All images use React components rendered via Playwright screenshot
+
 ## v2 Requirements
 
 ### Notifications
@@ -134,11 +161,27 @@
 | DEMO-04 | Phase 2 | Complete |
 | DEMO-05 | Phase 4 | Complete |
 
+| SHARE-01 | — | Pending |
+| SHARE-02 | — | Pending |
+| SHARE-03 | — | Pending |
+| SHARE-04 | — | Pending |
+| LEAD-01 | — | Pending |
+| LEAD-02 | — | Pending |
+| LEAD-03 | — | Pending |
+| LEAD-04 | — | Pending |
+| CONT-01 | — | Pending |
+| CONT-02 | — | Pending |
+| CONT-03 | — | Pending |
+| CONT-04 | — | Pending |
+| CONT-05 | — | Pending |
+| CONT-06 | — | Pending |
+
 **Coverage:**
-- v1 requirements: 37 total
-- Mapped to phases: 37
-- Unmapped: 0 ✓
+- v1 requirements: 37 total (v1.0), 14 total (v1.1)
+- v1.0 mapped: 37 (all complete or pending)
+- v1.1 mapped: 0
+- v1.1 unmapped: 14
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 after initial definition*
+*Last updated: 2026-03-06 after v1.1 requirements added*
