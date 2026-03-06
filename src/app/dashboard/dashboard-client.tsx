@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download, Eye, LogOut, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
+import { Download, Eye, FileText, LogOut, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { toast } from "sonner";
 
@@ -358,7 +358,9 @@ function FansTab({ fanList }: { fanList: FanRow[] }) {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-4 py-8 text-center text-sm text-light-gray">
-                  No fans found.
+                  {fanList.length === 0
+                    ? "No fans yet. Share your QR code at your next show to start building your audience."
+                    : "No fans match your search."}
                 </td>
               </tr>
             ) : (
@@ -415,9 +417,12 @@ function MessagesTab({ performerId }: { performerId: string }) {
     });
 
     if (res.ok) {
+      toast.success("Draft saved successfully.");
       setSent(true);
       setSubject("");
       setBody("");
+    } else {
+      toast.error("Failed to save draft. Try again.");
     }
     setSending(false);
   }
@@ -426,14 +431,15 @@ function MessagesTab({ performerId }: { performerId: string }) {
     return (
       <div className="flex flex-col items-center gap-4 py-12">
         <div className="rounded-full bg-teal/10 p-4">
-          <Send size={24} className="text-teal" />
+          <FileText size={24} className="text-teal" />
         </div>
-        <p className="font-semibold">Message sent!</p>
+        <p className="font-semibold">Draft saved</p>
+        <p className="text-sm text-gray">Your message has been saved. Email delivery coming soon.</p>
         <button
           onClick={() => setSent(false)}
           className="text-sm text-pink hover:underline"
         >
-          Send another
+          Compose another
         </button>
       </div>
     );
@@ -441,6 +447,9 @@ function MessagesTab({ performerId }: { performerId: string }) {
 
   return (
     <form onSubmit={handleSend} className="mx-auto max-w-lg flex flex-col gap-4">
+      <div className="rounded-lg border border-blue/20 bg-blue/5 px-4 py-3 text-xs text-blue">
+        Messages are saved as drafts. Email delivery coming in v2.
+      </div>
       <div>
         <label className="mb-1 block text-xs text-gray">Send to</label>
         <select
@@ -481,7 +490,7 @@ function MessagesTab({ performerId }: { performerId: string }) {
         disabled={sending || !body.trim()}
         className="w-full rounded-xl bg-gradient-to-r from-pink to-purple px-6 py-3 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
       >
-        {sending ? "Sending..." : "Send Message"}
+        {sending ? "Saving..." : "Save Draft"}
       </button>
     </form>
   );
