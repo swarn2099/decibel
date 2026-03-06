@@ -70,11 +70,11 @@ async function fetchFanLeaderboard(
   const fanIds = sorted.map((s) => s.fanId);
   const { data: fans } = await admin
     .from("fans")
-    .select("id, name, email")
+    .select("id, name")
     .in("id", fanIds);
 
   const fanMap = new Map(
-    (fans || []).map((f) => [f.id, f.name || f.email || "Anonymous"])
+    (fans || []).map((f) => [f.id, f.name || "Anonymous"])
   );
 
   return sorted.map((s, i) => ({

@@ -132,7 +132,7 @@ function FanPodium({
               {entry.count} collected
             </p>
             <span
-              className={`mt-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${tierColor?.bg || ""} ${tierColor?.text || ""}`}
+              className={`mt-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${tierColor?.bg || ""} ${tierColor?.text || ""}`}
             >
               {TIER_LABELS[entry.topTier] || entry.topTier}
             </span>
@@ -271,6 +271,11 @@ function RankedList({
                     style={{ color: "var(--text)" }}
                   >
                     {entry.name}
+                  </span>
+                )}
+                {isFan && (
+                  <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${TIER_COLORS[(entry as FanEntry).topTier]?.bg || ""} ${TIER_COLORS[(entry as FanEntry).topTier]?.text || ""}`}>
+                    {TIER_LABELS[(entry as FanEntry).topTier] || (entry as FanEntry).topTier}
                   </span>
                 )}
                 {isYou && (
