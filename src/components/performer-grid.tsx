@@ -34,7 +34,7 @@ export function PerformerGrid({ performers }: { performers: Performer[] }) {
             placeholder="Search artists or genres..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-full border border-light-gray/20 bg-bg-card py-3 pl-11 pr-4 text-sm text-white placeholder:text-light-gray outline-none transition-all focus:border-pink/40 focus:ring-1 focus:ring-pink/20"
+            className="w-full rounded-full border border-light-gray/20 bg-bg-card py-3 pl-11 pr-4 text-sm placeholder:text-light-gray outline-none transition-all focus:border-pink/40 focus:ring-1 focus:ring-pink/20"
           />
           {query && (
             <button

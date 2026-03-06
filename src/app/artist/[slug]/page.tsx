@@ -82,7 +82,7 @@ function formatTime(timeStr: string): string {
 }
 
 function getSoundCloudEmbedUrl(profileUrl: string): string {
-  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(profileUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
+  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(profileUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true`;
 }
 
 async function getPerformer(slug: string): Promise<Performer | null> {
