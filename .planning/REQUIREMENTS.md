@@ -27,8 +27,8 @@ Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phas
 
 ### Scraper Pipeline
 
-- [ ] **SCRP-01**: Event-name-as-artist entries are identified and cleaned from DB
-- [ ] **SCRP-02**: Instagram handles stored as usernames (not full URLs) across all scrapers
+- [x] **SCRP-01**: Event-name-as-artist entries are identified and cleaned from DB
+- [x] **SCRP-02**: Instagram handles stored as usernames (not full URLs) across all scrapers
 - [ ] **SCRP-03**: Scraper added for additional Chicago venues not yet covered
 
 ## Future Requirements
@@ -68,8 +68,8 @@ Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phas
 | MAP-04 | Phase 9 | Complete |
 | MAP-05 | Phase 9 | Complete |
 | MAP-06 | Phase 9 | Complete |
-| SCRP-01 | Phase 10 | Pending |
-| SCRP-02 | Phase 10 | Pending |
+| SCRP-01 | Phase 10 | Complete |
+| SCRP-02 | Phase 10 | Complete |
 | SCRP-03 | Phase 10 | Pending |
 
 **Coverage:**

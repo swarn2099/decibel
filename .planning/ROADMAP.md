@@ -76,7 +76,7 @@ Plans:
   1. No performers table rows contain event names instead of actual artist names
   2. All Instagram handles in the database are stored as plain usernames (e.g., "djname") not full URLs
   3. Scraper pipeline covers additional Chicago venues beyond current EDMTrain/RA/DICE sources
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 10-01-PLAN.md — Clean bad performer names and normalize Instagram handles
@@ -98,4 +98,4 @@ Phases 8, 9, and 10 are independent and can execute in any order.
 | 7. Content Generator | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
 | 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
-| 10. Scraper Pipeline | v1.2 | 0/2 | Not started | - |
+| 10. Scraper Pipeline | 1/2 | In Progress|  | - |
