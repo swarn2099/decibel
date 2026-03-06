@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { PerformerGrid } from "@/components/performer-grid";
 import Link from "next/link";
@@ -185,7 +186,9 @@ export default async function Home() {
           <h2 className="mb-8 text-center text-sm font-semibold uppercase tracking-widest text-gray">
             Chicago Performers
           </h2>
-          <PerformerGrid performers={performers} />
+          <Suspense>
+            <PerformerGrid performers={performers} />
+          </Suspense>
         </div>
       )}
     </div>

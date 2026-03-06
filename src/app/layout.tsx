@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Poppins } from "next/font/google";
 import { Toaster } from "sonner";
 import { Navbar } from "@/components/navbar";
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <Navbar />
+        <Suspense>
+          <Navbar />
+        </Suspense>
         {children}
         <Toaster theme="dark" position="top-center" richColors />
       </body>

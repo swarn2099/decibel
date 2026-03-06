@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 interface Performer {
   name: string;
@@ -13,7 +12,8 @@ interface Performer {
 }
 
 export function PerformerGrid({ performers }: { performers: Performer[] }) {
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const query = searchParams.get("q") || "";
 
   const filtered = query.length < 2
     ? performers
@@ -25,32 +25,11 @@ export function PerformerGrid({ performers }: { performers: Performer[] }) {
 
   return (
     <>
-      {/* Search */}
-      <div className="mx-auto mb-8 max-w-md">
-        <div className="relative">
-          <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-light-gray" />
-          <input
-            type="text"
-            placeholder="Search artists or genres..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-full border border-light-gray/20 bg-bg-card py-3 pl-11 pr-4 text-sm placeholder:text-light-gray outline-none transition-all focus:border-pink/40 focus:ring-1 focus:ring-pink/20"
-          />
-          {query && (
-            <button
-              onClick={() => setQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-light-gray hover:text-white"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-        {query.length >= 2 && (
-          <p className="mt-2 text-center text-xs text-light-gray">
-            {filtered.length} result{filtered.length !== 1 ? "s" : ""}
-          </p>
-        )}
-      </div>
+      {query.length >= 2 && (
+        <p className="mb-4 text-center text-xs text-light-gray">
+          {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+        </p>
+      )}
 
       {/* Grid */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
