@@ -146,7 +146,6 @@ export default async function Home() {
                             <Link
                               href={`/artist/${event.performer.slug}`}
                               className="truncate text-sm font-semibold hover:text-pink"
-                              onClick={(e) => e.stopPropagation()}
                             >
                               {event.performer.name}
                             </Link>
