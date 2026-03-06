@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "motion/react";
+import { toast } from "sonner";
 
 const TIER_CONFIG = {
   network: { label: "Network", color: "text-pink", bg: "bg-pink/10", border: "border-pink/30", min: 1 },
@@ -48,12 +50,19 @@ export function CollectForm({ performer }: { performer: Performer }) {
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Something went wrong");
+        toast.error(data.error || "Something went wrong");
         return;
       }
 
       setResult(data);
+      if (data.already_collected) {
+        toast("Already in your collection", { icon: "👋" });
+      } else {
+        toast.success(`Collected ${performer.name}!`);
+      }
     } catch {
       setError("Failed to connect. Try again.");
+      toast.error("Failed to connect. Try again.");
     } finally {
       setLoading(false);
     }
@@ -64,7 +73,12 @@ export function CollectForm({ performer }: { performer: Performer }) {
 
   if (result) {
     return (
-      <div className="flex w-full max-w-sm flex-col items-center gap-6 animate-in fade-in duration-500">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="flex w-full max-w-sm flex-col items-center gap-6"
+      >
         {performer.photo_url && (
           <img
             src={performer.photo_url}
@@ -96,7 +110,7 @@ export function CollectForm({ performer }: { performer: Performer }) {
 
         <div className="mt-4 flex h-0.5 w-16 rounded-full bg-gradient-to-r from-pink to-purple" />
         <p className="text-xs text-light-gray">DECIBEL</p>
-      </div>
+      </motion.div>
     );
   }
 
@@ -131,13 +145,16 @@ export function CollectForm({ performer }: { performer: Performer }) {
 
       {error && <p className="text-sm text-pink">{error}</p>}
 
-      <button
+      <motion.button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-gradient-to-r from-pink to-purple px-6 py-3 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.02 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        className="w-full rounded-xl bg-gradient-to-r from-pink to-purple px-6 py-3 font-semibold transition-colors disabled:opacity-50"
       >
         {loading ? "Collecting..." : "Collect"}
-      </button>
+      </motion.button>
 
       <div className="mt-2 flex h-0.5 w-16 rounded-full bg-gradient-to-r from-pink to-purple" />
       <p className="text-xs text-light-gray">DECIBEL</p>
