@@ -44,6 +44,7 @@ export function logError(source: string, msg: string, err?: unknown) {
  */
 export function isNonArtistName(name: string): boolean {
   const lower = name.toLowerCase().trim();
+  const words = lower.split(/\s+/);
 
   // Event/party keywords (but not as part of a DJ name like "Party Favor")
   const eventPatterns = [
@@ -59,14 +60,36 @@ export function isNonArtistName(name: string): boolean {
     /\btour\b$/i,
     /\bvs\.\s/i,
     /\bvs\s/i,
+    // New patterns
+    /\btakeover\b/i,
+    /\bresidency\b/i,
+    /\bopen to close\b/i,
+    /\ball night long\b/i,
+    /\bfree entry\b/i,
+    /\bno cover\b/i,
+    /\bdoors at\b/i,
+    /\b(21|18)\+/i,
+    /\$\d+/i, // ticket price patterns like "$XX"
   ];
 
   for (const pattern of eventPatterns) {
     if (pattern.test(name)) return true;
   }
 
-  // Names that are too long (15+ words = probably an event title)
-  if (lower.split(/\s+/).length >= 15) return true;
+  // "rave" as standalone word at end (but NOT as part of a DJ name)
+  if (/\brave\b$/i.test(name.trim())) return true;
+
+  // "night" at end when preceded by adjective/descriptor
+  if (/\b\w+\s+night\b$/i.test(name.trim()) && words.length >= 2) return true;
+
+  // "b2b" as the entire name (not as part of "Artist1 b2b Artist2")
+  if (lower === "b2b") return true;
+
+  // Names with 8+ words are almost certainly event titles
+  if (words.length >= 8) return true;
+
+  // ALL CAPS names with 4+ words are likely event titles
+  if (name === name.toUpperCase() && words.length >= 4) return true;
 
   // Contains a year (e.g., "2000's Party")
   if (/\b(19|20)\d{2}('s)?\b/.test(name) && name.length > 20) return true;
@@ -81,4 +104,39 @@ export function isNonArtistName(name: string): boolean {
   if (name.includes(" - ") && name.length > 40) return true;
 
   return false;
+}
+
+/**
+ * Normalizes an Instagram handle from various formats to a plain username.
+ * Handles full URLs, @-prefixed handles, and plain usernames.
+ * Returns lowercase trimmed username, or empty string if input is empty/null.
+ */
+export function normalizeInstagramHandle(raw: string | null | undefined): string {
+  if (!raw || !raw.trim()) return "";
+
+  let handle = raw.trim();
+
+  // If it contains "instagram.com/", extract the path segment
+  if (handle.includes("instagram.com/")) {
+    try {
+      // Ensure it has a protocol for URL parsing
+      const urlStr = handle.startsWith("http") ? handle : `https://${handle}`;
+      const url = new URL(urlStr);
+      // Get the first non-empty path segment
+      const segments = url.pathname.split("/").filter(Boolean);
+      handle = segments[0] || "";
+    } catch {
+      // Fallback: regex extraction
+      const match = handle.match(/instagram\.com\/([^/?&#]+)/);
+      handle = match?.[1] || "";
+    }
+  }
+
+  // Strip leading "@"
+  handle = handle.replace(/^@/, "");
+
+  // Strip query params or trailing slashes that might remain
+  handle = handle.split("?")[0].split("#")[0].replace(/\/+$/, "");
+
+  return handle.toLowerCase().trim();
 }
