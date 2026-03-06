@@ -32,7 +32,7 @@
 **Milestone Goal:** Fix UI bugs and data quality issues, add an interactive venue map, and improve scraper pipeline reliability.
 
 - [x] **Phase 8: Bug Fixes** - Fix visual bugs across artist profiles, leaderboard, and CTA styling (completed 2026-03-06)
-- [ ] **Phase 9: Scene Map** - Interactive dark-themed venue map at /map with filtering and mobile support
+- [x] **Phase 9: Scene Map** - Interactive dark-themed venue map at /map with filtering and mobile support (completed 2026-03-06)
 - [ ] **Phase 10: Scraper Pipeline** - Clean data quality issues and expand venue coverage
 
 ## Phase Details
@@ -62,7 +62,7 @@ Plans:
   3. Selecting a genre filter narrows visible venues to only those hosting events in that genre
   4. Toggling "Tonight" mode shows only venues with events today, with pulsing animation on active dots
   5. Map is fully usable on mobile — pan, zoom, tap markers, and read popups without horizontal scroll or overlap
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 09-01-PLAN.md — Geocode venues and create map data API endpoint
@@ -96,5 +96,5 @@ Phases 8, 9, and 10 are independent and can execute in any order.
 | 6. City Leaderboard | v1.1 | 1/1 | Complete | 2026-03-06 |
 | 7. Content Generator | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
-| 9. Scene Map | v1.2 | 0/2 | Not started | - |
+| 9. Scene Map | 2/2 | Complete   | 2026-03-06 | - |
 | 10. Scraper Pipeline | v1.2 | 0/? | Not started | - |

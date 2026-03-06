@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Polish, Map, and Pipeline Fixes
 status: executing
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-03-06T23:25:24.863Z"
-last_activity: 2026-03-06 — Completed Phase 9 Plan 1 geocode + map API
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-03-06T23:30:03.000Z"
+last_activity: 2026-03-06 — Completed Phase 9 Plan 2 Scene Map frontend
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
-**Current focus:** v1.2 Phase 9 — Scene Map (Plan 1 complete)
+**Current focus:** v1.2 Phase 9 — Scene Map (Complete)
 
 ## Current Position
 
 Phase: 9 of 10 (Scene Map)
-Plan: 1 of 2
-Status: Executing
-Last activity: 2026-03-06 — Completed Phase 9 Plan 1 geocode + map API
+Plan: 2 of 2
+Status: Complete
+Last activity: 2026-03-06 — Completed Phase 9 Plan 2 Scene Map frontend
 
-Progress: [███████░░░] 67%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15 (v1.0: 8, v1.1: 5, v1.2: 2)
+- Total plans completed: 16 (v1.0: 8, v1.1: 5, v1.2: 3)
 - Average duration: —
 - Total execution time: —
 
@@ -43,6 +43,7 @@ Progress: [███████░░░] 67%
 |-------|------|----------|-------|-------|
 | 08    | 01   | 3min     | 2     | 3     |
 | 09    | 01   | 3min     | 2     | 3     |
+| 09    | 02   | 3min     | 2     | 5     |
 
 ## Accumulated Context
 
@@ -56,6 +57,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 9, Plan 1]: Used Nominatim OSM for free venue geocoding with 1 req/sec rate limit
 - [Phase 9, Plan 1]: Jitter ungeocodable venue coords by +/-0.02 degrees to prevent marker stacking
 - [Phase 9, Plan 1]: Genre filtering applied post-query in JS for flexibility with text[] column
+- [Phase 9, Plan 2]: Used CartoDB dark_all tiles for free dark-themed map (no API key)
+- [Phase 9, Plan 2]: CircleMarker instead of default markers for better dark map aesthetics
+- [Phase 9, Plan 2]: Client wrapper component for next/dynamic ssr:false in server component page
 
 ### Pending Todos
 
@@ -68,5 +72,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-06
-Stopped at: Completed 09-01-PLAN.md
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None
