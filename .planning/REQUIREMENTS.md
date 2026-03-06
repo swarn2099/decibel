@@ -13,7 +13,7 @@
 - [x] **AUTH-04**: Dashboard routes are protected — unauthenticated users redirect to login
 - [x] **AUTH-05**: Performer claim flow verifies session identity (fix `/api/claim` security hole)
 - [x] **AUTH-06**: RLS policies added for collections, fan_tiers, and messages tables
-- [ ] **AUTH-07**: Fan can log in via magic link to view their profile
+- [x] **AUTH-07**: Fan can log in via magic link to view their profile
 
 ### Fan Capture
 
@@ -40,10 +40,10 @@
 
 ### Fan Profile
 
-- [ ] **FAN-01**: Logged-in fan can view their collected artists in a grid/list
-- [ ] **FAN-02**: Each collected artist shows tier badge and scan count
-- [ ] **FAN-03**: Fan can view their scan history with dates
-- [ ] **FAN-04**: Fan profile page follows dark underground aesthetic
+- [x] **FAN-01**: Logged-in fan can view their collected artists in a grid/list
+- [x] **FAN-02**: Each collected artist shows tier badge and scan count
+- [x] **FAN-03**: Fan can view their scan history with dates
+- [x] **FAN-04**: Fan profile page follows dark underground aesthetic
 
 ### Settings & Account
 
@@ -55,7 +55,7 @@
 ### Polish & Demo Readiness
 
 - [ ] **DEMO-01**: All pages follow Decibel dark aesthetic (bg #0B0B0F, brand colors, Poppins)
-- [ ] **DEMO-02**: Tier colors are consistent: pink (network), purple (early_access), blue (secret), teal (inner_circle)
+- [x] **DEMO-02**: Tier colors are consistent: pink (network), purple (early_access), blue (secret), teal (inner_circle)
 - [x] **DEMO-03**: Animations on collect page (button press, confirmation reveal) using motion
 - [x] **DEMO-04**: Toast notifications for user actions (sonner)
 - [ ] **DEMO-05**: `npm run build` passes with zero errors
@@ -102,7 +102,7 @@
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Complete |
-| AUTH-07 | Phase 4 | Pending |
+| AUTH-07 | Phase 4 | Complete |
 | CAPT-01 | Phase 2 | Complete |
 | CAPT-02 | Phase 2 | Complete |
 | CAPT-03 | Phase 2 | Complete |
@@ -120,16 +120,16 @@
 | DASH-08 | Phase 3 | Pending |
 | DASH-09 | Phase 3 | Pending |
 | DASH-10 | Phase 3 | Complete |
-| FAN-01 | Phase 4 | Pending |
-| FAN-02 | Phase 4 | Pending |
-| FAN-03 | Phase 4 | Pending |
-| FAN-04 | Phase 4 | Pending |
+| FAN-01 | Phase 4 | Complete |
+| FAN-02 | Phase 4 | Complete |
+| FAN-03 | Phase 4 | Complete |
+| FAN-04 | Phase 4 | Complete |
 | SETT-01 | Phase 4 | Pending |
 | SETT-02 | Phase 4 | Pending |
 | SETT-03 | Phase 4 | Pending |
 | SETT-04 | Phase 4 | Pending |
 | DEMO-01 | Phase 4 | Pending |
-| DEMO-02 | Phase 4 | Pending |
+| DEMO-02 | Phase 4 | Complete |
 | DEMO-03 | Phase 2 | Complete |
 | DEMO-04 | Phase 2 | Complete |
 | DEMO-05 | Phase 4 | Pending |

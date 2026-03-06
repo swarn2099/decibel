@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 4 context gathered
-last_updated: "2026-03-06T15:36:03.113Z"
-last_activity: 2026-03-06 — Completed 02-02 collect animation + toast
+status: in-progress
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-06T15:48:00Z"
+last_activity: 2026-03-06 — Completed 04-01 fan auth flow + profile page
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 7
+  completed_plans: 7
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
-**Current focus:** Phase 2 Complete. Ready for Phase 3.
+**Current focus:** Phase 4 — Fan profile polish.
 
 ## Current Position
 
-Phase: 2 of 4 (Fan Capture) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase 2 Complete
-Last activity: 2026-03-06 — Completed 02-02 collect animation + toast
+Phase: 4 of 4 (Fan Profile Polish)
+Plan: 1 of 1 in current phase
+Status: 04-01 Complete
+Last activity: 2026-03-06 — Completed 04-01 fan auth flow + profile page
 
 Progress: [██████████████████████████████] 100%
 
@@ -53,6 +53,7 @@ Progress: [███████████████████████
 *Updated after each plan completion*
 | Phase 03 P01 | 2min | 2 tasks | 1 files |
 | Phase 03 P02 | 1min | 2 tasks | 1 files |
+| Phase 04 P01 | 2min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Phase 02]: Motion/react for animations, sonner Toaster in root layout for app-wide toast availability
 - [Phase 03]: Eye icon for Secret tier stat card (thematic fit)
 - [Phase 03]: FileText icon for draft confirmation, single draft banner approach
+- [04-01]: Shared tier constants in src/lib/tiers.ts for cross-page reuse
+- [04-01]: Auth callback defaults to /profile on error to prevent redirect loops
+- [04-01]: Profile page uses admin client pattern matching dashboard
 
 ### Pending Todos
 
@@ -86,6 +90,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-06T15:36:03.106Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-fan-profile-polish/04-CONTEXT.md
+Last session: 2026-03-06T15:48:00Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: .planning/phases/04-fan-profile-polish/04-01-SUMMARY.md
