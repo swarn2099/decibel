@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { User, LogIn } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 
+const HIDDEN_ROUTES = ["/profile", "/settings", "/dashboard", "/auth"];
+
 export function Navbar() {
+  const pathname = usePathname();
   const [user, setUser] = useState<{ email?: string } | null>(null);
   const [loaded, setLoaded] = useState(false);
 
@@ -16,6 +20,8 @@ export function Navbar() {
       setLoaded(true);
     });
   }, []);
+
+  if (HIDDEN_ROUTES.some((r) => pathname.startsWith(r))) return null;
 
   if (!loaded) return null;
 
