@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Download, LogOut, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
+import { Download, Eye, LogOut, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 
 type Performer = {
@@ -240,10 +240,11 @@ function OverviewTab({
   return (
     <div className="flex flex-col gap-8">
       {/* Stats row */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
         <StatCard icon={<Users size={18} />} label="Total Fans" value={totalFans} color="text-pink" />
         <StatCard icon={<Zap size={18} />} label="Network" value={tiers.network} color="text-pink" />
         <StatCard icon={<Shield size={18} />} label="Early Access" value={tiers.early_access} color="text-purple" />
+        <StatCard icon={<Eye size={18} />} label="Secret" value={tiers.secret} color="text-blue" />
         <StatCard icon={<Crown size={18} />} label="Inner Circle" value={tiers.inner_circle} color="text-teal" />
       </div>
 
