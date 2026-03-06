@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Growth Mechanics + Content Engine
-status: planning
+status: ready_to_plan
 stopped_at: null
-last_updated: "2026-03-06T18:00:00.000Z"
-last_activity: 2026-03-06 — Milestone v1.1 started
+last_updated: "2026-03-06T19:00:00.000Z"
+last_activity: 2026-03-06 — Roadmap created for v1.1 (Phases 5-7)
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,23 +21,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
-**Current focus:** Defining requirements for v1.1
+**Current focus:** Phase 5 — Shareable Collection Cards
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-06 — Milestone v1.1 started
+Phase: 5 of 7 (Shareable Collection Cards)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-03-06 — Roadmap created for v1.1 (Phases 5-7)
 
 Progress: [░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 4min
-- Total execution time: 0.27 hours
+- Total plans completed: 8 (across v1.0)
+- Average duration: 3min
+- Total execution time: 0.4 hours
 
 **By Phase:**
 
@@ -45,16 +45,14 @@ Progress: [░░░░░░░░░░░░░░░░░░░░░░░
 |-------|-------|-------|----------|
 | 01-auth-security | 2 | 13min | 6.5min |
 | 02-fan-capture | 2 | 3min | 1.5min |
+| 03-performer-dashboard | 2 | 3min | 1.5min |
+| 04-fan-profile-polish | 2 | 4min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: -
-- Trend: -
+- Last 5 plans: 2min, 1min, 2min, 2min, 2min
+- Trend: Stable
 
 *Updated after each plan completion*
-| Phase 03 P01 | 2min | 2 tasks | 1 files |
-| Phase 03 P02 | 1min | 2 tasks | 1 files |
-| Phase 04 P01 | 2min | 2 tasks | 7 files |
-| Phase 04 P02 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -63,21 +61,9 @@ Progress: [░░░░░░░░░░░░░░░░░░░░░░░
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap]: Auth-first build order — everything downstream depends on performer auth and RLS
-- [Roadmap]: DEMO-03/DEMO-04 (animations, toasts) assigned to Phase 2 with capture flow, not Phase 4 polish
-- [Roadmap]: Phase 4 depends on Phase 1 only (not Phase 3) — fan profile is a parallel track
-- [01-01]: Admin client for all dashboard data queries since RLS policies don't exist yet
-- [01-01]: Session-based identity extraction in API routes via getUser() — never trust form data
-- [01-02]: Permissive INSERT on collections/fan_tiers for Phase 2 fan capture flow
-- [01-02]: Messages INSERT restricted to performer owners only
-- [01-02]: Migration file for RLS deployment when DB credentials available
-- [Phase 02]: Motion/react for animations, sonner Toaster in root layout for app-wide toast availability
-- [Phase 03]: Eye icon for Secret tier stat card (thematic fit)
-- [Phase 03]: FileText icon for draft confirmation, single draft banner approach
-- [04-01]: Shared tier constants in src/lib/tiers.ts for cross-page reuse
-- [04-01]: Auth callback defaults to /profile on error to prevent redirect loops
-- [04-01]: Profile page uses admin client pattern matching dashboard
-- [Phase 04]: Upsert pattern for fans row on name update (handles fans without existing row)
+- [v1.1 Roadmap]: Phase 5 (sharing) before Phase 6 (leaderboard) — shared display patterns reuse
+- [v1.1 Roadmap]: Phase 7 (content generator) independent of 5-6 — uses existing DB data, could parallelize
+- [v1.1 Roadmap]: OG image generation via dynamic route, not pre-rendered — fan collections change
 
 ### Pending Todos
 
@@ -85,13 +71,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Phase 1]: Magic link deliverability to Gmail/Outlook must be tested before demo — may need custom SMTP
 - [Phase 1]: RLS policies written but not yet applied — need DB password or Supabase CLI login to deploy
-- [Phase 1]: /api/claim security hole — RESOLVED in 01-01 (session-based identity)
-- [Phase 1]: Dashboard queries switched to admin client — RESOLVED in 01-01
+- [Phase 5]: OG image generation needs Playwright or similar for React-to-PNG — verify Vercel supports this at runtime
 
 ## Session Continuity
 
-Last session: 2026-03-06T15:52:54.659Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-06T19:00:00.000Z
+Stopped at: Roadmap created for v1.1
 Resume file: None

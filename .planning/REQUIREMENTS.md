@@ -160,28 +160,27 @@ Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
 | DEMO-03 | Phase 2 | Complete |
 | DEMO-04 | Phase 2 | Complete |
 | DEMO-05 | Phase 4 | Complete |
-
-| SHARE-01 | — | Pending |
-| SHARE-02 | — | Pending |
-| SHARE-03 | — | Pending |
-| SHARE-04 | — | Pending |
-| LEAD-01 | — | Pending |
-| LEAD-02 | — | Pending |
-| LEAD-03 | — | Pending |
-| LEAD-04 | — | Pending |
-| CONT-01 | — | Pending |
-| CONT-02 | — | Pending |
-| CONT-03 | — | Pending |
-| CONT-04 | — | Pending |
-| CONT-05 | — | Pending |
-| CONT-06 | — | Pending |
+| SHARE-01 | Phase 5 | Pending |
+| SHARE-02 | Phase 5 | Pending |
+| SHARE-03 | Phase 5 | Pending |
+| SHARE-04 | Phase 5 | Pending |
+| LEAD-01 | Phase 6 | Pending |
+| LEAD-02 | Phase 6 | Pending |
+| LEAD-03 | Phase 6 | Pending |
+| LEAD-04 | Phase 6 | Pending |
+| CONT-01 | Phase 7 | Pending |
+| CONT-02 | Phase 7 | Pending |
+| CONT-03 | Phase 7 | Pending |
+| CONT-04 | Phase 7 | Pending |
+| CONT-05 | Phase 7 | Pending |
+| CONT-06 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 37 total (v1.0), 14 total (v1.1)
-- v1.0 mapped: 37 (all complete or pending)
-- v1.1 mapped: 0
-- v1.1 unmapped: 14
+- v1.0 requirements: 37 total (all complete or pending, mapped to Phases 1-4)
+- v1.1 requirements: 14 total (all mapped to Phases 5-7)
+- v1.1 mapped: 14/14
+- v1.1 unmapped: 0
 
 ---
 *Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 after v1.1 requirements added*
+*Last updated: 2026-03-06 after v1.1 roadmap created*
