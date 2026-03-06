@@ -1,4 +1,4 @@
-import { createSupabaseServer } from "@/lib/supabase";
+import { createSupabaseServer, createSupabaseAdmin } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 import { DashboardClient } from "./dashboard-client";
 
@@ -11,31 +11,32 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/auth/login");
 
+  // Use admin client for all data queries (bypasses RLS)
+  const admin = createSupabaseAdmin();
+
   // Find performer claimed by this user
-  const { data: performer } = await supabase
+  const { data: performer } = await admin
     .from("performers")
     .select("*")
     .eq("claimed_by", user.id)
     .single();
 
-  // If no claimed performer, try to match by email
+  // If no claimed performer, show claim page
   if (!performer) {
-    // Check if there's an unclaimed performer we can auto-claim
-    // For now, show a claim page
     return (
       <main className="flex min-h-dvh flex-col items-center justify-center bg-bg px-6">
-        <ClaimPrompt userId={user.id} userEmail={user.email || ""} />
+        <ClaimPrompt userEmail={user.email || ""} />
       </main>
     );
   }
 
   // Get fan stats
-  const { count: totalFans } = await supabase
+  const { count: totalFans } = await admin
     .from("fan_tiers")
     .select("*", { count: "exact", head: true })
     .eq("performer_id", performer.id);
 
-  const { data: tierBreakdown } = await supabase
+  const { data: tierBreakdown } = await admin
     .from("fan_tiers")
     .select("current_tier")
     .eq("performer_id", performer.id);
@@ -55,7 +56,7 @@ export default async function DashboardPage() {
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const { data: recentScans } = await supabase
+  const { data: recentScans } = await admin
     .from("collections")
     .select(`
       id,
@@ -74,7 +75,7 @@ export default async function DashboardPage() {
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-  const { data: scanHistory } = await supabase
+  const { data: scanHistory } = await admin
     .from("collections")
     .select("created_at")
     .eq("performer_id", performer.id)
@@ -82,7 +83,7 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: true });
 
   // Fan list with tiers
-  const { data: fanList } = await supabase
+  const { data: fanList } = await admin
     .from("fan_tiers")
     .select(`
       scan_count,
@@ -94,7 +95,7 @@ export default async function DashboardPage() {
     .order("scan_count", { ascending: false });
 
   // Venues for Go Live
-  const { data: venues } = await supabase
+  const { data: venues } = await admin
     .from("venues")
     .select("id, name, slug")
     .order("name");
@@ -113,16 +114,15 @@ export default async function DashboardPage() {
 }
 
 async function ClaimPrompt({
-  userId,
   userEmail,
 }: {
-  userId: string;
   userEmail: string;
 }) {
-  const supabase = await createSupabaseServer();
+  // Use admin client to query unclaimed performers (bypasses RLS)
+  const admin = createSupabaseAdmin();
 
   // Find unclaimed performers
-  const { data: unclaimed } = await supabase
+  const { data: unclaimed } = await admin
     .from("performers")
     .select("id, name, slug, city, genres")
     .eq("claimed", false)
@@ -140,7 +140,6 @@ async function ClaimPrompt({
           {unclaimed.map((p) => (
             <form key={p.id} action={`/api/claim`} method="POST">
               <input type="hidden" name="performer_id" value={p.id} />
-              <input type="hidden" name="user_id" value={userId} />
               <button
                 type="submit"
                 className="w-full rounded-xl border border-light-gray/20 bg-bg-card px-4 py-3 text-left transition-colors hover:border-pink/30"
