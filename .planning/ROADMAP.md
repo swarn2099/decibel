@@ -77,11 +77,11 @@ Plans:
   3. Fan can access settings, update their display name, and log out
   4. Every page in the app uses Decibel dark aesthetic (bg #0B0B0F, brand colors, Poppins font) with consistent tier colors (pink/purple/blue/teal)
   5. `npm run build` passes with zero errors
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Shared tier constants, auth flow updates, fan profile page with collection grid and scan history
+- [ ] 04-02-PLAN.md — Settings page with display name update, logout, aesthetic audit, and build verification
 
 ## Progress
 
