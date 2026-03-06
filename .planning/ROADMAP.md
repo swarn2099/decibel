@@ -27,7 +27,7 @@
 
 </details>
 
-### 🚧 v1.2 Polish, Map, and Pipeline Fixes (In Progress)
+### v1.2 Polish, Map, and Pipeline Fixes (In Progress)
 
 **Milestone Goal:** Fix UI bugs and data quality issues, add an interactive venue map, and improve scraper pipeline reliability.
 
@@ -47,11 +47,10 @@
   3. Empty content sections (Tracks, etc.) are not visible on artist profiles when there is no data
   4. Leaderboard shows display names for fans, never raw email addresses
   5. "Collect" button on artist pages is visually dominant — larger, full-width on mobile, uses brand accent color
-**Plans**: TBD
+**Plans:** 1 plan
 
 Plans:
-- [ ] 08-01: TBD
-- [ ] 08-02: TBD
+- [ ] 08-01-PLAN.md — Fix artist profile bugs and leaderboard display issues
 
 ### Phase 9: Scene Map
 **Goal**: Fans can explore Chicago's underground scene on an interactive dark-themed map at /map
@@ -96,6 +95,6 @@ Phases 8, 9, and 10 are independent and can execute in any order.
 | 5. Shareable Collection Cards | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 6. City Leaderboard | v1.1 | 1/1 | Complete | 2026-03-06 |
 | 7. Content Generator | v1.1 | 2/2 | Complete | 2026-03-06 |
-| 8. Bug Fixes | v1.2 | 0/? | Not started | - |
+| 8. Bug Fixes | v1.2 | 0/1 | In progress | - |
 | 9. Scene Map | v1.2 | 0/? | Not started | - |
 | 10. Scraper Pipeline | v1.2 | 0/? | Not started | - |
