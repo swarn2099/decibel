@@ -24,22 +24,14 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 
 ### Active
 
-- [ ] Fan capture page (`/collect/[slug]`) — full email → collect → tier upgrade flow
-- [ ] QR code generation endpoint (`/api/qr/[slug]`) — verified working
-- [ ] Repeat scan handling — show updated tier, no duplicate collections
-- [ ] OG meta tags for social sharing on collect page
-- [ ] Performer dashboard (`/dashboard`) — fan count, tier breakdown, recent scans
-- [ ] Performer auth via Supabase magic link (infrastructure done, needs live test)
-- [ ] Performer profile claiming flow (secured in Phase 1)
-- [ ] Fan list with search/filter by tier on dashboard
-- [ ] Scan-over-time chart (last 90 days) on dashboard
-- [ ] Message composer — select tier, write, preview, send
-- [ ] QR code download as print-ready PNG from dashboard
-- [ ] "Go Live" button — mark performer as live at a venue
-- [ ] Fan profile page — logged-in fans see collected artists, tier badges, scan history
-- [ ] Fan settings page — account management
-- [ ] Logout functionality for both fans and performers (performer logout done in Phase 1)
-- [ ] Demo/production readiness — all flows working end-to-end
+## Current Milestone: v1.1 Growth Mechanics + Content Engine
+
+**Goal:** Add viral sharing, gamification, and automated content generation to drive organic growth.
+
+**Target features:**
+- Shareable collection cards (OG image generation for social sharing)
+- City leaderboard (top fans, top performers, time filters)
+- Content generator (DJ Spotlight, Scene Roundup, Product Teaser — automated Instagram pipeline)
 
 ### Out of Scope
 
@@ -83,4 +75,4 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 | Stub message delivery for v1 | Real SendGrid integration adds complexity, not needed for demo | — Pending |
 
 ---
-*Last updated: 2026-03-06 after Phase 1 (Auth & Security)*
+*Last updated: 2026-03-06 after milestone v1.1 started*
