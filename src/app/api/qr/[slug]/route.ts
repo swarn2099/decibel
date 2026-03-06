@@ -16,8 +16,8 @@ export async function GET(req: NextRequest, context: RouteContext) {
       width: 900,
       margin: 2,
       color: {
-        dark: "#FFFFFF",
-        light: "#0B0B0F",
+        dark: "#0B0B0F",
+        light: "#FFFFFF",
       },
       errorCorrectionLevel: "H",
     });

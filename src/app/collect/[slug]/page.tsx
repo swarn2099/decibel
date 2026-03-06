@@ -34,6 +34,12 @@ export async function generateMetadata({
       description: `You were on ${performer.name}'s dancefloor. Collect them on Decibel.`,
       images: performer.photo_url ? [performer.photo_url] : [],
     },
+    twitter: {
+      card: "summary_large_image",
+      title: `Collect ${performer.name} | DECIBEL`,
+      description: `You were on ${performer.name}'s dancefloor. Collect them on Decibel.`,
+      images: performer.photo_url ? [performer.photo_url] : [],
+    },
   };
 }
 
