@@ -205,7 +205,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
             />
           ) : (
             <div
-              className={`flex h-40 w-40 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${gradFrom}/30 ${gradTo}/30 text-5xl font-bold text-white/80 shadow-2xl ring-2 ring-white/10 sm:h-52 sm:w-52 sm:text-6xl`}
+              className={`flex h-40 w-40 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${gradFrom}/30 ${gradTo}/30 text-5xl font-bold text-[var(--text-muted)] shadow-2xl ring-2 ring-white/10 sm:h-52 sm:w-52 sm:text-6xl`}
             >
               {performer.name
                 .split(" ")
@@ -223,7 +223,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
                 {performer.genres.map((genre) => (
                   <span
                     key={genre}
-                    className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-medium text-white/90"
+                    className="rounded-full bg-gray/20 px-2.5 py-0.5 text-[11px] font-medium text-[var(--text-muted)]"
                   >
                     {genre}
                   </span>
@@ -238,7 +238,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray">
               {performer.follower_count && performer.follower_count > 0 && (
                 <span>
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-[var(--text)]">
                     {formatFollowers(performer.follower_count)}
                   </span>{" "}
                   followers
@@ -259,7 +259,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
       <div className="mx-auto flex max-w-4xl items-center gap-4 px-6 py-6">
         <Link
           href={`/collect/${performer.slug}`}
-          className={`flex items-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-7 py-3 text-sm font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl`}
+          className={`flex items-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-7 py-3 text-sm font-bold text-[var(--text)] shadow-lg transition-all hover:scale-105 hover:shadow-xl`}
         >
           <Play className="h-4 w-4 fill-current" />
           Collect
@@ -276,7 +276,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
             title={link.label}
           >
             <link.icon className={`h-4 w-4 ${link.color}`} />
-            <span className="text-white/90">{link.label}</span>
+            <span className="text-[var(--text-muted)]">{link.label}</span>
           </a>
         ))}
 
@@ -344,7 +344,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
                     className="group flex items-center gap-4 rounded-xl border border-light-gray/15 bg-bg-card px-5 py-4 transition-all hover:border-pink/20 hover:bg-bg-card/80"
                   >
                     {/* Date block */}
-                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-white/5">
+                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-gray/10">
                       <span className="text-[10px] font-bold uppercase leading-none text-pink">
                         {month}
                       </span>
@@ -378,7 +378,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
 
                     {/* External link indicator */}
                     {event.external_url && (
-                      <ExternalLink className="h-4 w-4 shrink-0 text-light-gray transition-colors group-hover:text-white" />
+                      <ExternalLink className="h-4 w-4 shrink-0 text-light-gray transition-colors group-hover:text-[var(--text)]" />
                     )}
                   </Wrapper>
                 );
@@ -410,7 +410,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
               About
             </h2>
             <div className="rounded-xl border border-light-gray/15 bg-bg-card p-6">
-              <p className="leading-relaxed text-white/90">{performer.bio}</p>
+              <p className="leading-relaxed text-[var(--text-muted)]">{performer.bio}</p>
               {performer.city && (
                 <p className="mt-4 flex items-center gap-1.5 text-sm text-gray">
                   <MapPin className="h-3.5 w-3.5" />
@@ -419,7 +419,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
               )}
               {performer.follower_count && performer.follower_count > 0 && (
                 <p className="mt-1 text-sm text-gray">
-                  <span className="font-semibold text-white/90">
+                  <span className="font-semibold text-[var(--text-muted)]">
                     {formatFollowers(performer.follower_count)}
                   </span>{" "}
                   followers on SoundCloud
@@ -457,7 +457,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
         <div className="text-center">
           <Link
             href="/"
-            className="text-sm text-gray transition-colors hover:text-white"
+            className="text-sm text-gray transition-colors hover:text-[var(--text)]"
           >
             &larr; Back to all performers
           </Link>

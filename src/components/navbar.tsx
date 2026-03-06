@@ -7,6 +7,7 @@ import { User, LogIn } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 
 const HIDDEN_ROUTES = ["/profile", "/settings", "/dashboard", "/auth"];
+const HIDE_LOGO_ROUTES = ["/"];
 
 export function Navbar() {
   const pathname = usePathname();
@@ -27,11 +28,15 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4">
-      <Link href="/" className="text-xl font-bold">
-        <span className="bg-gradient-to-r from-pink via-purple to-blue bg-clip-text text-transparent">
-          DECIBEL
-        </span>
-      </Link>
+      {HIDE_LOGO_ROUTES.includes(pathname) ? (
+        <div />
+      ) : (
+        <Link href="/" className="text-xl font-bold">
+          <span className="bg-gradient-to-r from-pink via-purple to-blue bg-clip-text text-transparent">
+            DECIBEL
+          </span>
+        </Link>
+      )}
       {user ? (
         <Link
           href="/profile"
