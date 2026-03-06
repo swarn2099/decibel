@@ -60,3 +60,35 @@ body {
 .fade-in {
   animation-name: fade-in;
 }
+
+/* ─── Pulsing dot for Tonight mode ─── */
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+.pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ─── Leaflet popup dark theme ─── */
+.leaflet-popup-content-wrapper {
+  background: #15151C !important;
+  color: #ededed !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(110, 110, 130, 0.3) !important;
+}
+.leaflet-popup-tip {
+  background: #15151C !important;
+}
+.leaflet-popup-close-button {
+  color: #A0A0B0 !important;
+}
+
+/* ─── Hide scrollbar for genre pills ─── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
