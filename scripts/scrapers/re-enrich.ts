@@ -158,7 +158,7 @@ export async function reEnrich() {
                 description: ogDesc?.getAttribute('content') || '',
               };
             })()
-          `);
+          `) as { avatarUrl: string | null; description: string };
 
           if (profile.avatarUrl && !profile.avatarUrl.includes("fb_placeholder") && !performer.photo_url) {
             updates.photo_url = profile.avatarUrl.replace("-large", "-t500x500");
