@@ -1,230 +1,378 @@
-import { chromium } from "playwright";
+/**
+ * DICE Scraper: Fetches Chicago event listings from DICE's Next.js data routes.
+ * Uses their browse endpoint with city ID chicago-5b238ca66e4bcd93783835b0.
+ * Extracts artists from summary_lineup.top_artists and event descriptions.
+ * Cross-references against existing DB performers.
+ *
+ * Chicago city ID: 5b238ca66e4bcd93783835b0
+ */
 import { getSupabase, slugify, namesMatch, log, logError, isNonArtistName } from "./utils";
+
+const DICE_CITY_SLUG = "chicago-5b238ca66e4bcd93783835b0";
+const DELAY_MS = 500;
+
+// Categories to scrape — DJ and Party have most electronic music
+const CATEGORIES = [
+  { slug: "music/dj", label: "DJ" },
+  { slug: "music/party", label: "Party" },
+  { slug: "music/gig", label: "Gigs" },
+];
+
+interface DiceEvent {
+  name: string;
+  date: string;
+  venue: string;
+  venueAddress: string;
+  artists: { name: string; image: string | null; id: string }[];
+  url: string;
+  about: string;
+}
+
+async function getBuildId(): Promise<string> {
+  // Fetch a known working page to get the build ID
+  const res = await fetch("https://dice.fm/venue/spybar-pm7k", {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+    },
+  });
+
+  const html = await res.text();
+  const match = html.match(/"buildId":"([^"]+)"/);
+  if (match) return match[1];
+
+  throw new Error("Could not extract DICE build ID");
+}
+
+async function fetchDicePage(
+  buildId: string,
+  categorySlug: string,
+  cursor?: string
+): Promise<{ events: DiceEvent[]; nextCursor: string | null }> {
+  let url = `https://dice.fm/_next/data/${buildId}/en/browse/${DICE_CITY_SLUG}/${categorySlug}.json`;
+  if (cursor) {
+    url += `?cursor=${encodeURIComponent(cursor)}`;
+  }
+
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+    },
+  });
+
+  if (res.status !== 200) {
+    throw new Error(`HTTP ${res.status} for ${url}`);
+  }
+
+  const data = await res.json();
+  const pp = data.pageProps || {};
+  const rawEvents = pp.events || [];
+  const nextCursor = pp.nextCursor || null;
+
+  const events: DiceEvent[] = rawEvents.map((e: any) => {
+    const topArtists = e.summary_lineup?.top_artists || [];
+    const artists = topArtists.map((a: any) => ({
+      name: a.name || "",
+      image: a.image?.url || null,
+      id: a.artist_id || "",
+    }));
+
+    // Also try to extract artists from about/description
+    const about = e.about?.description || "";
+
+    return {
+      name: e.name || "",
+      date: e.dates?.event_start_date?.slice(0, 10) || "",
+      venue: e.venues?.[0]?.name || "",
+      venueAddress: e.venues?.[0]?.address || "",
+      artists,
+      url: e.perm_name ? `https://dice.fm/event/${e.perm_name}` : "",
+      about,
+    };
+  });
+
+  return { events, nextCursor };
+}
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+// Venue name matching for DICE -> our DB
+const VENUE_NAME_MAP: Record<string, string> = {
+  "spybar": "spybar",
+  "309 n morgan": "311-n-morgan-st",
+  "309 n morgan st": "311-n-morgan-st",
+  "smartbar": "smartbar",
+  "smart bar": "smartbar",
+  "sound-bar": "sound-bar-chicago",
+  "sound bar": "sound-bar-chicago",
+  "soundbar": "sound-bar-chicago",
+  "concord music hall": "concord-music-hall",
+  "radius": "radius",
+  "radius chicago": "radius",
+  "prysm": "prysm",
+  "the mid": "the-mid",
+  "podlasie": "podlasie",
+  "primary": "primary",
+};
+
+function matchVenueSlug(venueName: string): string | null {
+  const lower = venueName.toLowerCase().trim();
+  for (const [pattern, slug] of Object.entries(VENUE_NAME_MAP)) {
+    if (lower === pattern || lower.startsWith(pattern + " ") || lower.includes(pattern)) {
+      return slug;
+    }
+  }
+  return null;
+}
 
 export async function scrapeDICE() {
   const supabase = getSupabase();
 
-  let browser;
-  try {
-    browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext({
-      userAgent:
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    });
-    const page = await context.newPage();
+  log("dice", "Getting DICE build ID...");
+  const buildId = await getBuildId();
+  log("dice", `Build ID: ${buildId}`);
 
-    log("dice", "Navigating to DICE Chicago...");
+  const allEvents: DiceEvent[] = [];
 
-    // Try multiple DICE URL patterns
-    const urls = [
-      "https://dice.fm/browse/chicago",
-      "https://dice.fm/browse/chicago/music",
-      "https://dice.fm/search?query=chicago&type=events",
-    ];
+  for (const category of CATEGORIES) {
+    log("dice", `Fetching category: ${category.label}`);
+    let cursor: string | null = null;
+    let pageNum = 0;
 
-    let loaded = false;
-    for (const url of urls) {
+    do {
+      pageNum++;
       try {
-        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
-        await page.waitForTimeout(4000);
-        loaded = true;
-        log("dice", `Loaded: ${url}`);
+        const { events, nextCursor } = await fetchDicePage(buildId, category.slug, cursor || undefined);
+        allEvents.push(...events);
+        cursor = nextCursor;
+        log("dice", `  ${category.label} page ${pageNum}: ${events.length} events (total: ${allEvents.length})`);
+        await sleep(DELAY_MS);
+      } catch (err) {
+        logError("dice", `Failed to fetch ${category.label} page ${pageNum}`, err);
         break;
-      } catch {
-        log("dice", `Failed to load ${url}, trying next...`);
+      }
+    } while (cursor && pageNum < 20); // Safety limit
+  }
+
+  log("dice", `Total DICE events fetched: ${allEvents.length}`);
+
+  // Deduplicate by event name + date
+  const seen = new Set<string>();
+  const uniqueEvents = allEvents.filter((e) => {
+    const key = `${e.name}|${e.date}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  log("dice", `Unique events after dedup: ${uniqueEvents.length}`);
+
+  // Collect unique artists
+  const artistsSeen = new Map<string, {
+    name: string;
+    image: string | null;
+    events: { date: string; venue: string; eventName: string; url: string }[];
+  }>();
+
+  for (const event of uniqueEvents) {
+    let artists = event.artists;
+
+    // If no artists from lineup, try to parse from event name
+    if (artists.length === 0) {
+      const nameParts = event.name
+        .split(/\s+(?:@|at|w\/|with|presents|x)\s+/i)
+        .filter((p) => p.length > 1 && p.length < 60);
+      if (nameParts.length > 0) {
+        // First part is usually the artist
+        const artistNames = nameParts[0]
+          .split(/[,&+]/)
+          .map((a) => a.trim())
+          .filter((a) => a.length > 1 && a.length < 60);
+        artists = artistNames.map((name) => ({ name, image: null, id: "" }));
       }
     }
 
-    if (!loaded) {
-      log("dice", "Could not load any DICE page — skipping");
-      return;
-    }
+    for (const artist of artists) {
+      if (isNonArtistName(artist.name)) continue;
+      if (artist.name.length < 2) continue;
 
-    // Scroll to load more events
-    for (let i = 0; i < 5; i++) {
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await page.waitForTimeout(2000);
-    }
+      const key = artist.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (key.length < 2) continue;
 
-    // Extract events with wide selector net
-    const events = await page.evaluate(() => {
-      const results: { title: string; venue: string; date: string; url: string }[] = [];
+      if (!artistsSeen.has(key)) {
+        artistsSeen.set(key, {
+          name: artist.name,
+          image: artist.image,
+          events: [],
+        });
+      }
 
-      // Strategy 1: Event card links
-      const eventLinks = document.querySelectorAll(
-        'a[href*="/event/"], a[href*="/events/"]'
-      );
-      const seenUrls = new Set<string>();
-
-      eventLinks.forEach((link) => {
-        const href = link.getAttribute("href") || "";
-        if (seenUrls.has(href)) return;
-        seenUrls.add(href);
-
-        const container = link.closest("li, article, div") || link;
-
-        const title = (
-          container.querySelector("h3, h4, [class*='title'], [class*='name']") ||
-          link
-        )?.textContent?.trim() || "";
-
-        const venue =
-          container.querySelector(
-            "[class*='venue'], [class*='location'], [class*='subtitle']"
-          )?.textContent?.trim() || "";
-
-        const dateEl = container.querySelector("time, [datetime], [class*='date']");
-        const date = dateEl?.getAttribute("datetime") || dateEl?.textContent?.trim() || "";
-
-        if (title && title.length > 2 && title.length < 200) {
-          results.push({
-            title,
-            venue,
-            date,
-            url: href.startsWith("http") ? href : `https://dice.fm${href}`,
-          });
-        }
+      const entry = artistsSeen.get(key)!;
+      if (artist.image && !entry.image) entry.image = artist.image;
+      entry.events.push({
+        date: event.date,
+        venue: event.venue,
+        eventName: event.name,
+        url: event.url,
       });
+    }
+  }
 
-      // Strategy 2: Broader card-based extraction
-      if (results.length === 0) {
-        const cards = document.querySelectorAll(
-          "[class*='card'], [class*='Card'], [class*='event'], [class*='Event']"
-        );
-        cards.forEach((card) => {
-          const title = card.querySelector("h2, h3, h4")?.textContent?.trim() || "";
-          const venue = card.querySelector("[class*='venue'], [class*='location']")?.textContent?.trim() || "";
-          const date = card.querySelector("time")?.textContent?.trim() || "";
+  log("dice", `Unique artists: ${artistsSeen.size}`);
 
-          if (title && title.length > 2) {
-            results.push({ title, venue, date, url: "" });
-          }
-        });
+  // Cross-reference with DB
+  const { data: existingPerformers } = await supabase
+    .from("performers")
+    .select("id, name, slug, photo_url");
+
+  const existingMap = new Map<string, (typeof existingPerformers extends (infer T)[] | null ? T : never)>();
+  for (const p of existingPerformers || []) {
+    const key = p.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+    existingMap.set(key, p);
+    existingMap.set(p.slug, p);
+  }
+
+  // Pre-fetch venue IDs
+  const { data: dbVenues } = await supabase.from("venues").select("id, slug, name");
+  const venueIdMap = new Map<string, string>();
+  for (const v of dbVenues || []) {
+    venueIdMap.set(v.slug, v.id);
+    venueIdMap.set(v.name.toLowerCase(), v.id);
+  }
+
+  let newPerformers = 0;
+  let updatedPerformers = 0;
+  let totalEventsInserted = 0;
+
+  for (const [key, artist] of artistsSeen) {
+    let existing = existingMap.get(key);
+    if (!existing) {
+      const slug = slugify(artist.name);
+      existing = existingMap.get(slug);
+    }
+    if (!existing && existingPerformers) {
+      existing = existingPerformers.find((p) => namesMatch(p.name, artist.name)) || undefined;
+    }
+
+    let performerId: string;
+
+    if (existing) {
+      // Update photo if missing
+      if (artist.image && !existing.photo_url) {
+        await supabase.from("performers").update({ photo_url: artist.image }).eq("id", existing.id);
+        updatedPerformers++;
       }
+      performerId = existing.id;
+    } else {
+      const { data: newP, error } = await supabase
+        .from("performers")
+        .insert({
+          name: artist.name,
+          slug: slugify(artist.name),
+          city: "Chicago",
+          genres: ["electronic"],
+          photo_url: artist.image || null,
+          claimed: false,
+        })
+        .select("id")
+        .single();
 
-      return results.slice(0, 60);
-    });
-
-    log("dice", `Found ${events.length} events`);
-
-    let totalEvents = 0;
-    let newPerformers = 0;
-
-    for (const event of events) {
-      // Parse artists from title
-      // Common formats: "Artist1, Artist2 at Venue" or "Artist1 + Artist2"
-      const titleParts = event.title.split(/\s+at\s+/i);
-      const artistPart = titleParts[0];
-
-      const artists = artistPart
-        .split(/[,&+]|\s+x\s+|\s+b2b\s+/i)
-        .map((a) => a.replace(/presents?:?/i, "").trim())
-        .filter((a) => a.length > 1 && a.length < 60 && !/ticket|rsvp|free|sold/i.test(a));
-
-      if (artists.length === 0) continue;
-
-      // Try to match venue
-      let venueId: string | null = null;
-      const venueSearch = event.venue || (titleParts[1] || "");
-      if (venueSearch) {
-        const { data: dbVenue } = await supabase
-          .from("venues")
-          .select("id")
-          .ilike("name", `%${venueSearch.split(",")[0].trim().slice(0, 20)}%`)
-          .limit(1)
-          .single();
-        venueId = dbVenue?.id || null;
-      }
-
-      for (const artistName of artists) {
-        if (isNonArtistName(artistName)) {
-          log("dice", `  SKIP (non-artist): ${artistName}`);
-          continue;
-        }
-
-        const { data: existing } = await supabase
+      if (error) {
+        const { data: retry } = await supabase
           .from("performers")
-          .select("id, name")
-          .or(`slug.eq.${slugify(artistName)},name.ilike.${artistName}`);
+          .insert({
+            name: artist.name,
+            slug: `${slugify(artist.name)}-dice`,
+            city: "Chicago",
+            genres: ["electronic"],
+            photo_url: artist.image || null,
+            claimed: false,
+          })
+          .select("id")
+          .single();
 
-        const match = existing?.find((p) => namesMatch(p.name, artistName));
-        let performerId: string;
+        if (!retry) continue;
+        performerId = retry.id;
+      } else {
+        performerId = newP!.id;
+      }
+      newPerformers++;
+    }
 
-        if (match) {
-          performerId = match.id;
-        } else {
-          const { data: newP, error } = await supabase
-            .from("performers")
-            .insert({
-              name: artistName,
-              slug: slugify(artistName),
-              city: "Chicago",
-              genres: ["electronic"],
-            })
-            .select("id")
-            .single();
+    // Insert events
+    for (const ev of artist.events) {
+      if (!ev.date) continue;
 
-          if (error || !newP) continue;
-          performerId = newP.id;
-          newPerformers++;
+      let venueId: string | null = null;
+      if (ev.venue) {
+        const slug = matchVenueSlug(ev.venue);
+        if (slug) venueId = venueIdMap.get(slug) || null;
+        if (!venueId) venueId = venueIdMap.get(ev.venue.toLowerCase()) || null;
+        if (!venueId) {
+          const vSlug = slugify(ev.venue);
+          const existingVId = venueIdMap.get(vSlug);
+          if (existingVId) {
+            venueId = existingVId;
+          } else {
+            const { data: newV } = await supabase
+              .from("venues")
+              .insert({
+                name: ev.venue,
+                slug: vSlug,
+                city: "Chicago",
+                latitude: 41.8781,
+                longitude: -87.6298,
+              })
+              .select("id")
+              .single();
+            if (newV) {
+              venueId = newV.id;
+              venueIdMap.set(vSlug, newV.id);
+            }
+          }
         }
+      }
 
-        const eventDate = parseDate(event.date);
-        if (eventDate) {
-          const { error: evErr } = await supabase.from("events").insert({
-            performer_id: performerId,
-            venue_id: venueId,
-            event_date: eventDate,
-            source: "dice",
-            external_url: event.url || null,
-          });
-          if (!evErr) totalEvents++;
-        }
+      // Check for duplicate
+      const { data: existingEvent } = await supabase
+        .from("events")
+        .select("id")
+        .eq("performer_id", performerId)
+        .eq("event_date", ev.date)
+        .eq("source", "dice")
+        .maybeSingle();
 
-        await supabase.from("scraped_profiles").insert({
+      if (!existingEvent) {
+        const { error: evErr } = await supabase.from("events").insert({
           performer_id: performerId,
+          venue_id: venueId,
+          event_date: ev.date,
           source: "dice",
-          raw_data: { event_title: event.title, venue: event.venue, date: event.date, url: event.url },
+          external_url: ev.url || null,
         });
-      }
-    }
-
-    log("dice", `Done. ${totalEvents} events, ${newPerformers} new performers.`);
-  } finally {
-    if (browser) await browser.close();
-  }
-}
-
-function parseDate(dateStr: string): string | null {
-  if (!dateStr) return null;
-
-  try {
-    const d = new Date(dateStr);
-    if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
-  } catch {
-    // ignore
-  }
-
-  const patterns = [
-    /(\d{4})-(\d{2})-(\d{2})/,
-    /(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i,
-    /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})/i,
-  ];
-
-  for (const pattern of patterns) {
-    const match = dateStr.match(pattern);
-    if (match) {
-      const year = new Date().getFullYear();
-      try {
-        const d = new Date(`${match[0]} ${year}`);
-        if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
-      } catch {
-        continue;
+        if (!evErr) totalEventsInserted++;
       }
     }
   }
 
-  return null;
+  log("dice", "\n=== DICE SCRAPE RESULTS ===");
+  log("dice", `Events fetched: ${allEvents.length} (${uniqueEvents.length} unique)`);
+  log("dice", `Unique artists: ${artistsSeen.size}`);
+  log("dice", `New performers added: ${newPerformers}`);
+  log("dice", `Existing performers updated: ${updatedPerformers}`);
+  log("dice", `Events inserted: ${totalEventsInserted}`);
+
+  // Target venue breakdown
+  log("dice", "\n--- Venue Hits ---");
+  const venueCounts = new Map<string, number>();
+  for (const e of uniqueEvents) {
+    const v = e.venue || "Unknown";
+    venueCounts.set(v, (venueCounts.get(v) || 0) + 1);
+  }
+  const sorted = [...venueCounts.entries()].sort((a, b) => b[1] - a[1]);
+  for (const [v, c] of sorted.slice(0, 15)) {
+    log("dice", `  ${v}: ${c}`);
+  }
 }
 
 if (require.main === module) {

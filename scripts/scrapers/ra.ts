@@ -1,232 +1,441 @@
-import { chromium } from "playwright";
+/**
+ * RA GraphQL Scraper: Fetches Chicago event listings from Resident Advisor's
+ * GraphQL API for the last 12 months. Extracts artists, venues, genres,
+ * and social links. Cross-references against existing DB performers.
+ *
+ * Chicago area ID: 17
+ * Key filter: listingDate (not date) for date range queries
+ */
 import { getSupabase, slugify, namesMatch, log, logError, isNonArtistName } from "./utils";
 
-const RA_VENUES: { name: string; raSlug: string; dbSlug: string }[] = [
-  { name: "Smartbar", raSlug: "smartbar", dbSlug: "smartbar" },
-  { name: "Soundbar", raSlug: "soundbar-chicago", dbSlug: "soundbar" },
-  { name: "Spybar", raSlug: "spybar", dbSlug: "spybar" },
-  { name: "Concord Music Hall", raSlug: "concord-music-hall", dbSlug: "concord-music-hall" },
-  { name: "The Mid", raSlug: "the-mid", dbSlug: "the-mid" },
-  { name: "Primary", raSlug: "primary-chicago", dbSlug: "primary" },
-  { name: "Radius Chicago", raSlug: "radius-chicago", dbSlug: "radius-chicago" },
-  { name: "309 N Morgan", raSlug: "309-n-morgan", dbSlug: "309-n-morgan" },
-  { name: "Podlasie", raSlug: "podlasie", dbSlug: "podlasie" },
-];
+const RA_GRAPHQL = "https://ra.co/graphql";
+const CHICAGO_AREA_ID = 17;
+const PAGE_SIZE = 50;
+const DELAY_MS = 800; // be polite
+
+interface RAEvent {
+  id: string;
+  title: string;
+  date: string;
+  venue: { id: string; name: string } | null;
+  artists: {
+    id: string;
+    name: string;
+    urlSafeName: string;
+    soundcloud: string | null;
+    instagram: string | null;
+    image: string | null;
+  }[];
+  genres: { id: string; name: string }[];
+}
+
+const EVENT_QUERY = `
+query GetChicagoEvents($filters: FilterInputDtoInput, $pageSize: Int, $page: Int) {
+  eventListings(filters: $filters, pageSize: $pageSize, page: $page) {
+    data {
+      id
+      event {
+        id
+        title
+        date
+        venue { id name }
+        artists {
+          id
+          name
+          urlSafeName
+          soundcloud
+          instagram
+          image
+        }
+        genres { id name }
+      }
+    }
+    totalResults
+  }
+}`;
+
+async function fetchPage(page: number, dateFrom: string): Promise<{ events: RAEvent[]; total: number }> {
+  const res = await fetch(RA_GRAPHQL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+      "Referer": "https://ra.co/events/us/chicago",
+    },
+    body: JSON.stringify({
+      query: EVENT_QUERY,
+      variables: {
+        filters: {
+          areas: { eq: CHICAGO_AREA_ID },
+          listingDate: { gte: dateFrom },
+        },
+        pageSize: PAGE_SIZE,
+        page,
+      },
+    }),
+  });
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+
+  if (json.errors) {
+    throw new Error(json.errors.map((e: any) => e.message).join("; "));
+  }
+
+  const listings = json.data?.eventListings;
+  const events: RAEvent[] = (listings?.data || []).map((d: any) => d.event).filter(Boolean);
+  return { events, total: listings?.totalResults || 0 };
+}
+
+function sleep(ms: number) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+// Target venue name matching — map RA venue names to our DB slugs
+const VENUE_NAME_MAP: Record<string, string> = {
+  "smartbar": "smartbar",
+  "smart bar": "smartbar",
+  "spybar": "spybar",
+  "spy bar": "spybar",
+  "primary": "primary",
+  "309 n morgan": "311-n-morgan-st",
+  "309 n. morgan": "311-n-morgan-st",
+  "morgan mfg": "morgan-mfg",
+  "podlasie": "podlasie",
+  "podlasie club": "podlasie",
+  "sound-bar": "sound-bar-chicago",
+  "sound bar": "sound-bar-chicago",
+  "soundbar": "sound-bar-chicago",
+  "concord music hall": "concord-music-hall",
+  "radius chicago": "radius",
+  "radius": "radius",
+  "cermak hall": "cermak-hall-at-radius",
+  "prysm": "prysm",
+  "prysm nightclub": "prysm",
+  "the mid": "the-mid",
+};
+
+function matchVenueSlug(raVenueName: string): string | null {
+  const lower = raVenueName.toLowerCase().trim();
+  for (const [pattern, slug] of Object.entries(VENUE_NAME_MAP)) {
+    if (lower === pattern || lower.startsWith(pattern + " ") || lower.includes(pattern)) {
+      return slug;
+    }
+  }
+  return null;
+}
 
 export async function scrapeRA() {
   const supabase = getSupabase();
 
-  let browser;
-  try {
-    browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext({
-      userAgent:
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    });
-    const page = await context.newPage();
+  // Calculate date 12 months ago
+  const now = new Date();
+  const twelveMonthsAgo = new Date(now);
+  twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+  const dateFrom = twelveMonthsAgo.toISOString().split(".")[0] + ".000";
 
-    let totalEvents = 0;
-    let newPerformers = 0;
+  log("ra", `Fetching Chicago events from RA since ${dateFrom.slice(0, 10)}`);
 
-    for (const venue of RA_VENUES) {
-      log("ra", `Scraping: ${venue.name}`);
+  // Step 1: Fetch all events via pagination
+  const allEvents: RAEvent[] = [];
+  let page = 1;
+  let total = 0;
 
-      try {
-        // Try past events page
-        await page.goto(`https://ra.co/clubs/${venue.raSlug}/past-events`, {
-          waitUntil: "domcontentloaded",
-          timeout: 30000,
+  const { events: firstPage, total: totalResults } = await fetchPage(page, dateFrom);
+  allEvents.push(...firstPage);
+  total = totalResults;
+  log("ra", `Total events available: ${total}`);
+
+  const totalPages = Math.ceil(Math.min(total, 10000) / PAGE_SIZE);
+  log("ra", `Fetching ${totalPages} pages...`);
+
+  while (page < totalPages) {
+    page++;
+    await sleep(DELAY_MS);
+    try {
+      const { events } = await fetchPage(page, dateFrom);
+      if (events.length === 0) break;
+      allEvents.push(...events);
+      if (page % 10 === 0) {
+        log("ra", `  Page ${page}/${totalPages} — ${allEvents.length} events so far`);
+      }
+    } catch (err) {
+      logError("ra", `Page ${page} failed`, err);
+      // Continue to next page
+    }
+  }
+
+  log("ra", `Fetched ${allEvents.length} events total`);
+
+  // Step 2: Collect unique artists and venues
+  const artistsSeen = new Map<string, {
+    name: string;
+    raSlug: string;
+    soundcloud: string | null;
+    instagram: string | null;
+    image: string | null;
+    events: { date: string; venue: string | null; title: string; genres: string[] }[];
+  }>();
+
+  const venuesSeen = new Map<string, string>(); // RA venue name -> our slug or null
+
+  for (const event of allEvents) {
+    const venueName = event.venue?.name || null;
+
+    for (const artist of event.artists) {
+      if (!artist.name || artist.name.length < 2) continue;
+      if (isNonArtistName(artist.name)) continue;
+
+      const key = artist.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (!artistsSeen.has(key)) {
+        artistsSeen.set(key, {
+          name: artist.name,
+          raSlug: artist.urlSafeName || "",
+          soundcloud: artist.soundcloud || null,
+          instagram: artist.instagram || null,
+          image: artist.image || null,
+          events: [],
         });
-        await page.waitForTimeout(4000);
+      }
 
-        // Scroll to load content
-        for (let i = 0; i < 3; i++) {
-          await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-          await page.waitForTimeout(2000);
-        }
+      const entry = artistsSeen.get(key)!;
+      // Update social links if we get new ones
+      if (artist.soundcloud && !entry.soundcloud) entry.soundcloud = artist.soundcloud;
+      if (artist.instagram && !entry.instagram) entry.instagram = artist.instagram;
+      if (artist.image && !entry.image) entry.image = artist.image;
 
-        // Extract events — RA uses varied markup, so cast a wide net
-        const events = await page.evaluate(() => {
-          const results: { artists: string[]; date: string; title: string }[] = [];
+      entry.events.push({
+        date: event.date?.slice(0, 10) || "",
+        venue: venueName,
+        title: event.title,
+        genres: event.genres.map((g) => g.name.toLowerCase()),
+      });
+    }
 
-          // Strategy 1: Look for event links with artist names
-          const allLinks = document.querySelectorAll("a[href*='/events/']");
-          const seenHrefs = new Set<string>();
+    if (venueName) {
+      const slug = matchVenueSlug(venueName);
+      if (slug) venuesSeen.set(venueName, slug);
+    }
+  }
 
-          allLinks.forEach((link) => {
-            const href = link.getAttribute("href") || "";
-            if (seenHrefs.has(href)) return;
-            seenHrefs.add(href);
+  log("ra", `Unique artists: ${artistsSeen.size}`);
+  log("ra", `Matched venues: ${venuesSeen.size}`);
 
-            const container = link.closest("li, article, div[class*='event'], div[class*='Event']") || link.parentElement;
-            if (!container) return;
+  // Step 3: Cross-reference with DB and upsert
+  let newPerformers = 0;
+  let updatedPerformers = 0;
+  let totalEventsInserted = 0;
+  let skipped = 0;
 
-            const title = link.textContent?.trim() || "";
+  // Pre-fetch all existing performers for efficient matching
+  const { data: existingPerformers } = await supabase
+    .from("performers")
+    .select("id, name, slug, soundcloud_url, instagram_handle, photo_url, ra_url, genres");
 
-            // Look for date in the container or nearby
-            const dateEl = container.querySelector("time, [datetime]");
-            const date = dateEl?.getAttribute("datetime") || dateEl?.textContent?.trim() || "";
+  const existingMap = new Map<string, typeof existingPerformers extends (infer T)[] | null ? T : never>();
+  for (const p of existingPerformers || []) {
+    const key = p.name.toLowerCase().replace(/[^a-z0-9]/g, "");
+    existingMap.set(key, p);
+    // Also map by slug for backup matching
+    existingMap.set(p.slug, p);
+  }
 
-            // Look for artist/DJ names — typically in separate elements
-            const artistEls = container.querySelectorAll("a[href*='/dj/'], a[href*='/artist/']");
-            let artists: string[] = [];
+  // Pre-fetch venue IDs
+  const { data: dbVenues } = await supabase.from("venues").select("id, slug, name");
+  const venueIdMap = new Map<string, string>();
+  for (const v of dbVenues || []) {
+    venueIdMap.set(v.slug, v.id);
+    venueIdMap.set(v.name.toLowerCase(), v.id);
+  }
 
-            if (artistEls.length > 0) {
-              artists = Array.from(artistEls)
-                .map((a) => a.textContent?.trim() || "")
-                .filter((a) => a.length > 1 && a.length < 60);
-            }
+  let processed = 0;
+  const totalArtists = artistsSeen.size;
 
-            // If no artist links found, try to parse from title
-            if (artists.length === 0 && title) {
-              // Common patterns: "Artist1, Artist2" or "Artist1 b2b Artist2"
-              const parts = title
-                .split(/[,&]|b2b|\|/)
-                .map((s) => s.trim())
-                .filter((s) => s.length > 1 && s.length < 60);
-              if (parts.length > 0) artists = parts;
-            }
+  for (const [key, artist] of artistsSeen) {
+    processed++;
+    if (processed % 50 === 0) {
+      log("ra", `  Processing ${processed}/${totalArtists}...`);
+    }
 
-            if (artists.length > 0 || title.length > 2) {
-              results.push({
-                artists: artists.length > 0 ? artists : [title],
-                date,
-                title,
-              });
-            }
-          });
+    // Find existing performer
+    let existing = existingMap.get(key);
+    if (!existing) {
+      // Try slug-based match
+      const slug = slugify(artist.name);
+      existing = existingMap.get(slug);
+    }
+    if (!existing && existingPerformers) {
+      // Fuzzy match
+      existing = existingPerformers.find((p) => namesMatch(p.name, artist.name)) || undefined;
+    }
 
-          // Strategy 2: Look for lineup-style lists
-          if (results.length === 0) {
-            const textBlocks = document.querySelectorAll("p, span, div");
-            textBlocks.forEach((el) => {
-              const text = el.textContent?.trim() || "";
-              // Look for comma-separated lists of names that look like lineups
-              if (text.includes(",") && text.length > 10 && text.length < 500) {
-                const names = text.split(",").map((n) => n.trim()).filter((n) => n.length > 1 && n.length < 50);
-                if (names.length >= 2) {
-                  results.push({ artists: names, date: "", title: text.slice(0, 100) });
-                }
-              }
-            });
-          }
+    // Collect genres from all events
+    const allGenres = new Set<string>();
+    for (const ev of artist.events) {
+      for (const g of ev.genres) allGenres.add(g);
+    }
 
-          return results.slice(0, 40);
-        });
+    const raUrl = artist.raSlug ? `https://ra.co/dj/${artist.raSlug}` : null;
 
-        // Get venue ID
-        const { data: dbVenue } = await supabase
-          .from("venues")
+    let performerId: string;
+
+    if (existing) {
+      // Update existing performer with RA data if we have new info
+      const updates: Record<string, any> = {};
+      if (raUrl && !existing.ra_url) updates.ra_url = raUrl;
+      if (artist.soundcloud && !existing.soundcloud_url) {
+        updates.soundcloud_url = artist.soundcloud.startsWith("http")
+          ? artist.soundcloud
+          : `https://soundcloud.com/${artist.soundcloud}`;
+      }
+      if (artist.instagram && !existing.instagram_handle) {
+        updates.instagram_handle = artist.instagram.replace(/^@/, "");
+      }
+      if (artist.image && !existing.photo_url) updates.photo_url = artist.image;
+
+      // Merge genres
+      const existingGenres = new Set(existing.genres || []);
+      const newGenres = [...allGenres].filter((g) => !existingGenres.has(g));
+      if (newGenres.length > 0) {
+        updates.genres = [...existingGenres, ...newGenres].slice(0, 10);
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await supabase.from("performers").update(updates).eq("id", existing.id);
+        updatedPerformers++;
+      }
+
+      performerId = existing.id;
+    } else {
+      // Insert new performer
+      const scUrl = artist.soundcloud
+        ? (artist.soundcloud.startsWith("http") ? artist.soundcloud : `https://soundcloud.com/${artist.soundcloud}`)
+        : null;
+
+      const { data: newP, error } = await supabase
+        .from("performers")
+        .insert({
+          name: artist.name,
+          slug: slugify(artist.name),
+          city: "Chicago",
+          genres: [...allGenres].slice(0, 5) || ["electronic"],
+          soundcloud_url: scUrl,
+          instagram_handle: artist.instagram?.replace(/^@/, "") || null,
+          ra_url: raUrl,
+          photo_url: artist.image || null,
+          claimed: false,
+        })
+        .select("id")
+        .single();
+
+      if (error) {
+        // Slug conflict — try with suffix
+        const { data: retry } = await supabase
+          .from("performers")
+          .insert({
+            name: artist.name,
+            slug: `${slugify(artist.name)}-ra`,
+            city: "Chicago",
+            genres: [...allGenres].slice(0, 5) || ["electronic"],
+            soundcloud_url: scUrl,
+            instagram_handle: artist.instagram?.replace(/^@/, "") || null,
+            ra_url: raUrl,
+            photo_url: artist.image || null,
+            claimed: false,
+          })
           .select("id")
-          .eq("slug", venue.dbSlug)
           .single();
 
-        if (!dbVenue) {
-          log("ra", `Venue ${venue.name} not in DB — skipping`);
+        if (!retry) {
+          skipped++;
           continue;
         }
+        performerId = retry.id;
+      } else {
+        performerId = newP!.id;
+      }
+      newPerformers++;
+    }
 
-        for (const event of events) {
-          for (const artistName of event.artists) {
-            if (!artistName || artistName.length < 2) continue;
+    // Insert events for this performer
+    for (const ev of artist.events) {
+      if (!ev.date) continue;
 
-            // Skip common non-artist strings
-            if (/^\d+$/.test(artistName) || /ticket|rsvp|free|sold out/i.test(artistName)) continue;
-            if (isNonArtistName(artistName)) {
-              log("ra", `  SKIP (non-artist): ${artistName}`);
-              continue;
+      // Resolve venue ID
+      let venueId: string | null = null;
+      if (ev.venue) {
+        const slug = matchVenueSlug(ev.venue);
+        if (slug) venueId = venueIdMap.get(slug) || null;
+        if (!venueId) {
+          // Try direct name match
+          venueId = venueIdMap.get(ev.venue.toLowerCase()) || null;
+        }
+        if (!venueId) {
+          // Create venue
+          const vSlug = slugify(ev.venue);
+          const existingVenueId = venueIdMap.get(vSlug);
+          if (existingVenueId) {
+            venueId = existingVenueId;
+          } else {
+            const { data: newV } = await supabase
+              .from("venues")
+              .insert({
+                name: ev.venue,
+                slug: vSlug,
+                city: "Chicago",
+                latitude: 41.8781,
+                longitude: -87.6298,
+              })
+              .select("id")
+              .single();
+            if (newV) {
+              venueId = newV.id;
+              venueIdMap.set(vSlug, newV.id);
+              venueIdMap.set(ev.venue.toLowerCase(), newV.id);
             }
-
-            const { data: existing } = await supabase
-              .from("performers")
-              .select("id, name")
-              .or(`slug.eq.${slugify(artistName)},name.ilike.${artistName}`);
-
-            const match = existing?.find((p) => namesMatch(p.name, artistName));
-            let performerId: string;
-
-            if (match) {
-              performerId = match.id;
-            } else {
-              const { data: newP, error } = await supabase
-                .from("performers")
-                .insert({
-                  name: artistName,
-                  slug: slugify(artistName),
-                  city: "Chicago",
-                  genres: ["electronic"],
-                })
-                .select("id")
-                .single();
-
-              if (error || !newP) continue;
-              performerId = newP.id;
-              newPerformers++;
-            }
-
-            const eventDate = parseDate(event.date);
-            if (eventDate) {
-              const { error: evErr } = await supabase.from("events").insert({
-                performer_id: performerId,
-                venue_id: dbVenue.id,
-                event_date: eventDate,
-                source: "ra",
-              });
-              if (!evErr) totalEvents++;
-            }
-
-            await supabase.from("scraped_profiles").insert({
-              performer_id: performerId,
-              source: "ra",
-              raw_data: { venue: venue.name, event_title: event.title, date: event.date },
-            });
           }
         }
-
-        log("ra", `${venue.name}: found ${events.length} events`);
-      } catch (err) {
-        logError("ra", `Failed to scrape ${venue.name}`, err);
       }
 
-      await page.waitForTimeout(3000);
-    }
+      // Check for duplicate event
+      const { data: existingEvent } = await supabase
+        .from("events")
+        .select("id")
+        .eq("performer_id", performerId)
+        .eq("event_date", ev.date)
+        .eq("source", "ra")
+        .maybeSingle();
 
-    log("ra", `Done. ${totalEvents} events, ${newPerformers} new performers.`);
-  } finally {
-    if (browser) await browser.close();
-  }
-}
-
-function parseDate(dateStr: string): string | null {
-  if (!dateStr) return null;
-
-  try {
-    const d = new Date(dateStr);
-    if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
-  } catch {
-    // ignore
-  }
-
-  // Try various patterns
-  const patterns = [
-    /(\d{4})-(\d{2})-(\d{2})/,
-    /(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+(\d{4})/i,
-    /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\w*\s+(\d{1,2}),?\s+(\d{4})/i,
-  ];
-
-  for (const pattern of patterns) {
-    const match = dateStr.match(pattern);
-    if (match) {
-      try {
-        const d = new Date(match[0]);
-        if (!isNaN(d.getTime())) return d.toISOString().split("T")[0];
-      } catch {
-        continue;
+      if (!existingEvent) {
+        const { error: evErr } = await supabase.from("events").insert({
+          performer_id: performerId,
+          venue_id: venueId,
+          event_date: ev.date,
+          source: "ra",
+        });
+        if (!evErr) totalEventsInserted++;
       }
     }
   }
 
-  return null;
+  // Stats
+  log("ra", "\n=== RA SCRAPE RESULTS ===");
+  log("ra", `Events fetched from API: ${allEvents.length}`);
+  log("ra", `Unique artists found: ${artistsSeen.size}`);
+  log("ra", `New performers added: ${newPerformers}`);
+  log("ra", `Existing performers updated: ${updatedPerformers}`);
+  log("ra", `Events inserted: ${totalEventsInserted}`);
+  log("ra", `Skipped (errors): ${skipped}`);
+
+  // Show target venue breakdown
+  log("ra", "\n--- Target Venue Hits ---");
+  const targetVenues = ["smartbar", "spybar", "primary", "podlasie", "309 n morgan", "sound-bar", "concord music hall", "radius", "the mid", "prysm"];
+  for (const tv of targetVenues) {
+    const count = allEvents.filter((e) =>
+      e.venue?.name && e.venue.name.toLowerCase().includes(tv)
+    ).length;
+    if (count > 0) log("ra", `  ${tv}: ${count} events`);
+  }
 }
 
 if (require.main === module) {
