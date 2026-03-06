@@ -114,7 +114,10 @@ Plans:
   2. Visitor can see top performers ranked by fan count on the same page
   3. User can toggle between weekly, monthly, and all-time time filters and rankings update accordingly
   4. Leaderboard page uses Decibel dark aesthetic with gamification feel (ranks, visual hierarchy, tier colors)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 06-01-PLAN.md — Leaderboard page with podium layout, fan/performer tabs, time filtering
 
 ### Phase 7: Content Generator
 **Goal**: Automated pipeline produces ready-to-post Instagram content from scraped performer and event data
@@ -140,5 +143,5 @@ Phases execute in numeric order: 5 -> 6 -> 7
 | 3. Performer Dashboard | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 4. Fan Profile + Polish | v1.0 | 2/2 | Complete | 2026-03-06 |
 | 5. Shareable Collection Cards | 1/2 | In Progress|  | - |
-| 6. City Leaderboard | v1.1 | 0/? | Not started | - |
+| 6. City Leaderboard | v1.1 | 0/1 | Not started | - |
 | 7. Content Generator | v1.1 | 0/? | Not started | - |
