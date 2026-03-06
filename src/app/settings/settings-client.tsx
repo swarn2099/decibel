@@ -61,7 +61,7 @@ export function SettingsClient({
   }
 
   return (
-    <div className="min-h-dvh bg-bg">
+    <div className="min-h-dvh bg-bg pt-14">
       {/* Header */}
       <header className="border-b border-light-gray/10 px-6 py-4">
         <div className="mx-auto flex max-w-md items-center gap-3">
