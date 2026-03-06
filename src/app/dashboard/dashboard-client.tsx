@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Download, Eye, LogOut, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
+import { toast } from "sonner";
 
 type Performer = {
   id: string;
@@ -174,6 +175,9 @@ function GoLiveButton({
     if (res.ok) {
       setLiveStatus("live");
       setShowPicker(false);
+      toast.success("You're live! Fans nearby will be notified.");
+    } else {
+      toast.error("Failed to go live. Try again.");
     }
   }
 
