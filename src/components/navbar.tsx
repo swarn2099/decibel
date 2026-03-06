@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { User, LogIn, MapPin } from "lucide-react";
+import { User, LogIn, MapPin, Trophy } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { SearchBar } from "./search-bar";
 
@@ -44,6 +44,19 @@ export function Navbar() {
       {!isLanding && <SearchBar className="mx-auto" />}
 
       <div className="flex shrink-0 items-center gap-2">
+        {/* Leaderboard link */}
+        <Link
+          href="/leaderboard"
+          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm backdrop-blur-sm transition-colors ${
+            pathname.startsWith("/leaderboard")
+              ? "border-pink/50 bg-bg-card/80 text-pink"
+              : "border-light-gray/20 bg-bg-card/80 text-gray hover:border-pink/30 hover:text-pink"
+          }`}
+        >
+          <Trophy size={16} />
+          <span className="hidden sm:inline">Leaderboard</span>
+        </Link>
+
         {/* Map link */}
         <Link
           href="/map"
