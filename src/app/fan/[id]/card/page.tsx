@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { createSupabaseAdmin } from "@/lib/supabase-admin";
 import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
+import { CardClient } from "./card-client";
 
 type Collection = {
   scan_count: number;
@@ -168,6 +169,8 @@ export default async function FanCardPage({ params }: Props) {
           </p>
         </div>
       </div>
+
+      <CardClient />
     </div>
   );
 }
