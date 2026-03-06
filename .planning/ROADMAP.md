@@ -76,10 +76,11 @@ Plans:
   1. No performers table rows contain event names instead of actual artist names
   2. All Instagram handles in the database are stored as plain usernames (e.g., "djname") not full URLs
   3. Scraper pipeline covers additional Chicago venues beyond current EDMTrain/RA/DICE sources
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 10-01: TBD
+- [ ] 10-01-PLAN.md — Clean bad performer names and normalize Instagram handles
+- [ ] 10-02-PLAN.md — Add Bandsintown scraper for expanded Chicago venue coverage
 
 ## Progress
 
@@ -96,5 +97,5 @@ Phases 8, 9, and 10 are independent and can execute in any order.
 | 6. City Leaderboard | v1.1 | 1/1 | Complete | 2026-03-06 |
 | 7. Content Generator | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
-| 9. Scene Map | 2/2 | Complete   | 2026-03-06 | - |
-| 10. Scraper Pipeline | v1.2 | 0/? | Not started | - |
+| 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
+| 10. Scraper Pipeline | v1.2 | 0/2 | Not started | - |
