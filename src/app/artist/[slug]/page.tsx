@@ -9,7 +9,6 @@ import {
   Headphones,
   Music,
   Users,
-  Calendar,
   Clock,
   Play,
 } from "lucide-react";
@@ -59,6 +58,24 @@ function getGradient(name: string) {
     name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0) %
     GRADIENT_PAIRS.length;
   return GRADIENT_PAIRS[idx];
+}
+
+function cleanInstagramHandle(handle: string): string {
+  // If it's a full URL, extract the username from the path
+  if (handle.startsWith("http") || handle.includes("instagram.com")) {
+    try {
+      const url = new URL(handle.startsWith("http") ? handle : `https://${handle}`);
+      const path = url.pathname.replace(/^\//, "").replace(/\/$/, "");
+      return path.replace(/^@/, "");
+    } catch {
+      // If URL parsing fails, just strip common prefixes
+      return handle
+        .replace(/^https?:\/\/(www\.)?instagram\.com\//, "")
+        .replace(/^@/, "")
+        .replace(/\/$/, "");
+    }
+  }
+  return handle.replace(/^@/, "");
 }
 
 function formatFollowers(count: number): string {
@@ -118,6 +135,17 @@ async function getUpcomingEvents(performerId: string): Promise<Event[]> {
   })) as Event[];
 }
 
+async function getFanCount(performerId: string): Promise<number> {
+  const supabase = await createSupabaseServer();
+  const { count, error } = await supabase
+    .from("collections")
+    .select("fan_id", { count: "exact", head: true })
+    .eq("performer_id", performerId);
+
+  if (error || count === null) return 0;
+  return count;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -149,7 +177,10 @@ export default async function ArtistPage({ params }: { params: Params }) {
   if (!performer) notFound();
 
   const [gradFrom, gradTo] = getGradient(performer.name);
-  const upcomingEvents = await getUpcomingEvents(performer.id);
+  const [upcomingEvents, fanCount] = await Promise.all([
+    getUpcomingEvents(performer.id),
+    getFanCount(performer.id),
+  ]);
   const socialLinks = [
     performer.soundcloud_url && {
       href: performer.soundcloud_url,
@@ -159,9 +190,9 @@ export default async function ArtistPage({ params }: { params: Params }) {
       hoverBorder: "hover:border-pink/30",
     },
     performer.instagram_handle && {
-      href: `https://instagram.com/${performer.instagram_handle}`,
+      href: `https://instagram.com/${cleanInstagramHandle(performer.instagram_handle)}`,
       icon: Instagram,
-      label: `@${performer.instagram_handle}`,
+      label: `@${cleanInstagramHandle(performer.instagram_handle)}`,
       color: "text-purple",
       hoverBorder: "hover:border-purple/30",
     },
@@ -246,6 +277,13 @@ export default async function ArtistPage({ params }: { params: Params }) {
                   followers
                 </span>
               )}
+              {fanCount > 0 && (
+                <span className="flex items-center gap-1">
+                  <Users className="h-3.5 w-3.5" />
+                  <span className="font-semibold text-[var(--text)]">{fanCount}</span>{" "}
+                  fans
+                </span>
+              )}
               {performer.city && (
                 <span className="flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5" />
@@ -258,44 +296,48 @@ export default async function ArtistPage({ params }: { params: Params }) {
       </div>
 
       {/* ───── Action Bar ───── */}
-      <div className="mx-auto flex max-w-4xl items-center gap-4 px-6 py-6">
-        <Link
-          href={`/collect/${performer.slug}`}
-          className={`flex items-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-7 py-3 text-sm font-bold text-[var(--text)] shadow-lg transition-all hover:scale-105 hover:shadow-xl`}
-        >
-          <Play className="h-4 w-4 fill-current" />
-          Collect
-        </Link>
-
-        {/* Social link pills */}
-        {socialLinks.map((link) => (
-          <a
-            key={link.label}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`hidden items-center gap-2 rounded-full border border-light-gray/20 px-4 py-2.5 text-xs font-medium transition-all hover:bg-bg-card sm:flex ${link.hoverBorder}`}
-            title={link.label}
+      <div className="mx-auto max-w-4xl px-6 py-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <Link
+            href={`/collect/${performer.slug}`}
+            className={`flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-10 py-4 text-base font-extrabold text-[var(--text)] shadow-[0_0_20px_rgba(255,77,106,0.4)] transition-all hover:scale-105 hover:shadow-xl sm:w-auto`}
           >
-            <link.icon className={`h-4 w-4 ${link.color}`} />
-            <span className="text-[var(--text-muted)]">{link.label}</span>
-          </a>
-        ))}
+            <Play className="h-5 w-5 fill-current" />
+            Collect
+          </Link>
 
-        {/* Mobile social icons */}
-        <div className="flex items-center gap-2 sm:hidden">
-          {socialLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex items-center justify-center rounded-full border border-light-gray/20 p-2.5 transition-all hover:bg-bg-card ${link.hoverBorder}`}
-              title={link.label}
-            >
-              <link.icon className={`h-4 w-4 ${link.color}`} />
-            </a>
-          ))}
+          {/* Social link pills (desktop) */}
+          <div className="hidden items-center gap-3 sm:flex">
+            {socialLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-2 rounded-full border border-light-gray/20 px-4 py-2.5 text-xs font-medium transition-all hover:bg-bg-card ${link.hoverBorder}`}
+                title={link.label}
+              >
+                <link.icon className={`h-4 w-4 ${link.color}`} />
+                <span className="text-[var(--text-muted)]">{link.label}</span>
+              </a>
+            ))}
+          </div>
+
+          {/* Mobile social icons */}
+          <div className="flex items-center justify-center gap-2 sm:hidden">
+            {socialLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center rounded-full border border-light-gray/20 p-2.5 transition-all hover:bg-bg-card ${link.hoverBorder}`}
+                title={link.label}
+              >
+                <link.icon className={`h-4 w-4 ${link.color}`} />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -385,22 +427,6 @@ export default async function ArtistPage({ params }: { params: Params }) {
                   </Wrapper>
                 );
               })}
-            </div>
-          </section>
-        )}
-
-        {/* No upcoming shows placeholder */}
-        {upcomingEvents.length === 0 && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
-              Upcoming Shows
-            </h2>
-            <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-light-gray/20 py-10 text-center">
-              <Calendar className="h-8 w-8 text-light-gray" />
-              <p className="text-sm text-gray">No upcoming shows listed yet</p>
-              <p className="text-xs text-light-gray">
-                Collect {performer.name} to get notified when shows are announced
-              </p>
             </div>
           </section>
         )}
