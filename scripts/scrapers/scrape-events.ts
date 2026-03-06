@@ -12,6 +12,7 @@ interface ScrapedEvent {
   venue: string;
   genres: string[];
   source: string;
+  ticketUrl?: string;
 }
 
 // ─── EDMTrain Scraper ───
@@ -65,13 +66,17 @@ async function scrapeEdmTrain(page: Page): Promise<ScrapedEvent[]> {
             if (g && g.length > 2) genres.push(g);
           });
 
+          // Get event URL
+          const linkEl = c.querySelector('a[itemprop="url"]');
+          const eventUrl = linkEl?.getAttribute('href') || '';
+
           if (artists.length > 0 && sorteddate) {
-            results.push({ date: sorteddate, artists, venue, genres });
+            results.push({ date: sorteddate, artists, venue, genres, eventUrl });
           }
         });
         return results;
       })()
-    `) as Array<{ date: string; artists: string[]; venue: string; genres: string[] }>;
+    `) as Array<{ date: string; artists: string[]; venue: string; genres: string[]; eventUrl: string }>;
 
     const now = new Date();
     const twoMonthsOut = new Date(now);
@@ -87,6 +92,7 @@ async function scrapeEdmTrain(page: Page): Promise<ScrapedEvent[]> {
         venue: raw.venue,
         genres: raw.genres,
         source: "edmtrain",
+        ticketUrl: raw.eventUrl || undefined,
       });
     }
 
@@ -377,6 +383,7 @@ async function insertEventsForPerformer(
         venue_id: venueId,
         event_date: event.date,
         source: "edmtrain",
+        external_url: event.ticketUrl || null,
       })
       .select("id")
       .single();

@@ -329,10 +329,19 @@ export default async function ArtistPage({ params }: { params: Params }) {
             <div className="grid gap-3 sm:grid-cols-2">
               {upcomingEvents.map((event) => {
                 const { day, month, weekday } = formatEventDate(event.event_date);
+                const Wrapper = event.external_url ? "a" : "div";
+                const wrapperProps = event.external_url
+                  ? {
+                      href: event.external_url,
+                      target: "_blank" as const,
+                      rel: "noopener noreferrer",
+                    }
+                  : {};
                 return (
-                  <div
+                  <Wrapper
                     key={event.id}
-                    className="group flex items-center gap-4 rounded-xl border border-light-gray/15 bg-bg-card px-5 py-4 transition-all hover:border-pink/20"
+                    {...wrapperProps}
+                    className="group flex items-center gap-4 rounded-xl border border-light-gray/15 bg-bg-card px-5 py-4 transition-all hover:border-pink/20 hover:bg-bg-card/80"
                   >
                     {/* Date block */}
                     <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-white/5">
@@ -367,18 +376,11 @@ export default async function ArtistPage({ params }: { params: Params }) {
                       )}
                     </div>
 
-                    {/* External link */}
+                    {/* External link indicator */}
                     {event.external_url && (
-                      <a
-                        href={event.external_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="shrink-0 text-light-gray transition-colors hover:text-white"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
+                      <ExternalLink className="h-4 w-4 shrink-0 text-light-gray transition-colors group-hover:text-white" />
                     )}
-                  </div>
+                  </Wrapper>
                 );
               })}
             </div>
