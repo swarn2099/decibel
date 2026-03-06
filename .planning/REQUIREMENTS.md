@@ -73,10 +73,10 @@ Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
 
 ### Leaderboard
 
-- [ ] **LEAD-01**: Public leaderboard page at `/leaderboard` showing top fans by collection count
-- [ ] **LEAD-02**: Leaderboard shows top performers by fan count
-- [ ] **LEAD-03**: User can filter leaderboard by time period (weekly/monthly/all-time)
-- [ ] **LEAD-04**: Leaderboard displays with Decibel dark aesthetic and gamification feel
+- [x] **LEAD-01**: Public leaderboard page at `/leaderboard` showing top fans by collection count
+- [x] **LEAD-02**: Leaderboard shows top performers by fan count
+- [x] **LEAD-03**: User can filter leaderboard by time period (weekly/monthly/all-time)
+- [x] **LEAD-04**: Leaderboard displays with Decibel dark aesthetic and gamification feel
 
 ### Content
 
@@ -164,10 +164,10 @@ Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
 | SHARE-02 | Phase 5 | Complete |
 | SHARE-03 | Phase 5 | Complete |
 | SHARE-04 | Phase 5 | Complete |
-| LEAD-01 | Phase 6 | Pending |
-| LEAD-02 | Phase 6 | Pending |
-| LEAD-03 | Phase 6 | Pending |
-| LEAD-04 | Phase 6 | Pending |
+| LEAD-01 | Phase 6 | Complete |
+| LEAD-02 | Phase 6 | Complete |
+| LEAD-03 | Phase 6 | Complete |
+| LEAD-04 | Phase 6 | Complete |
 | CONT-01 | Phase 7 | Pending |
 | CONT-02 | Phase 7 | Pending |
 | CONT-03 | Phase 7 | Pending |
