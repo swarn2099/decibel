@@ -69,7 +69,7 @@ Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
 - [x] **SHARE-01**: Fan can view a branded collection card at `/fan/[id]/card` showing collected artists, tier badges, and total count
 - [x] **SHARE-02**: Collection card renders as 1200x630 OG image for social media preview
 - [x] **SHARE-03**: Card uses Decibel dark aesthetic with artist photos in a grid layout
-- [ ] **SHARE-04**: Fan can share their collection card URL and it previews correctly on social platforms
+- [x] **SHARE-04**: Fan can share their collection card URL and it previews correctly on social platforms
 
 ### Leaderboard
 
@@ -163,7 +163,7 @@ Requirements for milestone v1.1 — Growth Mechanics + Content Engine.
 | SHARE-01 | Phase 5 | Complete |
 | SHARE-02 | Phase 5 | Complete |
 | SHARE-03 | Phase 5 | Complete |
-| SHARE-04 | Phase 5 | Pending |
+| SHARE-04 | Phase 5 | Complete |
 | LEAD-01 | Phase 6 | Pending |
 | LEAD-02 | Phase 6 | Pending |
 | LEAD-03 | Phase 6 | Pending |
