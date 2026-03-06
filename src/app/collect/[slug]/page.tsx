@@ -1,4 +1,4 @@
-import { createSupabaseServer } from "@/lib/supabase";
+import { createSupabaseServer } from "@/lib/supabase-server";
 import { notFound } from "next/navigation";
 import { CollectForm } from "./collect-form";
 import type { Metadata } from "next";
