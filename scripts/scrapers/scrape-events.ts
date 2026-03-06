@@ -4,7 +4,7 @@
  * and populates the DB with real event-sourced performers + events.
  */
 import { chromium, type Page, type Browser } from "playwright";
-import { getSupabase, slugify, log, logError } from "./utils";
+import { getSupabase, slugify, log, logError, isNonArtistName } from "./utils";
 
 interface ScrapedEvent {
   date: string;
@@ -238,6 +238,12 @@ async function main() {
     const total = artistMap.size;
 
     for (const [key, meta] of artistMap.entries()) {
+      // Skip non-artist entries (events, parties, etc.)
+      if (isNonArtistName(meta.displayName)) {
+        log("main", `  SKIP (non-artist): ${meta.displayName}`);
+        continue;
+      }
+
       const idx = inserted + 1;
       const genres = [...meta.genres].filter(Boolean);
       const uniqueGenres = [...new Set(genres)].slice(0, 5);

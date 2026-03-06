@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-import { getSupabase, slugify, namesMatch, log, logError } from "./utils";
+import { getSupabase, slugify, namesMatch, log, logError, isNonArtistName } from "./utils";
 
 export async function scrapeDICE() {
   const supabase = getSupabase();
@@ -137,6 +137,11 @@ export async function scrapeDICE() {
       }
 
       for (const artistName of artists) {
+        if (isNonArtistName(artistName)) {
+          log("dice", `  SKIP (non-artist): ${artistName}`);
+          continue;
+        }
+
         const { data: existing } = await supabase
           .from("performers")
           .select("id, name")

@@ -1,14 +1,16 @@
 import { chromium } from "playwright";
-import { getSupabase, slugify, namesMatch, log, logError } from "./utils";
+import { getSupabase, slugify, namesMatch, log, logError, isNonArtistName } from "./utils";
 
 const RA_VENUES: { name: string; raSlug: string; dbSlug: string }[] = [
   { name: "Smartbar", raSlug: "smartbar", dbSlug: "smartbar" },
   { name: "Soundbar", raSlug: "soundbar-chicago", dbSlug: "soundbar" },
   { name: "Spybar", raSlug: "spybar", dbSlug: "spybar" },
-  { name: "Concord Music Hall", raSlug: "concord-music-hall", dbSlug: "concord" },
+  { name: "Concord Music Hall", raSlug: "concord-music-hall", dbSlug: "concord-music-hall" },
   { name: "The Mid", raSlug: "the-mid", dbSlug: "the-mid" },
   { name: "Primary", raSlug: "primary-chicago", dbSlug: "primary" },
-  { name: "Radius Chicago", raSlug: "radius-chicago", dbSlug: "radius" },
+  { name: "Radius Chicago", raSlug: "radius-chicago", dbSlug: "radius-chicago" },
+  { name: "309 N Morgan", raSlug: "309-n-morgan", dbSlug: "309-n-morgan" },
+  { name: "Podlasie", raSlug: "podlasie", dbSlug: "podlasie" },
 ];
 
 export async function scrapeRA() {
@@ -130,6 +132,10 @@ export async function scrapeRA() {
 
             // Skip common non-artist strings
             if (/^\d+$/.test(artistName) || /ticket|rsvp|free|sold out/i.test(artistName)) continue;
+            if (isNonArtistName(artistName)) {
+              log("ra", `  SKIP (non-artist): ${artistName}`);
+              continue;
+            }
 
             const { data: existing } = await supabase
               .from("performers")

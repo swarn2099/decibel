@@ -54,7 +54,8 @@ export default async function Home() {
   const [{ data: performers }, { data: rawEvents }] = await Promise.all([
     supabase
       .from("performers")
-      .select("name, slug, photo_url, genres, follower_count")
+      .select("name, slug, photo_url, genres, follower_count, is_chicago_resident")
+      .order("is_chicago_resident", { ascending: false })
       .order("follower_count", { ascending: false })
       .limit(500),
     supabase
