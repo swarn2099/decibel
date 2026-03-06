@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Download, LogOut, Radio, Send, Users, Zap, Shield, Crown } from "lucide-react";
+import { createSupabaseBrowser } from "@/lib/supabase-browser";
 
 type Performer = {
   id: string;
@@ -63,9 +65,15 @@ export function DashboardClient({
   fanList: FanRow[];
   venues: Venue[];
 }) {
+  const router = useRouter();
   const [tab, setTab] = useState<Tab>("overview");
   const [goLiveVenue, setGoLiveVenue] = useState("");
   const [liveStatus, setLiveStatus] = useState<string | null>(null);
+
+  async function handleLogout() {
+    await createSupabaseBrowser().auth.signOut();
+    router.push("/auth/login");
+  }
 
   return (
     <div className="min-h-dvh bg-bg">
@@ -93,6 +101,13 @@ export function DashboardClient({
               liveStatus={liveStatus}
               setLiveStatus={setLiveStatus}
             />
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 rounded-lg border border-light-gray/20 px-3 py-2 text-xs text-gray transition-colors hover:border-pink/30 hover:text-pink"
+            >
+              <LogOut size={14} />
+              Log Out
+            </button>
           </div>
         </div>
       </header>
