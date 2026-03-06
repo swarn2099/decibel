@@ -9,10 +9,10 @@
   --blue: #4D9AFF;
   --teal: #00D4AA;
   --yellow: #FFD700;
-  --gray: #8E8E9A;
-  --light-gray: #55556A;
+  --gray: #A0A0B0;
+  --light-gray: #6E6E82;
   --text: #ededed;
-  --text-muted: rgba(255, 255, 255, 0.8);
+  --text-muted: rgba(255, 255, 255, 0.85);
   color-scheme: dark;
 }
 

@@ -82,7 +82,7 @@ function formatTime(timeStr: string): string {
 }
 
 function getSoundCloudEmbedUrl(profileUrl: string): string {
-  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(profileUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=true`;
+  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(profileUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
 }
 
 async function getPerformer(slug: string): Promise<Performer | null> {
@@ -223,7 +223,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
                 {performer.genres.map((genre) => (
                   <span
                     key={genre}
-                    className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-medium text-white/70"
+                    className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-medium text-white/90"
                   >
                     {genre}
                   </span>
@@ -276,7 +276,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
             title={link.label}
           >
             <link.icon className={`h-4 w-4 ${link.color}`} />
-            <span className="text-white/80">{link.label}</span>
+            <span className="text-white/90">{link.label}</span>
           </a>
         ))}
 
@@ -305,11 +305,11 @@ export default async function ArtistPage({ params }: { params: Params }) {
             <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
               Tracks
             </h2>
-            <div className="overflow-hidden rounded-xl border border-light-gray/15 bg-bg-card">
+            <div className="overflow-hidden rounded-xl border border-light-gray/15">
               <iframe
                 title={`${performer.name} on SoundCloud`}
                 width="100%"
-                height="300"
+                height="166"
                 scrolling="no"
                 frameBorder="no"
                 allow="autoplay"
@@ -410,7 +410,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
               About
             </h2>
             <div className="rounded-xl border border-light-gray/15 bg-bg-card p-6">
-              <p className="leading-relaxed text-white/80">{performer.bio}</p>
+              <p className="leading-relaxed text-white/90">{performer.bio}</p>
               {performer.city && (
                 <p className="mt-4 flex items-center gap-1.5 text-sm text-gray">
                   <MapPin className="h-3.5 w-3.5" />
