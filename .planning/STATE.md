@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-06)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
-**Current focus:** Phase 5 — Shareable Collection Cards
+**Current focus:** Phase 6 — City Leaderboard
 
 ## Current Position
 
@@ -77,10 +77,10 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 1]: RLS policies written but not yet applied — need DB password or Supabase CLI login to deploy
-- [Phase 5]: OG image generation needs Playwright or similar for React-to-PNG — RESOLVED: using Next.js ImageResponse (Satori), no Playwright needed
+- ~~[Phase 5]: OG image generation needs Playwright or similar for React-to-PNG~~ — RESOLVED: using Next.js ImageResponse (Satori), no Playwright needed
 
 ## Session Continuity
 
-Last session: 2026-03-06T20:02:13.364Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-06
+Stopped at: Phase 5 complete, ready to plan Phase 6
 Resume file: None

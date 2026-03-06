@@ -22,6 +22,12 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 - ✓ Homepage with performer grid and search bar — Bonus
 - ✓ Dark underground aesthetic (Nerve movie vibe) with brand design tokens — Phase 0
 
+### Validated (v1.1)
+
+- ✓ Shareable fan collection card page (`/fan/[id]/card`) with artist grid and tier badges — Phase 5
+- ✓ Dynamic OG image generation (1200×630) for social sharing previews — Phase 5
+- ✓ Copy-to-clipboard share button + Share on X (Twitter intent) — Phase 5
+
 ### Active
 
 ## Current Milestone: v1.1 Growth Mechanics + Content Engine
@@ -29,7 +35,7 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 **Goal:** Add viral sharing, gamification, and automated content generation to drive organic growth.
 
 **Target features:**
-- Shareable collection cards (OG image generation for social sharing)
+- ~~Shareable collection cards (OG image generation for social sharing)~~ ✓ Phase 5
 - City leaderboard (top fans, top performers, time filters)
 - Content generator (DJ Spotlight, Scene Roundup, Product Teaser — automated Instagram pipeline)
 
@@ -73,6 +79,8 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 | Admin client for dashboard queries | Bypasses RLS, simpler than per-user policies with server-side auth check | ✓ Good |
 | Session-based identity in /api/claim | Never trust form-submitted user_id | ✓ Good |
 | Stub message delivery for v1 | Real SendGrid integration adds complexity, not needed for demo | — Pending |
+| Inline createClient in OG image route | supabase-admin.ts uses server-only, incompatible with Edge runtime | ✓ Good |
+| System sans-serif in OG images | Avoids Poppins font fetch failures, simpler | ✓ Good |
 
 ---
-*Last updated: 2026-03-06 after milestone v1.1 started*
+*Last updated: 2026-03-06 after Phase 5*
