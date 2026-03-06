@@ -29,11 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Unauthenticated user visiting /dashboard is redirected to /auth/login
   4. Performer can only claim a profile that matches their authenticated email — claiming another performer's profile fails
   5. Database queries scoped by RLS return only rows the authenticated user owns (collections, fan_tiers, messages)
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md — Security hardening: fix claim route, switch dashboard to admin client, add logout
+- [ ] 01-02-PLAN.md — RLS policies for collections/fan_tiers/messages + human verification
 
 ### Phase 2: Fan Capture
 **Goal**: A fan at a venue can scan a QR code, enter their email, and be collected with correct tier progression — the core product loop works end-to-end
