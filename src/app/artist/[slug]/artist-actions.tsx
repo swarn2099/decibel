@@ -147,13 +147,15 @@ export function ArtistActions({
               <Compass className="h-4 w-4" />
               Discover
             </Link>
-            <Link
-              href={`/auth/login?redirect=/collect/${performerSlug}`}
-              className={`flex items-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-8 py-3 text-sm font-extrabold text-[var(--text)] shadow-[0_0_20px_rgba(255,77,106,0.4)] transition-all hover:scale-105 hover:shadow-xl`}
-            >
-              <Play className="h-4 w-4 fill-current" />
-              Collect
-            </Link>
+            {nextShowVenue && (
+              <span className="text-xs text-gray">
+                Next show at{" "}
+                <span className="font-semibold text-[var(--text-muted)]">
+                  {nextShowVenue}
+                </span>
+                {" "}&middot; scan QR to collect
+              </span>
+            )}
           </>
         )}
 
@@ -168,19 +170,17 @@ export function ArtistActions({
               <Compass className="h-4 w-4" />
               {discovering ? "Adding..." : "Discover"}
             </button>
-            <Link
-              href={`/collect/${performerSlug}`}
-              className={`flex items-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-8 py-3 text-sm font-extrabold text-[var(--text)] shadow-[0_0_20px_rgba(255,77,106,0.4)] transition-all hover:scale-105 hover:shadow-xl`}
-            >
-              <Play className="h-4 w-4 fill-current" />
-              Collect
-            </Link>
-            {nextShowVenue && (
+            {nextShowVenue ? (
               <span className="text-xs text-gray">
                 Next show at{" "}
                 <span className="font-semibold text-[var(--text-muted)]">
                   {nextShowVenue}
                 </span>
+                {" "}&middot; scan QR to collect
+              </span>
+            ) : (
+              <span className="text-xs text-gray">
+                Scan QR at a show to collect in person
               </span>
             )}
           </>
@@ -193,16 +193,19 @@ export function ArtistActions({
               <Check className="h-4 w-4" />
               Discovered
             </span>
-            <Link
-              href={`/collect/${performerSlug}`}
-              className={`flex items-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-8 py-3 text-sm font-extrabold text-[var(--text)] shadow-[0_0_20px_rgba(255,77,106,0.4)] transition-all hover:scale-105 hover:shadow-xl`}
-            >
-              <Play className="h-4 w-4 fill-current" />
-              Collect in Person
-            </Link>
-            <span className="text-xs text-gray">
-              Collect at a show to level up
-            </span>
+            {nextShowVenue ? (
+              <span className="text-xs text-gray">
+                Scan QR at{" "}
+                <span className="font-semibold text-[var(--text-muted)]">
+                  {nextShowVenue}
+                </span>
+                {" "}to collect &amp; level up
+              </span>
+            ) : (
+              <span className="text-xs text-gray">
+                Scan QR at a show to collect &amp; level up
+              </span>
+            )}
           </>
         )}
 
