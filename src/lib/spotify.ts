@@ -1,7 +1,13 @@
 import "server-only";
+import { createSupabaseAdmin } from "@/lib/supabase-admin";
 
-let cachedToken: { token: string; expiresAt: number } | null = null;
+let cachedToken: { token: string; expiresAt: number; type: "user" | "client" } | null = null;
 
+/**
+ * Get a Spotify access token. Prefers user OAuth (via stored refresh token)
+ * which returns full artist data (followers, genres, popularity).
+ * Falls back to Client Credentials if no refresh token is available.
+ */
 async function getAccessToken(): Promise<string> {
   if (cachedToken && Date.now() < cachedToken.expiresAt) {
     return cachedToken.token;
@@ -13,11 +19,60 @@ async function getAccessToken(): Promise<string> {
     throw new Error("Spotify credentials not configured");
   }
 
+  const basicAuth = `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`;
+
+  // Try user OAuth via stored refresh token first
+  try {
+    const admin = createSupabaseAdmin();
+    const { data: tokenRow } = await admin
+      .from("spotify_tokens")
+      .select("refresh_token")
+      .eq("id", 1)
+      .single();
+
+    if (tokenRow?.refresh_token) {
+      const res = await fetch("https://accounts.spotify.com/api/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: basicAuth,
+        },
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: tokenRow.refresh_token,
+        }),
+        cache: "no-store",
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        cachedToken = {
+          token: data.access_token,
+          expiresAt: Date.now() + (data.expires_in - 60) * 1000,
+          type: "user",
+        };
+
+        // If Spotify rotated the refresh token, save the new one
+        if (data.refresh_token && data.refresh_token !== tokenRow.refresh_token) {
+          await admin.from("spotify_tokens").upsert(
+            { id: 1, refresh_token: data.refresh_token, updated_at: new Date().toISOString() },
+            { onConflict: "id" }
+          );
+        }
+
+        return cachedToken.token;
+      }
+    }
+  } catch {
+    // Fall through to Client Credentials
+  }
+
+  // Fallback: Client Credentials (no followers/genres in responses)
   const res = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+      Authorization: basicAuth,
     },
     body: "grant_type=client_credentials",
     cache: "no-store",
@@ -31,7 +86,8 @@ async function getAccessToken(): Promise<string> {
   const data = await res.json();
   cachedToken = {
     token: data.access_token,
-    expiresAt: Date.now() + (data.expires_in - 60) * 1000, // refresh 60s early
+    expiresAt: Date.now() + (data.expires_in - 60) * 1000,
+    type: "client",
   };
 
   return cachedToken.token;
@@ -45,27 +101,6 @@ export interface SpotifyArtistResult {
   genres: string[];
   spotify_url: string;
   followers: number;
-}
-
-/**
- * Scrape monthly listener count from public Spotify artist page.
- * Returns 0 if the scrape fails (treated as unknown/underground).
- */
-async function scrapeMonthlyListeners(artistId: string): Promise<number> {
-  try {
-    const res = await fetch(`https://open.spotify.com/artist/${artistId}`, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-      cache: "no-store",
-      signal: AbortSignal.timeout(3000),
-    });
-    if (!res.ok) return 0;
-    const html = await res.text();
-    const match = html.match(/([\d,]+)\s*monthly listeners/);
-    if (!match) return 0;
-    return parseInt(match[1].replace(/,/g, ""), 10) || 0;
-  } catch {
-    return 0;
-  }
 }
 
 export async function searchSpotifyArtists(
@@ -92,13 +127,6 @@ export async function searchSpotifyArtists(
 
   const data = await res.json();
   const artists = data.artists?.items || [];
-  if (artists.length === 0) return [];
-
-  // Spotify Client Credentials no longer returns followers/popularity.
-  // Scrape monthly listeners from public pages in parallel to filter mainstream.
-  const listenerResults = await Promise.allSettled(
-    artists.map((a: { id: string }) => scrapeMonthlyListeners(a.id))
-  );
 
   return artists.map(
     (a: {
@@ -107,21 +135,15 @@ export async function searchSpotifyArtists(
       images?: { url: string }[];
       genres?: string[];
       external_urls?: { spotify?: string };
-    },
-    i: number) => ({
+      followers?: { total?: number };
+    }) => ({
       id: a.id,
       name: a.name,
       photo_url: a.images?.[0]?.url || null,
-      monthly_listeners:
-        listenerResults[i].status === "fulfilled"
-          ? listenerResults[i].value
-          : null,
+      monthly_listeners: null,
       genres: a.genres || [],
       spotify_url: a.external_urls?.spotify || `https://open.spotify.com/artist/${a.id}`,
-      followers:
-        listenerResults[i].status === "fulfilled"
-          ? listenerResults[i].value
-          : 0,
+      followers: a.followers?.total ?? 0,
     })
   );
 }
@@ -149,6 +171,6 @@ export async function getSpotifyArtist(
     spotify_url:
       a.external_urls?.spotify ||
       `https://open.spotify.com/artist/${a.id}`,
-    followers: a.followers?.total || 0,
+    followers: a.followers?.total ?? 0,
   };
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createSupabaseAdmin } from "@/lib/supabase-admin";
 
 export async function GET(req: NextRequest) {
   const siteUrl =
@@ -36,12 +37,22 @@ export async function GET(req: NextRequest) {
 
     const tokenData = await tokenRes.json();
     const accessToken = tokenData.access_token;
+    const refreshToken = tokenData.refresh_token;
 
     if (!accessToken) {
       return NextResponse.redirect(new URL("/passport?spotify=error", siteUrl));
     }
 
-    // Set token in httpOnly cookie (expires in 1 hour matching Spotify token expiry)
+    // Store refresh token for server-side Spotify API calls (search, etc.)
+    if (refreshToken) {
+      const admin = createSupabaseAdmin();
+      await admin.from("spotify_tokens").upsert(
+        { id: 1, refresh_token: refreshToken, updated_at: new Date().toISOString() },
+        { onConflict: "id" }
+      );
+    }
+
+    // Set access token in httpOnly cookie (expires in 1 hour matching Spotify token expiry)
     const response = NextResponse.redirect(
       new URL("/passport?spotify=connected", siteUrl)
     );
