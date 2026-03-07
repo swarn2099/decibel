@@ -76,6 +76,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Artist not found on Spotify" }, { status: 404 });
     }
 
+    // Block mainstream artists (1M+ followers)
+    if (spotifyArtist.followers >= 1_000_000) {
+      return NextResponse.json(
+        { error: "This artist is too mainstream for Decibel. We focus on underground and emerging artists." },
+        { status: 400 }
+      );
+    }
+
     // Generate unique slug
     let slug = generateSlug(spotifyArtist.name);
     const { data: slugCheck } = await admin

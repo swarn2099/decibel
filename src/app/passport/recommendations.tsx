@@ -242,7 +242,7 @@ export function Recommendations() {
         </div>
       ) : (
         <div className="-mx-4 px-4">
-          <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 no-scrollbar">
+          <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pt-3 pb-2 no-scrollbar">
             {data?.recommendations.map((performer) => (
               <RecommendationCard
                 key={performer.id}
