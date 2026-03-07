@@ -45,7 +45,7 @@
 - [x] **PROF-06**: "Discover" button adds artist as a discovery to fan's passport
 - [x] **PROF-07**: "Collect" button shows next show info or QR context
 - [x] **PROF-08**: Fan sees tier progress and journey state (discovered -> collecting -> inner circle)
-- [ ] **PROF-09**: Unclaimed profiles show "Claim this profile" with magic link verification flow
+- [x] **PROF-09**: Unclaimed profiles show "Claim this profile" with magic link verification flow
 
 ### Social
 
@@ -107,7 +107,7 @@
 | PROF-06 | Phase 14 | Complete |
 | PROF-07 | Phase 14 | Complete |
 | PROF-08 | Phase 14 | Complete |
-| PROF-09 | Phase 14 | Pending |
+| PROF-09 | Phase 14 | Complete |
 | SOCL-01 | Phase 15 | Pending |
 | SOCL-02 | Phase 15 | Pending |
 | SOCL-03 | Phase 15 | Pending |

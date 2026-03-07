@@ -4,13 +4,13 @@ milestone: v2.0
 milestone_name: The Passport
 status: executing
 last_updated: "2026-03-07T05:31:04.661Z"
-last_activity: 2026-03-07 — Completed 14-02-PLAN.md
+last_activity: 2026-03-07 — Completed 14-03-PLAN.md
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 10
-  completed_plans: 9
-  percent: 93
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 14 of 15 (Enhanced Artist Profiles)
-Plan: 2 of 3 complete
-Status: In Progress
-Last activity: 2026-03-07 — Completed 14-02-PLAN.md
+Plan: 3 of 3 complete
+Status: Phase Complete
+Last activity: 2026-03-07 — Completed 14-03-PLAN.md
 
-Progress: [█████████░] 93%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -69,6 +69,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 14]: Journey state derived from collections + fan_tiers tables (no new DB migration needed)
 - [Phase 14]: ArtistActions fetches journey on mount via client-side fetch for SSR compatibility
 - [Phase 14]: Gradient props passed from server to client component for visual consistency
+- [Phase 14-03]: Used signInWithOtp with emailRedirectTo claim param for magic link claim flow
+- [Phase 14-03]: Auth callback handles claim query param to auto-claim performer post-verification
+- [Phase 14-03]: Default auth callback redirect changed from /profile to /passport
 
 ### Pending Todos
 
