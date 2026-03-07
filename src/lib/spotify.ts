@@ -103,6 +103,27 @@ export interface SpotifyArtistResult {
   followers: number;
 }
 
+/**
+ * Scrape monthly listener count from public Spotify artist page.
+ * Returns 0 if the scrape fails (treated as unknown/underground).
+ */
+async function scrapeMonthlyListeners(artistId: string): Promise<number> {
+  try {
+    const res = await fetch(`https://open.spotify.com/artist/${artistId}`, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!res.ok) return 0;
+    const html = await res.text();
+    const match = html.match(/([\d,]+)\s*monthly listeners/);
+    if (!match) return 0;
+    return parseInt(match[1].replace(/,/g, ""), 10) || 0;
+  } catch {
+    return 0;
+  }
+}
+
 export async function searchSpotifyArtists(
   query: string,
   limit = 10
@@ -127,6 +148,13 @@ export async function searchSpotifyArtists(
 
   const data = await res.json();
   const artists = data.artists?.items || [];
+  if (artists.length === 0) return [];
+
+  // Spotify Dev Mode apps don't get followers/genres/popularity from ANY token type.
+  // Scrape monthly listeners from public pages in parallel to filter mainstream.
+  const listenerResults = await Promise.allSettled(
+    artists.map((a: { id: string }) => scrapeMonthlyListeners(a.id))
+  );
 
   return artists.map(
     (a: {
@@ -136,15 +164,21 @@ export async function searchSpotifyArtists(
       genres?: string[];
       external_urls?: { spotify?: string };
       followers?: { total?: number };
-    }) => ({
-      id: a.id,
-      name: a.name,
-      photo_url: a.images?.[0]?.url || null,
-      monthly_listeners: null,
-      genres: a.genres || [],
-      spotify_url: a.external_urls?.spotify || `https://open.spotify.com/artist/${a.id}`,
-      followers: a.followers?.total ?? 0,
-    })
+    },
+    i: number) => {
+      const scraped = listenerResults[i].status === "fulfilled" ? listenerResults[i].value : 0;
+      // Use API followers if available, otherwise use scraped monthly listeners
+      const apiFollowers = a.followers?.total ?? 0;
+      return {
+        id: a.id,
+        name: a.name,
+        photo_url: a.images?.[0]?.url || null,
+        monthly_listeners: scraped || null,
+        genres: a.genres || [],
+        spotify_url: a.external_urls?.spotify || `https://open.spotify.com/artist/${a.id}`,
+        followers: apiFollowers > 0 ? apiFollowers : scraped,
+      };
+    }
   );
 }
 
