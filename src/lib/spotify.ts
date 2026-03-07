@@ -47,6 +47,27 @@ export interface SpotifyArtistResult {
   followers: number;
 }
 
+/**
+ * Scrape monthly listener count from public Spotify artist page.
+ * Returns 0 if the scrape fails (treated as unknown/underground).
+ */
+async function scrapeMonthlyListeners(artistId: string): Promise<number> {
+  try {
+    const res = await fetch(`https://open.spotify.com/artist/${artistId}`, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      cache: "no-store",
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!res.ok) return 0;
+    const html = await res.text();
+    const match = html.match(/([\d,]+)\s*monthly listeners/);
+    if (!match) return 0;
+    return parseInt(match[1].replace(/,/g, ""), 10) || 0;
+  } catch {
+    return 0;
+  }
+}
+
 export async function searchSpotifyArtists(
   query: string,
   limit = 10
@@ -73,21 +94,11 @@ export async function searchSpotifyArtists(
   const artists = data.artists?.items || [];
   if (artists.length === 0) return [];
 
-  // Search endpoint returns followers as 0 with Client Credentials auth.
-  // Batch-fetch real follower counts via /v1/artists endpoint.
-  const ids = artists.map((a: { id: string }) => a.id).join(",");
-  const detailRes = await fetch(
-    `https://api.spotify.com/v1/artists?ids=${ids}`,
-    { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
+  // Spotify Client Credentials no longer returns followers/popularity.
+  // Scrape monthly listeners from public pages in parallel to filter mainstream.
+  const listenerResults = await Promise.allSettled(
+    artists.map((a: { id: string }) => scrapeMonthlyListeners(a.id))
   );
-
-  const followerMap = new Map<string, number>();
-  if (detailRes.ok) {
-    const detailData = await detailRes.json();
-    for (const a of detailData.artists || []) {
-      followerMap.set(a.id, a.followers?.total ?? 0);
-    }
-  }
 
   return artists.map(
     (a: {
@@ -96,14 +107,21 @@ export async function searchSpotifyArtists(
       images?: { url: string }[];
       genres?: string[];
       external_urls?: { spotify?: string };
-    }) => ({
+    },
+    i: number) => ({
       id: a.id,
       name: a.name,
       photo_url: a.images?.[0]?.url || null,
-      monthly_listeners: null,
+      monthly_listeners:
+        listenerResults[i].status === "fulfilled"
+          ? listenerResults[i].value
+          : null,
       genres: a.genres || [],
       spotify_url: a.external_urls?.spotify || `https://open.spotify.com/artist/${a.id}`,
-      followers: followerMap.get(a.id) ?? 0,
+      followers:
+        listenerResults[i].status === "fulfilled"
+          ? listenerResults[i].value
+          : 0,
     })
   );
 }

@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
 
   const admin = createSupabaseAdmin();
 
+  // Monthly listeners threshold — filters out mainstream artists
   const MAX_FOLLOWERS = 1_000_000;
 
   // Search Decibel DB first (exclude mainstream artists with 1M+ followers)
@@ -27,7 +28,7 @@ export async function GET(req: NextRequest) {
   let spotifyResults: Awaited<ReturnType<typeof searchSpotifyArtists>> = [];
   let spotifyError: string | undefined;
   try {
-    spotifyResults = await searchSpotifyArtists(q, 5);
+    spotifyResults = await searchSpotifyArtists(q, 10);
   } catch (err) {
     spotifyError = err instanceof Error ? err.message : "Unknown Spotify error";
     console.error("Spotify search error:", spotifyError);
