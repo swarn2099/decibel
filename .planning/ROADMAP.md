@@ -142,7 +142,7 @@ Plans:
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
 | 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
 | 10. Scraper Pipeline | v1.2 | 2/2 | Complete | 2026-03-07 |
-| 11. Passport Visual Overhaul | v2.0 | 2/2 | Complete | 2026-03-07 |
+| 11. Passport Visual Overhaul | v2.0 | Complete    | 2026-03-07 | 2026-03-07 |
 | 12. Online Discovery | v2.0 | 0/? | Not started | - |
 | 13. Badges and Gamification | v2.0 | 0/? | Not started | - |
 | 14. Enhanced Artist Profiles | v2.0 | 0/? | Not started | - |
