@@ -741,9 +741,21 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
           <div className="flex items-start gap-4">
             {/* Avatar */}
             <div className="relative shrink-0">
-              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-pink to-purple flex items-center justify-center text-xl font-bold text-white ring-2 ring-pink/30">
-                {initials}
-              </div>
+              {fan.avatar_url ? (
+                <div className="relative h-16 w-16 overflow-hidden rounded-full ring-2 ring-pink/30">
+                  <Image
+                    src={fan.avatar_url}
+                    alt={fan.name || "Avatar"}
+                    fill
+                    className="object-cover"
+                    sizes="64px"
+                  />
+                </div>
+              ) : (
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-pink to-purple flex items-center justify-center text-xl font-bold text-white ring-2 ring-pink/30">
+                  {initials}
+                </div>
+              )}
             </div>
 
             {/* Info */}

@@ -19,7 +19,7 @@ async function findFanBySlug(slug: string) {
   const admin = createSupabaseAdmin();
   const { data: fans } = await admin
     .from("fans")
-    .select("id, email, name, city, created_at")
+    .select("id, email, name, city, created_at, avatar_url")
     .limit(500);
 
   if (!fans) return null;
@@ -176,6 +176,7 @@ export default async function PublicPassportPage({ params }: Props) {
     name: fan.name,
     city: fan.city,
     created_at: fan.created_at,
+    avatar_url: fan.avatar_url ?? null,
   };
 
   // Check viewer identity

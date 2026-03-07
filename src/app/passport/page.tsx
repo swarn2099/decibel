@@ -39,6 +39,7 @@ export default async function PassportPage() {
       name: null,
       city: null,
       created_at: new Date().toISOString(),
+      avatar_url: null,
     };
     return <PassportClient fan={emptyFan} fanSlug={user.id.slice(0, 8)} timeline={[]} />;
   }
@@ -49,6 +50,7 @@ export default async function PassportPage() {
     name: fan.name,
     city: fan.city,
     created_at: fan.created_at,
+    avatar_url: fan.avatar_url,
   };
 
   const fanSlug = fan.name ? slugify(fan.name) : fan.id.slice(0, 8);
