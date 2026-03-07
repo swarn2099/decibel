@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: The Passport
 status: executing
-last_updated: "2026-03-07T04:08:58.128Z"
+last_updated: "2026-03-07T04:11:27.400Z"
 last_activity: 2026-03-07 — Completed 12-03-PLAN.md
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 90
 ---
 
@@ -56,6 +56,9 @@ Progress: [█████████░] 90%
 - [12-03] Fallback to popular performers when no genre overlap exists
 
 Decisions are logged in PROJECT.md Key Decisions table.
+- [Phase 12-02]: Spotify token stored in httpOnly cookie and deleted after import (one-time-use pattern)
+- [Phase 12-02]: Artist matching uses case-insensitive ILIKE on performer name
+- [Phase 12-02]: Auto-create performer from Spotify data if not in DB
 
 ### Pending Todos
 

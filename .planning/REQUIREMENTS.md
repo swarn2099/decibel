@@ -19,10 +19,10 @@
 
 - [x] **DISC-01**: Fan can paste a link (Spotify/SoundCloud/RA/Instagram/TikTok/YouTube) to add an artist as a discovery
 - [x] **DISC-02**: If artist doesn't exist in DB, auto-scraping pipeline creates their profile
-- [ ] **DISC-03**: Fan can connect Spotify via OAuth and import top artists as discoveries
-- [ ] **DISC-04**: Matched Spotify artists with upcoming local shows surface a "collect in person" prompt
+- [x] **DISC-03**: Fan can connect Spotify via OAuth and import top artists as discoveries
+- [x] **DISC-04**: Matched Spotify artists with upcoming local shows surface a "collect in person" prompt
 - [x] **DISC-05**: Fan sees "Artists you might like" recommendations based on collection + listening data
-- [ ] **DISC-06**: Apple Music stub UI ("Coming soon — connect Apple Music in the mobile app")
+- [x] **DISC-06**: Apple Music stub UI ("Coming soon — connect Apple Music in the mobile app")
 
 ### Badges
 
@@ -87,10 +87,10 @@
 | PASS-07 | Phase 11 | Complete |
 | DISC-01 | Phase 12 | Complete |
 | DISC-02 | Phase 12 | Complete |
-| DISC-03 | Phase 12 | Pending |
-| DISC-04 | Phase 12 | Pending |
+| DISC-03 | Phase 12 | Complete |
+| DISC-04 | Phase 12 | Complete |
 | DISC-05 | Phase 12 | Complete |
-| DISC-06 | Phase 12 | Pending |
+| DISC-06 | Phase 12 | Complete |
 | BADGE-01 | Phase 13 | Pending |
 | BADGE-02 | Phase 13 | Pending |
 | BADGE-03 | Phase 13 | Pending |
