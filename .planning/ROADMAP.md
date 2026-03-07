@@ -90,11 +90,11 @@ Plans:
   2. Badges display on the passport with icon, name, description, date earned, and rarity tier
   3. When a badge is unlocked, the fan sees a visual animation or toast notification
   4. Existing fans receive retroactive badges based on their current collection data when the feature launches
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
+- [ ] 13-01-PLAN.md -- Badge types, definitions, evaluation engine, API endpoints, and retroactive backfill script
+- [ ] 13-02-PLAN.md -- Badge showcase on passport with rarity styling and unlock animation
 
 ### Phase 14: Enhanced Artist Profiles
 **Goal**: Artist profiles become rich destination pages that fans browse, discover from, and use to plan their next show
@@ -145,6 +145,6 @@ Plans:
 | 10. Scraper Pipeline | v1.2 | 2/2 | Complete | 2026-03-07 |
 | 11. Passport Visual Overhaul | v2.0 | Complete    | 2026-03-07 | 2026-03-07 |
 | 12. Online Discovery | 3/3 | Complete    | 2026-03-07 | - |
-| 13. Badges and Gamification | v2.0 | 0/? | Not started | - |
+| 13. Badges and Gamification | v2.0 | 0/2 | Not started | - |
 | 14. Enhanced Artist Profiles | v2.0 | 0/? | Not started | - |
 | 15. Passport Sharing and Social | v2.0 | 0/? | Not started | - |
