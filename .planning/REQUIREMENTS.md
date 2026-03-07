@@ -50,11 +50,11 @@
 ### Social
 
 - [x] **SOCL-01**: Fan can generate shareable cards (single-artist, milestone, badge, discovery, stats variants)
-- [ ] **SOCL-02**: Activity feed shows friend collections, discoveries, badge unlocks
+- [x] **SOCL-02**: Activity feed shows friend collections, discoveries, badge unlocks
 - [x] **SOCL-03**: Fan can follow/unfollow other fans
 - [x] **SOCL-04**: Fan sees follower/following counts on passport
 - [x] **SOCL-05**: Privacy setting controls who sees activity (mutual followers / public / private)
-- [ ] **SOCL-06**: Fan can discover which contacts are on Decibel via email lookup, with in-app notification for newly joined contacts (push notifications require MOBILE-03/04)
+- [x] **SOCL-06**: Fan can discover which contacts are on Decibel via email lookup, with in-app notification for newly joined contacts (push notifications require MOBILE-03/04)
 
 ## Future Requirements
 
@@ -109,11 +109,11 @@
 | PROF-08 | Phase 14 | Complete |
 | PROF-09 | Phase 14 | Complete |
 | SOCL-01 | Phase 15 | Complete |
-| SOCL-02 | Phase 15 | Pending |
+| SOCL-02 | Phase 15 | Complete |
 | SOCL-03 | Phase 15 | Complete |
 | SOCL-04 | Phase 15 | Complete |
 | SOCL-05 | Phase 15 | Complete |
-| SOCL-06 | Phase 15 | Pending |
+| SOCL-06 | Phase 15 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 36 total

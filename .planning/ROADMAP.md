@@ -45,7 +45,7 @@
 - [x] **Phase 12: Online Discovery + Add From Anywhere** - Fan-driven artist discovery via links, Spotify import, and smart recommendations (completed 2026-03-07)
 - [x] **Phase 13: Badges and Gamification** - Badge system rewarding attendance, discovery, streaks, exploration, and social activity (completed 2026-03-07)
 - [x] **Phase 14: Enhanced Artist Profiles** - Rich artist pages with tracks, fan stats, similar artists, and distinct Collect vs Discover flows (completed 2026-03-07)
-- [ ] **Phase 15: Passport Sharing and Social** - Shareable cards, activity feed, follow system, and social notifications
+- [x] **Phase 15: Passport Sharing and Social** - Shareable cards, activity feed, follow system, and social notifications (completed 2026-03-07)
 
 ## Phase Details
 
@@ -149,4 +149,4 @@ Plans:
 | 12. Online Discovery | 3/3 | Complete    | 2026-03-07 | - |
 | 13. Badges and Gamification | 2/2 | Complete    | 2026-03-07 | - |
 | 14. Enhanced Artist Profiles | 3/3 | Complete    | 2026-03-07 | - |
-| 15. Passport Sharing and Social | 2/3 | In Progress|  | - |
+| 15. Passport Sharing and Social | 3/3 | Complete   | 2026-03-07 | - |

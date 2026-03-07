@@ -25,16 +25,16 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 15 of 15 (Passport Sharing & Social)
-Plan: 2 of 3 complete
-Status: In Progress
-Last activity: 2026-03-07 — Completed 15-02-PLAN.md
+Plan: 3 of 3 complete
+Status: Complete
+Last activity: 2026-03-07 — Completed 15-03-PLAN.md
 
-Progress: [██████████] 100% (v2.0 phases) | Plan 2/3 in Phase 15
+Progress: [██████████] 100% (v2.0 phases) | Plan 3/3 in Phase 15 -- PHASE COMPLETE
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 4)
+- Total plans completed: 22 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5)
 - Average duration: --
 - Total execution time: --
 
@@ -77,6 +77,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 15-02]: fan_follows uses DB-level no_self_follow constraint for defense in depth
 - [Phase 15-02]: countOnly query param on followers/following endpoints for efficient count fetching
 - [Phase 15]: All share card endpoints use edge runtime with query params (consistent with Phase 11 decision)
+- [Phase 15-03]: Feed merges collections + badges from followed fans, sorted by timestamp
+- [Phase 15-03]: Privacy enforcement server-side: private excluded, mutual requires bidirectional follow
+- [Phase 15-03]: Contact tracking uses localStorage for web notification without push infrastructure
+- [Phase 15-03]: ContactCheck UI embedded inline in ActivityFeed section
 
 ### Pending Todos
 
