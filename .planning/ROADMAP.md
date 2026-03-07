@@ -121,11 +121,12 @@ Plans:
   2. Fan can follow/unfollow other fans and see follower/following counts on their passport
   3. Fan sees an activity feed showing friend collections, discoveries, and badge unlocks
   4. Fan can control privacy (mutual followers / public / private) and receives a notification when a phone contact joins Decibel
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 15-01: TBD
-- [ ] 15-02: TBD
+- [ ] 15-01-PLAN.md -- Shareable card variants (artist, badge, milestone, discovery, stats)
+- [ ] 15-02-PLAN.md -- Follow system, follower/following counts, privacy settings
+- [ ] 15-03-PLAN.md -- Activity feed and contact-check for friend discovery
 
 ## Progress
 
@@ -148,4 +149,4 @@ Plans:
 | 12. Online Discovery | 3/3 | Complete    | 2026-03-07 | - |
 | 13. Badges and Gamification | 2/2 | Complete    | 2026-03-07 | - |
 | 14. Enhanced Artist Profiles | 3/3 | Complete    | 2026-03-07 | - |
-| 15. Passport Sharing and Social | v2.0 | 0/? | Not started | - |
+| 15. Passport Sharing and Social | v2.0 | 0/3 | Not started | - |
