@@ -1,6 +1,56 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchSpotifyArtists } from "@/lib/spotify";
 import { createSupabaseAdmin } from "@/lib/supabase-admin";
+import { createSupabaseServer } from "@/lib/supabase-server";
+
+async function getUserSpotifyToken(admin: ReturnType<typeof createSupabaseAdmin>): Promise<string | null> {
+  try {
+    const supabase = await createSupabaseServer();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) return null;
+
+    const { data: fan } = await admin
+      .from("fans")
+      .select("spotify_refresh_token")
+      .eq("email", user.email)
+      .maybeSingle();
+
+    if (!fan?.spotify_refresh_token) return null;
+
+    const clientId = process.env.SPOTIFY_CLIENT_ID!;
+    const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
+    const res = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+      },
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: fan.spotify_refresh_token,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("[spotify/search] User refresh token failed:", res.status);
+      return null;
+    }
+
+    const data = await res.json();
+
+    // Save rotated refresh token if provided
+    if (data.refresh_token && data.refresh_token !== fan.spotify_refresh_token) {
+      await admin
+        .from("fans")
+        .update({ spotify_refresh_token: data.refresh_token })
+        .eq("email", user.email);
+    }
+
+    return data.access_token;
+  } catch {
+    return null;
+  }
+}
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
@@ -24,11 +74,14 @@ export async function GET(req: NextRequest) {
 
   const existing = existingRaw || [];
 
+  // Try user's own Spotify token first, then fall back to server token
+  const userToken = await getUserSpotifyToken(admin);
+
   // Search Spotify
   let spotifyResults: Awaited<ReturnType<typeof searchSpotifyArtists>> = [];
   let spotifyError: string | undefined;
   try {
-    spotifyResults = await searchSpotifyArtists(q, 10);
+    spotifyResults = await searchSpotifyArtists(q, 10, userToken || undefined);
   } catch (err) {
     spotifyError = err instanceof Error ? err.message : "Unknown Spotify error";
     console.error("Spotify search error:", spotifyError);

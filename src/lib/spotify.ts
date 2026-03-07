@@ -131,9 +131,10 @@ async function scrapeMonthlyListeners(artistId: string): Promise<number> {
 
 export async function searchSpotifyArtists(
   query: string,
-  limit = 10
+  limit = 10,
+  tokenOverride?: string
 ): Promise<SpotifyArtistResult[]> {
-  const token = await getAccessToken();
+  const token = tokenOverride || await getAccessToken();
 
   const params = new URLSearchParams({
     q: query,
