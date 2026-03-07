@@ -31,8 +31,8 @@
 - [x] **BADGE-03**: Exploration badges award (Genre Explorer, City Hopper, Night Owl, Scene Veteran, Centurion)
 - [x] **BADGE-04**: Streak badges award (On Fire, Unstoppable, Year-Round)
 - [x] **BADGE-05**: Social badges award (Tastemaker, Connector)
-- [ ] **BADGE-06**: Badges display on passport with icon, name, description, date earned, rarity tier
-- [ ] **BADGE-07**: Badge unlock triggers visual feedback (animation/toast)
+- [x] **BADGE-06**: Badges display on passport with icon, name, description, date earned, rarity tier
+- [x] **BADGE-07**: Badge unlock triggers visual feedback (animation/toast)
 - [x] **BADGE-08**: Badges retroactively awarded for existing collection data on feature launch
 
 ### Artist Profile
@@ -96,8 +96,8 @@
 | BADGE-03 | Phase 13 | Complete |
 | BADGE-04 | Phase 13 | Complete |
 | BADGE-05 | Phase 13 | Complete |
-| BADGE-06 | Phase 13 | Pending |
-| BADGE-07 | Phase 13 | Pending |
+| BADGE-06 | Phase 13 | Complete |
+| BADGE-07 | Phase 13 | Complete |
 | BADGE-08 | Phase 13 | Complete |
 | PROF-01 | Phase 14 | Pending |
 | PROF-02 | Phase 14 | Pending |
