@@ -43,16 +43,30 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL("/passport?spotify=error", siteUrl));
     }
 
+    const admin = createSupabaseAdmin();
+
     // Store refresh token for server-side Spotify API calls (search, etc.)
     if (refreshToken) {
-      const admin = createSupabaseAdmin();
       await admin.from("spotify_tokens").upsert(
         { id: 1, refresh_token: refreshToken, updated_at: new Date().toISOString() },
         { onConflict: "id" }
       );
     }
 
-    // Set access token in httpOnly cookie (expires in 1 hour matching Spotify token expiry)
+    // Store per-user refresh token so we don't need to re-auth every time
+    const state = req.nextUrl.searchParams.get("state"); // user.id passed as state
+    if (state && refreshToken) {
+      // Look up fan by auth user id's email
+      const { data: { user } } = await (await import("@/lib/supabase-server")).createSupabaseServer().then(s => s.auth.getUser());
+      if (user?.email) {
+        await admin
+          .from("fans")
+          .update({ spotify_refresh_token: refreshToken, spotify_connected_at: new Date().toISOString() })
+          .eq("email", user.email);
+      }
+    }
+
+    // Set access token in httpOnly cookie for the immediate import
     const response = NextResponse.redirect(
       new URL("/passport?spotify=connected", siteUrl)
     );
@@ -60,7 +74,7 @@ export async function GET(req: NextRequest) {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
-      maxAge: 3600, // 1 hour
+      maxAge: 3600,
       path: "/",
     });
 

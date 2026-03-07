@@ -41,16 +41,64 @@ export async function POST() {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    // Get Spotify token from cookie
+    const supabaseAdmin = createSupabaseAdmin();
+
+    // Get Spotify token from cookie, or refresh from stored token
     const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
-    const spotifyToken = cookieStore.get("spotify_token")?.value;
+    let spotifyToken = cookieStore.get("spotify_token")?.value;
 
     if (!spotifyToken) {
-      return NextResponse.json(
-        { error: "Spotify not connected" },
-        { status: 401 }
-      );
+      // Try to get a fresh token from the user's stored refresh token
+      const { data: fanWithToken } = await supabaseAdmin
+        .from("fans")
+        .select("spotify_refresh_token")
+        .eq("email", user.email)
+        .maybeSingle();
+
+      if (!fanWithToken?.spotify_refresh_token) {
+        return NextResponse.json(
+          { error: "Spotify not connected" },
+          { status: 401 }
+        );
+      }
+
+      const clientId = process.env.SPOTIFY_CLIENT_ID!;
+      const clientSecret = process.env.SPOTIFY_CLIENT_SECRET!;
+      const refreshRes = await fetch("https://accounts.spotify.com/api/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+        },
+        body: new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: fanWithToken.spotify_refresh_token,
+        }),
+      });
+
+      if (!refreshRes.ok) {
+        // Refresh token revoked — clear it
+        await supabaseAdmin
+          .from("fans")
+          .update({ spotify_refresh_token: null, spotify_connected_at: null })
+          .eq("email", user.email);
+        return NextResponse.json(
+          { error: "Spotify session expired. Please reconnect." },
+          { status: 401 }
+        );
+      }
+
+      const refreshData = await refreshRes.json();
+      spotifyToken = refreshData.access_token;
+
+      // If Spotify rotated the refresh token, save the new one
+      if (refreshData.refresh_token) {
+        await supabaseAdmin
+          .from("fans")
+          .update({ spotify_refresh_token: refreshData.refresh_token })
+          .eq("email", user.email);
+      }
     }
 
     // Fetch top artists from Spotify
@@ -70,8 +118,6 @@ export async function POST() {
 
     const spotifyData = await spotifyRes.json();
     const spotifyArtists: SpotifyArtist[] = spotifyData.items || [];
-
-    const supabaseAdmin = createSupabaseAdmin();
 
     // Get or create fan
     const { data: fan } = await supabaseAdmin
