@@ -74,11 +74,12 @@ Plans:
   3. Fan can connect Spotify via OAuth and see their top artists imported as discoveries, with "collect in person" prompts for those with upcoming local shows
   4. Fan sees personalized "Artists you might like" recommendations on their passport based on collection and listening data
   5. Apple Music shows a "Coming soon -- connect Apple Music in the mobile app" stub UI
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
+- [ ] 12-01-PLAN.md -- Link-based artist discovery with auto-creation pipeline (paste any music link to discover)
+- [ ] 12-02-PLAN.md -- Spotify OAuth import + Apple Music stub
+- [ ] 12-03-PLAN.md -- Personalized artist recommendations engine
 
 ### Phase 13: Badges and Gamification
 **Goal**: Fans earn and display badges that reward showing up, exploring, and being early -- making the passport feel alive and collectible
@@ -143,7 +144,7 @@ Plans:
 | 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
 | 10. Scraper Pipeline | v1.2 | 2/2 | Complete | 2026-03-07 |
 | 11. Passport Visual Overhaul | v2.0 | Complete    | 2026-03-07 | 2026-03-07 |
-| 12. Online Discovery | v2.0 | 0/? | Not started | - |
+| 12. Online Discovery | v2.0 | 0/3 | Not started | - |
 | 13. Badges and Gamification | v2.0 | 0/? | Not started | - |
 | 14. Enhanced Artist Profiles | v2.0 | 0/? | Not started | - |
 | 15. Passport Sharing and Social | v2.0 | 0/? | Not started | - |
