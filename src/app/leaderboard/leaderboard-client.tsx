@@ -76,6 +76,63 @@ function PerformerAvatar({
   return <Initials name={name} className={className} />;
 }
 
+function FanPodiumCard({
+  entry,
+  rank,
+  isCenter,
+  isYou,
+}: {
+  entry: FanEntry;
+  rank: number;
+  isCenter: boolean;
+  isYou: boolean;
+}) {
+  const tierColor = TIER_COLORS[entry.topTier];
+  const colorIdx = rank - 1;
+
+  return (
+    <div
+      className={`flex w-full max-w-[10rem] flex-col items-center rounded-xl border bg-bg-card px-3 py-4 transition-all ${
+        isCenter ? "min-h-[10rem]" : "min-h-[8.5rem]"
+      } ${
+        isYou
+          ? "border-teal/60 shadow-[0_0_20px_rgba(0,212,170,0.3)]"
+          : `${PODIUM_BORDERS[colorIdx] || "border-light-gray/10"} ${PODIUM_GLOWS[colorIdx] || ""}`
+      }`}
+    >
+      {rank === 1 && (
+        <Crown size={20} className="mb-1 text-pink" fill="currentColor" />
+      )}
+      {rank > 1 && (
+        <Medal size={16} className={`mb-1 ${PODIUM_TEXT[colorIdx] || "text-gray"}`} />
+      )}
+      <Initials
+        name={entry.name}
+        className={`${isCenter ? "h-16 w-16" : "h-12 w-12"} text-sm`}
+      />
+      <p
+        className="mt-2 w-full truncate text-center text-sm font-semibold"
+        style={{ color: "var(--text)" }}
+      >
+        {entry.name}
+      </p>
+      <p className={`text-xs font-bold ${PODIUM_TEXT[colorIdx] || "text-gray"}`}>
+        {entry.count} collected
+      </p>
+      <span
+        className={`mt-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${tierColor?.bg || ""} ${tierColor?.text || ""}`}
+      >
+        {TIER_LABELS[entry.topTier] || entry.topTier}
+      </span>
+      {isYou && (
+        <span className="mt-1 rounded-full bg-teal/20 px-2 py-0.5 text-[10px] font-bold text-teal">
+          YOU
+        </span>
+      )}
+    </div>
+  );
+}
+
 function FanPodium({
   entries,
   currentFanId,
@@ -85,65 +142,29 @@ function FanPodium({
 }) {
   if (entries.length === 0) return null;
 
-  // Podium order: 2nd, 1st, 3rd
-  const podiumOrder = [entries[1], entries[0], entries[2]].filter(Boolean);
-  const heights = ["h-28", "h-36", "h-28"];
-  const sizes = ["h-14 w-14", "h-18 w-18", "h-14 w-14"];
-  const textSizes = ["text-base", "text-lg", "text-base"];
-
-  return (
-    <div className="flex items-end justify-center gap-3 md:gap-6">
-      {podiumOrder.map((entry, i) => {
-        const originalIndex =
-          i === 0 ? 1 : i === 1 ? 0 : 2;
-        const isYou = currentFanId === entry.fanId;
-        const tierColor = TIER_COLORS[entry.topTier];
-
-        return (
-          <div
+  // With < 3 entries, just show them in order centered
+  if (entries.length < 3) {
+    return (
+      <div className="flex items-end justify-center gap-4">
+        {entries.map((entry, i) => (
+          <FanPodiumCard
             key={entry.fanId}
-            className={`flex ${heights[i]} w-28 flex-col items-center justify-end rounded-xl border bg-bg-card p-3 transition-all md:w-36 ${
-              isYou
-                ? "border-teal/60 shadow-[0_0_20px_rgba(0,212,170,0.3)]"
-                : `${PODIUM_BORDERS[originalIndex]} ${PODIUM_GLOWS[originalIndex]}`
-            }`}
-          >
-            {originalIndex === 0 && (
-              <Crown
-                size={20}
-                className="mb-1 text-pink"
-                fill="currentColor"
-              />
-            )}
-            {originalIndex > 0 && (
-              <Medal
-                size={16}
-                className={`mb-1 ${PODIUM_TEXT[originalIndex]}`}
-              />
-            )}
-            <Initials name={entry.name} className={`${sizes[i]} text-sm`} />
-            <p
-              className={`mt-2 truncate text-center font-semibold ${textSizes[i]}`}
-              style={{ color: "var(--text)" }}
-            >
-              {entry.name}
-            </p>
-            <p className={`text-xs font-bold ${PODIUM_TEXT[originalIndex]}`}>
-              {entry.count} collected
-            </p>
-            <span
-              className={`mt-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${tierColor?.bg || ""} ${tierColor?.text || ""}`}
-            >
-              {TIER_LABELS[entry.topTier] || entry.topTier}
-            </span>
-            {isYou && (
-              <span className="mt-1 rounded-full bg-teal/20 px-2 py-0.5 text-[10px] font-bold text-teal">
-                YOU
-              </span>
-            )}
-          </div>
-        );
-      })}
+            entry={entry}
+            rank={i + 1}
+            isCenter={i === 0}
+            isYou={currentFanId === entry.fanId}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Podium order: 2nd, 1st, 3rd
+  return (
+    <div className="flex items-end justify-center gap-4">
+      <FanPodiumCard entry={entries[1]} rank={2} isCenter={false} isYou={currentFanId === entries[1].fanId} />
+      <FanPodiumCard entry={entries[0]} rank={1} isCenter isYou={currentFanId === entries[0].fanId} />
+      <FanPodiumCard entry={entries[2]} rank={3} isCenter={false} isYou={currentFanId === entries[2].fanId} />
     </div>
   );
 }
@@ -151,53 +172,38 @@ function FanPodium({
 function PerformerPodium({ entries }: { entries: PerformerEntry[] }) {
   if (entries.length === 0) return null;
 
-  const podiumOrder = [entries[1], entries[0], entries[2]].filter(Boolean);
-  const heights = ["h-28", "h-36", "h-28"];
-  const sizes = ["h-14 w-14", "h-18 w-18", "h-14 w-14"];
-  const textSizes = ["text-base", "text-lg", "text-base"];
+  function Card({ entry, rank, isCenter }: { entry: PerformerEntry; rank: number; isCenter: boolean }) {
+    const colorIdx = rank - 1;
+    return (
+      <Link
+        key={entry.performerId}
+        href={`/artist/${entry.slug}`}
+        className={`flex w-full max-w-[10rem] flex-col items-center rounded-xl border bg-bg-card px-3 py-4 transition-all hover:scale-105 ${
+          isCenter ? "min-h-[10rem]" : "min-h-[8.5rem]"
+        } ${PODIUM_BORDERS[colorIdx] || "border-light-gray/10"} ${PODIUM_GLOWS[colorIdx] || ""}`}
+      >
+        {rank === 1 && <Crown size={20} className="mb-1 text-pink" fill="currentColor" />}
+        {rank > 1 && <Medal size={16} className={`mb-1 ${PODIUM_TEXT[colorIdx] || "text-gray"}`} />}
+        <PerformerAvatar photoUrl={entry.photoUrl} name={entry.name} className={`${isCenter ? "h-16 w-16" : "h-12 w-12"} text-sm`} />
+        <p className="mt-2 w-full truncate text-center text-sm font-semibold" style={{ color: "var(--text)" }}>{entry.name}</p>
+        <p className={`text-xs font-bold ${PODIUM_TEXT[colorIdx] || "text-gray"}`}>{entry.fanCount} fans</p>
+      </Link>
+    );
+  }
+
+  if (entries.length < 3) {
+    return (
+      <div className="flex items-end justify-center gap-4">
+        {entries.map((entry, i) => <Card key={entry.performerId} entry={entry} rank={i + 1} isCenter={i === 0} />)}
+      </div>
+    );
+  }
 
   return (
-    <div className="flex items-end justify-center gap-3 md:gap-6">
-      {podiumOrder.map((entry, i) => {
-        const originalIndex =
-          i === 0 ? 1 : i === 1 ? 0 : 2;
-
-        return (
-          <Link
-            key={entry.performerId}
-            href={`/artist/${entry.slug}`}
-            className={`flex ${heights[i]} w-28 flex-col items-center justify-end rounded-xl border bg-bg-card p-3 transition-all hover:scale-105 md:w-36 ${PODIUM_BORDERS[originalIndex]} ${PODIUM_GLOWS[originalIndex]}`}
-          >
-            {originalIndex === 0 && (
-              <Crown
-                size={20}
-                className="mb-1 text-pink"
-                fill="currentColor"
-              />
-            )}
-            {originalIndex > 0 && (
-              <Medal
-                size={16}
-                className={`mb-1 ${PODIUM_TEXT[originalIndex]}`}
-              />
-            )}
-            <PerformerAvatar
-              photoUrl={entry.photoUrl}
-              name={entry.name}
-              className={`${sizes[i]} text-sm`}
-            />
-            <p
-              className={`mt-2 truncate text-center font-semibold ${textSizes[i]}`}
-              style={{ color: "var(--text)" }}
-            >
-              {entry.name}
-            </p>
-            <p className={`text-xs font-bold ${PODIUM_TEXT[originalIndex]}`}>
-              {entry.fanCount} fans
-            </p>
-          </Link>
-        );
-      })}
+    <div className="flex items-end justify-center gap-4">
+      <Card entry={entries[1]} rank={2} isCenter={false} />
+      <Card entry={entries[0]} rank={1} isCenter />
+      <Card entry={entries[2]} rank={3} isCenter={false} />
     </div>
   );
 }
