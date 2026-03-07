@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import Link from "next/link";
 import type { MapVenue } from "@/lib/types/map";
@@ -9,7 +9,8 @@ import "leaflet/dist/leaflet.css";
 
 const CHICAGO_CENTER: [number, number] = [41.8827, -87.6233];
 const DEFAULT_ZOOM = 12;
-const TILE_URL = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+const TILE_DARK = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+const TILE_LIGHT = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 const TILE_ATTR =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>';
 
@@ -33,6 +34,15 @@ export default function MapClient() {
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [tonightMode, setTonightMode] = useState(false);
   const [allGenres, setAllGenres] = useState<string[]>([]);
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    setIsDark(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsDark(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   // Fetch venues from API
   const fetchVenues = async (genre: string | null, tonight: boolean) => {
@@ -144,7 +154,7 @@ export default function MapClient() {
           zoomControl={false}
           attributionControl={true}
         >
-          <TileLayer url={TILE_URL} attribution={TILE_ATTR} />
+          <TileLayer url={isDark ? TILE_DARK : TILE_LIGHT} attribution={TILE_ATTR} />
 
           {venues.map((venue) => (
             <CircleMarker
@@ -161,7 +171,7 @@ export default function MapClient() {
             >
               <Popup maxWidth={280} className="decibel-popup">
                 <div className="min-w-[200px]">
-                  <h3 className="mb-2 text-base font-bold text-white">{venue.name}</h3>
+                  <h3 className="mb-2 text-base font-bold text-[var(--text)]">{venue.name}</h3>
 
                   {/* Top performers avatars */}
                   {venue.upcoming_events.some((e) => e.performer_photo) && (
@@ -185,13 +195,13 @@ export default function MapClient() {
                   <div className="flex flex-col gap-1.5">
                     {venue.upcoming_events.slice(0, 5).map((event) => (
                       <div key={event.id} className="flex items-baseline gap-2 text-sm">
-                        <span className="shrink-0 text-xs text-[#A0A0B0]">
+                        <span className="shrink-0 text-xs text-[var(--gray)]">
                           {formatDate(event.event_date)}
                           {formatTime(event.start_time)}
                         </span>
                         <Link
                           href={`/artist/${event.performer_slug}`}
-                          className="truncate text-[#FF4D6A] hover:underline"
+                          className="truncate text-pink hover:underline"
                         >
                           {event.performer_name}
                         </Link>
@@ -200,7 +210,7 @@ export default function MapClient() {
                   </div>
 
                   {venue.upcoming_events.length > 5 && (
-                    <p className="mt-1 text-xs text-[#A0A0B0]">+{venue.upcoming_events.length - 5} more events</p>
+                    <p className="mt-1 text-xs text-[var(--gray)]">+{venue.upcoming_events.length - 5} more events</p>
                   )}
                 </div>
               </Popup>

@@ -412,7 +412,7 @@ export function DiscoverModal({
   const inputIsUrl = isUrl(input);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B0B0F]/95 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg/95 backdrop-blur-sm">
       <div className="relative mx-4 w-full max-w-md rounded-2xl border border-light-gray/10 bg-bg-card p-6 shadow-2xl max-h-[85vh] overflow-y-auto">
         {/* Close button */}
         <button

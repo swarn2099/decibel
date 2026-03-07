@@ -70,18 +70,18 @@ body {
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* ─── Leaflet popup dark theme ─── */
+/* ─── Leaflet popup theme ─── */
 .leaflet-popup-content-wrapper {
-  background: #15151C !important;
-  color: #ededed !important;
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
   border-radius: 12px !important;
-  border: 1px solid rgba(110, 110, 130, 0.3) !important;
+  border: 1px solid rgba(110, 110, 130, 0.2) !important;
 }
 .leaflet-popup-tip {
-  background: #15151C !important;
+  background: var(--bg-card) !important;
 }
 .leaflet-popup-close-button {
-  color: #A0A0B0 !important;
+  color: var(--gray) !important;
 }
 
 /* ─── Hide scrollbar for genre pills ─── */
