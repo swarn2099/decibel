@@ -32,35 +32,48 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 
 ### Active
 
-#### Bug Fixes
-- [ ] Fix Instagram link double-URL bug on artist profiles
-- [ ] Fan count showing bare "0" — show "0 fans" or hide when zero
-- [ ] Empty sections (Tracks, etc.) still show headings — hide when no data
-- [ ] Leaderboard showing raw emails instead of display names
-- [ ] Leaderboard tier badges need brand colors (pink/purple/blue/teal)
-- [ ] "Collect" button needs to be dominant CTA (larger, full-width mobile, branded)
+#### Passport Visual Overhaul
+- [ ] Rich passport layout with timeline, stats dashboard, tier badges
+- [ ] "Your Year in Sound" stats section (dancefloors, cities, artists, streaks)
+- [ ] Shareable 1080x1920 story-ready passport card generation
+- [ ] Public passport page at /passport/[fan-slug] with OG meta tags
 
-#### Scene Map
-- [ ] Interactive map at /map with dark theme (Mapbox or Google Maps)
-- [ ] Venue dots sized/colored by activity level
-- [ ] Venue popup: name, upcoming shows, top performers
-- [ ] Genre filter (house, techno, bass, etc.)
-- [ ] "Tonight" mode with pulsing animation for active venues
-- [ ] Mobile responsive map
+#### Online Discovery
+- [ ] Add artist from link (Spotify, SoundCloud, RA, Instagram, TikTok)
+- [ ] Auto-scraping pipeline for artists not yet in database
+- [ ] Spotify OAuth integration importing top artists as discoveries
+- [ ] Smart recommendations based on collection + listening data
 
-#### Scraper Pipeline
-- [ ] Fix event-name-as-artist entries in DB
-- [ ] Normalize Instagram handles (usernames not full URLs)
-- [ ] Scraper coverage for additional Chicago venues
+#### Badges and Gamification
+- [ ] Discovery badges (Trailblazer, First 100, First 10 Verified)
+- [ ] Attendance badges (Regular, Devotee, Inner Circle, Venue Local/Legend)
+- [ ] Exploration badges (Genre Explorer, City Hopper, Night Owl, Scene Veteran, Centurion)
+- [ ] Streak badges (On Fire, Unstoppable, Year-Round)
+- [ ] Social badges (Tastemaker, Connector)
+- [ ] Badge display with rarity tiers, unlock animations
 
-## Current Milestone: v1.2 Polish, Map, and Pipeline Fixes
+#### Enhanced Artist Profiles
+- [ ] Profile enrichment (top tracks, fan stats, similar artists, past shows)
+- [ ] Spotify/SoundCloud embeds on profiles
+- [ ] Distinct "Collect" vs "Discover" CTAs
+- [ ] Artist claim flow (magic link + SoundCloud/Spotify verification)
 
-**Goal:** Fix UI bugs and data quality issues, add an interactive venue map, and improve scraper pipeline reliability.
+#### Passport Sharing and Social
+- [ ] Shareable cards (single-artist, milestone, badge, discovery, stats)
+- [ ] Activity feed showing friend collections, discoveries, badges
+- [ ] Follow system (follow/unfollow, mutual followers)
+- [ ] Contact-based "someone you know joined" notifications
+
+## Current Milestone: v2.0 — The Passport
+
+**Goal:** Transform the fan passport into a rich, visual, shareable experience that fans screenshot and post — the hero screen of the entire product.
 
 **Target features:**
-- Bug fixes across artist profiles, leaderboard, and CTA
-- Interactive dark-themed Scene Map at /map
-- Scraper data quality improvements
+- Passport visual overhaul with timeline, stats, and public shareable URL
+- Online discovery + add artists from any link + Spotify integration
+- Badge system rewarding attendance, discovery, streaks, and social activity
+- Enhanced artist profiles with distinct Collect vs Discover flows
+- Passport sharing with story-ready cards, activity feed, and follow system
 
 ### Out of Scope
 
@@ -85,7 +98,7 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 - **Scrapers**: `scripts/scrapers/` — EDMTrain, RA GraphQL, DICE API, SoundCloud enrichment
 - **Design tokens**: bg=#0B0B0F, pink=#FF4D6A, purple=#9B6DFF, blue=#4D9AFF, teal=#00D4AA, yellow=#FFD700
 - **Font**: Poppins via next/font/google
-- **Milestones shipped**: v1.0 MVP (Phases 1-4), v1.1 Growth Mechanics (Phases 5-7)
+- **Milestones shipped**: v1.0 MVP (Phases 1-4), v1.1 Growth Mechanics (Phases 5-7), v1.2 Polish/Map/Pipeline (Phases 8-10)
 
 ## Constraints
 
@@ -112,4 +125,4 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 | RA GraphQL + DICE API for event scraping | 5x more events than EDMTrain alone, no Playwright needed | ✓ Good |
 
 ---
-*Last updated: 2026-03-06 after v1.2 milestone start*
+*Last updated: 2026-03-07 after v2.0 milestone start*

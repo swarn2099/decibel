@@ -1,5 +1,20 @@
 # Milestones
 
+## v1.2 Polish, Map, and Pipeline Fixes (Shipped: 2026-03-07)
+
+**Phases:** 8-10 (3 phases, 5 plans)
+**Timeline:** 2026-03-06 to 2026-03-07
+
+**Key accomplishments:**
+- Bug fixes: Instagram handle normalization, fan count display, empty section hiding, leaderboard display names
+- Interactive Scene Map at `/map` with dark CartoDB tiles, venue markers, genre filtering, "Tonight" mode
+- Scraper pipeline cleanup: event-name-as-artist entries removed, 19hz.info scraper added
+- Venue geocoding via Nominatim OSM
+
+**Archive:** `phases/08-bug-fixes/`, `phases/09-scene-map/`, `phases/10-scraper-pipeline/`
+
+---
+
 ## v1.1 Growth Mechanics + Content Engine (Shipped: 2026-03-06)
 
 **Phases:** 5-7 (3 phases, 5 plans)
