@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 
 export function LoginForm() {
@@ -8,9 +8,17 @@ export function LoginForm() {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [cooldown, setCooldown] = useState(0);
 
-  async function handleLogin(e: React.FormEvent) {
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
+  const handleLogin = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    if (cooldown > 0) return;
     setLoading(true);
     setError("");
 
@@ -23,12 +31,16 @@ export function LoginForm() {
     });
 
     if (error) {
+      if (error.message.toLowerCase().includes("rate") || error.message.toLowerCase().includes("limit")) {
+        setCooldown(60);
+      }
       setError(error.message);
     } else {
       setSent(true);
+      setCooldown(60);
     }
     setLoading(false);
-  }
+  }, [email, cooldown]);
 
   if (sent) {
     return (
@@ -54,10 +66,10 @@ export function LoginForm() {
       {error && <p className="text-center text-sm text-pink">{error}</p>}
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || cooldown > 0}
         className="w-full rounded-xl bg-gradient-to-r from-pink to-purple px-6 py-3 font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
       >
-        {loading ? "Sending..." : "Send Magic Link"}
+        {loading ? "Sending..." : cooldown > 0 ? `Resend in ${cooldown}s` : "Send Magic Link"}
       </button>
     </form>
   );

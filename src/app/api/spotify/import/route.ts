@@ -185,6 +185,15 @@ export async function POST() {
       if (existingPerformer) {
         performerId = existingPerformer.id;
         performerPhotoUrl = existingPerformer.photo_url;
+
+        // Backfill follower_count if missing
+        if (artist.followers?.total && artist.followers.total > 0) {
+          await supabaseAdmin
+            .from("performers")
+            .update({ follower_count: artist.followers.total })
+            .eq("id", performerId)
+            .eq("follower_count", 0);
+        }
       } else {
         // Create new performer
         let slug = generateSlug(artist.name);
@@ -204,6 +213,7 @@ export async function POST() {
             slug,
             photo_url: photoUrl,
             genres: artist.genres || [],
+            follower_count: artist.followers?.total || 0,
             claimed: false,
           })
           .select("id, photo_url")
