@@ -11,8 +11,10 @@ import {
   Users,
   Clock,
   Play,
+  History,
 } from "lucide-react";
 import { PerformerImage } from "@/components/performer-image";
+import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
 
 type Params = Promise<{ slug: string }>;
 
@@ -23,6 +25,7 @@ interface Performer {
   bio: string | null;
   photo_url: string | null;
   soundcloud_url: string | null;
+  spotify_url: string | null;
   mixcloud_url: string | null;
   ra_url: string | null;
   instagram_handle: string | null;
@@ -43,6 +46,22 @@ interface Event {
     slug: string;
     address: string | null;
   } | null;
+}
+
+interface SimilarArtist {
+  id: string;
+  name: string;
+  slug: string;
+  photo_url: string | null;
+  genres: string[] | null;
+  city: string | null;
+}
+
+interface FanStats {
+  total_fans: number;
+  collectors: number;
+  discoverers: number;
+  tier_breakdown: Record<string, number>;
 }
 
 const GRADIENT_PAIRS = [
@@ -105,6 +124,19 @@ function getSoundCloudEmbedUrl(profileUrl: string): string {
   return `https://w.soundcloud.com/player/?url=${encodeURIComponent(normalizedUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
 }
 
+function getSpotifyArtistId(spotifyUrl: string): string | null {
+  const match = spotifyUrl.match(/artist\/([a-zA-Z0-9]+)/);
+  return match ? match[1] : null;
+}
+
+// Tailwind hex colors for tier bar segments (can't use dynamic class names)
+const TIER_BAR_COLORS: Record<string, string> = {
+  network: "bg-pink",
+  early_access: "bg-purple",
+  secret: "bg-blue",
+  inner_circle: "bg-teal",
+};
+
 async function getPerformer(slug: string): Promise<Performer | null> {
   const supabase = await createSupabaseServer();
   const { data, error } = await supabase
@@ -136,6 +168,24 @@ async function getUpcomingEvents(performerId: string): Promise<Event[]> {
   })) as Event[];
 }
 
+async function getPastEvents(performerId: string): Promise<Event[]> {
+  const supabase = await createSupabaseServer();
+  const today = new Date().toISOString().split("T")[0];
+  const { data } = await supabase
+    .from("events")
+    .select("id, event_date, start_time, end_time, external_url, venue:venues(name, slug, address)")
+    .eq("performer_id", performerId)
+    .lt("event_date", today)
+    .order("event_date", { ascending: false })
+    .limit(12);
+
+  if (!data) return [];
+  return data.map((e) => ({
+    ...e,
+    venue: Array.isArray(e.venue) ? e.venue[0] ?? null : e.venue,
+  })) as Event[];
+}
+
 async function getFanCount(performerId: string): Promise<number> {
   const supabase = await createSupabaseServer();
   const { count, error } = await supabase
@@ -145,6 +195,63 @@ async function getFanCount(performerId: string): Promise<number> {
 
   if (error || count === null) return 0;
   return count;
+}
+
+async function getFanStats(performerId: string): Promise<FanStats> {
+  const supabase = await createSupabaseServer();
+
+  const [collectorsRes, discoverersRes, tiersRes] = await Promise.all([
+    supabase
+      .from("collections")
+      .select("fan_id", { count: "exact", head: true })
+      .eq("performer_id", performerId)
+      .eq("verified", true),
+    supabase
+      .from("collections")
+      .select("fan_id", { count: "exact", head: true })
+      .eq("performer_id", performerId)
+      .eq("verified", false),
+    supabase
+      .from("fan_tiers")
+      .select("current_tier")
+      .eq("performer_id", performerId),
+  ]);
+
+  const collectors = collectorsRes.count ?? 0;
+  const discoverers = discoverersRes.count ?? 0;
+
+  const tier_breakdown: Record<string, number> = {};
+  if (tiersRes.data) {
+    for (const row of tiersRes.data) {
+      const tier = row.current_tier as string;
+      tier_breakdown[tier] = (tier_breakdown[tier] || 0) + 1;
+    }
+  }
+
+  return {
+    total_fans: collectors + discoverers,
+    collectors,
+    discoverers,
+    tier_breakdown,
+  };
+}
+
+async function getSimilarArtists(
+  performerId: string,
+  genres: string[] | null
+): Promise<SimilarArtist[]> {
+  if (!genres || genres.length === 0) return [];
+
+  const supabase = await createSupabaseServer();
+  const { data } = await supabase
+    .from("performers")
+    .select("id, name, slug, photo_url, genres, city")
+    .overlaps("genres", genres)
+    .neq("id", performerId)
+    .order("follower_count", { ascending: false, nullsFirst: false })
+    .limit(8);
+
+  return (data ?? []) as SimilarArtist[];
 }
 
 export async function generateMetadata({
@@ -178,10 +285,26 @@ export default async function ArtistPage({ params }: { params: Params }) {
   if (!performer) notFound();
 
   const [gradFrom, gradTo] = getGradient(performer.name);
-  const [upcomingEvents, fanCount] = await Promise.all([
-    getUpcomingEvents(performer.id),
-    getFanCount(performer.id),
-  ]);
+  const [upcomingEvents, pastEvents, fanCount, fanStats, similarArtists] =
+    await Promise.all([
+      getUpcomingEvents(performer.id),
+      getPastEvents(performer.id),
+      getFanCount(performer.id),
+      getFanStats(performer.id),
+      getSimilarArtists(performer.id, performer.genres),
+    ]);
+
+  const spotifyArtistId = performer.spotify_url
+    ? getSpotifyArtistId(performer.spotify_url)
+    : null;
+
+  // Count distinct venues from past events
+  const pastVenueNames = new Set(
+    pastEvents
+      .map((e) => e.venue?.name)
+      .filter(Boolean)
+  );
+
   const socialLinks = [
     performer.soundcloud_url && {
       href: performer.soundcloud_url,
@@ -218,6 +341,12 @@ export default async function ArtistPage({ params }: { params: Params }) {
     color: string;
     hoverBorder: string;
   }>;
+
+  // Total tier count for proportion bar
+  const tierTotal = Object.values(fanStats.tier_breakdown).reduce(
+    (sum, n) => sum + n,
+    0
+  );
 
   return (
     <main className="min-h-dvh bg-bg">
@@ -366,6 +495,28 @@ export default async function ArtistPage({ params }: { params: Params }) {
           </section>
         )}
 
+        {/* Spotify Embed */}
+        {spotifyArtistId && (
+          <section className="mb-10">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
+              On Spotify
+            </h2>
+            <div className="overflow-hidden rounded-xl">
+              <iframe
+                title={`${performer.name} on Spotify`}
+                src={`https://open.spotify.com/embed/artist/${spotifyArtistId}?utm_source=generator&theme=0`}
+                width="100%"
+                height="352"
+                frameBorder="0"
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                className="block rounded-xl"
+                style={{ borderRadius: "12px" }}
+              />
+            </div>
+          </section>
+        )}
+
         {/* Upcoming Shows */}
         {upcomingEvents.length > 0 && (
           <section className="mb-10">
@@ -433,6 +584,83 @@ export default async function ArtistPage({ params }: { params: Params }) {
           </section>
         )}
 
+        {/* Past Shows */}
+        {pastEvents.length > 0 && (
+          <section className="mb-10">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
+              <History className="mr-2 inline h-4 w-4" />
+              Past Shows
+            </h2>
+            {pastVenueNames.size > 0 && (
+              <p className="mb-3 text-sm text-gray">
+                Played at{" "}
+                <span className="font-semibold text-[var(--text-muted)]">
+                  {pastVenueNames.size}
+                </span>{" "}
+                venue{pastVenueNames.size !== 1 ? "s" : ""}
+              </p>
+            )}
+            <div className="grid gap-3 sm:grid-cols-2">
+              {pastEvents.map((event) => {
+                const { day, month, weekday } = formatEventDate(event.event_date);
+                const Wrapper = event.external_url ? "a" : "div";
+                const wrapperProps = event.external_url
+                  ? {
+                      href: event.external_url,
+                      target: "_blank" as const,
+                      rel: "noopener noreferrer",
+                    }
+                  : {};
+                return (
+                  <Wrapper
+                    key={event.id}
+                    {...wrapperProps}
+                    className="group flex items-center gap-4 rounded-xl border border-light-gray/15 bg-bg-card px-5 py-4 transition-all hover:border-pink/20 hover:bg-bg-card/80"
+                  >
+                    {/* Date block — muted for past events */}
+                    <div className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-lg bg-gray/10 opacity-70">
+                      <span className="text-[10px] font-bold uppercase leading-none text-pink">
+                        {month}
+                      </span>
+                      <span className="text-xl font-bold leading-tight">
+                        {day}
+                      </span>
+                      <span className="text-[10px] text-gray leading-none">
+                        {weekday}
+                      </span>
+                    </div>
+
+                    {/* Event info */}
+                    <div className="min-w-0 flex-1">
+                      {event.venue && (
+                        <p className="truncate text-sm font-semibold">
+                          {event.venue.name}
+                        </p>
+                      )}
+                      {event.venue?.address && (
+                        <p className="truncate text-xs text-gray">
+                          {event.venue.address}
+                        </p>
+                      )}
+                      {event.start_time && (
+                        <p className="mt-0.5 flex items-center gap-1 text-xs text-light-gray">
+                          <Clock className="h-3 w-3" />
+                          {formatTime(event.start_time)}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* External link indicator */}
+                    {event.external_url && (
+                      <ExternalLink className="h-4 w-4 shrink-0 text-light-gray transition-colors group-hover:text-[var(--text)]" />
+                    )}
+                  </Wrapper>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
         {/* About */}
         {performer.bio && (
           <section className="mb-10">
@@ -455,6 +683,126 @@ export default async function ArtistPage({ params }: { params: Params }) {
                   followers on SoundCloud
                 </p>
               )}
+            </div>
+          </section>
+        )}
+
+        {/* Community / Fan Stats */}
+        {fanStats.total_fans > 0 && (
+          <section className="mb-10">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
+              Community
+            </h2>
+            <div className="rounded-xl border border-light-gray/15 bg-bg-card p-6">
+              {/* Stat numbers row */}
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold">{fanStats.total_fans}</p>
+                  <p className="text-xs text-gray">Total Fans</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-pink">{fanStats.collectors}</p>
+                  <p className="text-xs text-gray">Collectors</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-purple">{fanStats.discoverers}</p>
+                  <p className="text-xs text-gray">Discoverers</p>
+                </div>
+              </div>
+
+              {/* Tier breakdown bar */}
+              {tierTotal > 0 && (
+                <div className="mt-6">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-gray">
+                    Tier Breakdown
+                  </p>
+                  {/* Proportion bar */}
+                  <div className="flex h-3 overflow-hidden rounded-full">
+                    {(["network", "early_access", "secret", "inner_circle"] as const).map(
+                      (tier) => {
+                        const count = fanStats.tier_breakdown[tier] || 0;
+                        if (count === 0) return null;
+                        const pct = (count / tierTotal) * 100;
+                        return (
+                          <div
+                            key={tier}
+                            className={`${TIER_BAR_COLORS[tier]} transition-all`}
+                            style={{ width: `${pct}%` }}
+                            title={`${TIER_LABELS[tier]}: ${count}`}
+                          />
+                        );
+                      }
+                    )}
+                  </div>
+                  {/* Legend */}
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                    {(["network", "early_access", "secret", "inner_circle"] as const).map(
+                      (tier) => {
+                        const count = fanStats.tier_breakdown[tier] || 0;
+                        if (count === 0) return null;
+                        return (
+                          <span
+                            key={tier}
+                            className="flex items-center gap-1.5 text-xs text-gray"
+                          >
+                            <span
+                              className={`inline-block h-2 w-2 rounded-full ${TIER_BAR_COLORS[tier]}`}
+                            />
+                            <span className={TIER_COLORS[tier]?.text}>
+                              {TIER_LABELS[tier]}
+                            </span>
+                            <span className="text-[var(--text-muted)]">{count}</span>
+                          </span>
+                        );
+                      }
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Similar Artists */}
+        {similarArtists.length > 0 && (
+          <section className="mb-10">
+            <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
+              Similar Artists
+            </h2>
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
+              {similarArtists.map((artist) => (
+                <Link
+                  key={artist.id}
+                  href={`/artist/${artist.slug}`}
+                  className="group flex w-32 shrink-0 flex-col items-center gap-2 rounded-xl border border-light-gray/15 bg-bg-card p-4 transition-all hover:border-pink/20 hover:bg-bg-card/80"
+                >
+                  {artist.photo_url ? (
+                    <PerformerImage
+                      src={artist.photo_url}
+                      alt={artist.name}
+                      className="h-16 w-16 rounded-full object-cover ring-1 ring-white/10"
+                      fallbackClassName="flex h-16 w-16 items-center justify-center rounded-full bg-gray/20 text-lg font-bold text-[var(--text-muted)] ring-1 ring-white/10"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray/20 text-lg font-bold text-[var(--text-muted)] ring-1 ring-white/10">
+                      {artist.name
+                        .split(" ")
+                        .map((w) => w[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </div>
+                  )}
+                  <p className="w-full truncate text-center text-xs font-semibold">
+                    {artist.name}
+                  </p>
+                  {artist.genres && artist.genres.length > 0 && (
+                    <span className="rounded-full bg-gray/15 px-2 py-0.5 text-[10px] text-gray">
+                      {artist.genres[0]}
+                    </span>
+                  )}
+                </Link>
+              ))}
             </div>
           </section>
         )}
