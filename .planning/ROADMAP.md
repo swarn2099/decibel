@@ -105,11 +105,12 @@ Plans:
   2. Artist profile shows upcoming and past shows with venue history, plus fan stats (total collectors, discoverers, tier breakdown) and similar artists based on genre overlap
   3. Fan can click "Discover" to add the artist to their passport or "Collect" to see next show info / QR context, with their tier progress and journey state visible (discovered -> collecting -> inner circle)
   4. Unclaimed profiles show a "Claim this profile" CTA with magic link verification flow
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
+- [ ] 14-01-PLAN.md -- Rich profile sections: Spotify embed, past shows, fan stats, similar artists
+- [ ] 14-02-PLAN.md -- Discover/Collect CTAs with fan journey state and tier progress
+- [ ] 14-03-PLAN.md -- Claim profile flow with magic link verification
 
 ### Phase 15: Passport Sharing and Social
 **Goal**: Fans can share any moment from their passport and see what their friends are collecting -- the viral loop
@@ -146,5 +147,5 @@ Plans:
 | 11. Passport Visual Overhaul | v2.0 | Complete    | 2026-03-07 | 2026-03-07 |
 | 12. Online Discovery | 3/3 | Complete    | 2026-03-07 | - |
 | 13. Badges and Gamification | 2/2 | Complete    | 2026-03-07 | - |
-| 14. Enhanced Artist Profiles | v2.0 | 0/? | Not started | - |
+| 14. Enhanced Artist Profiles | v2.0 | 0/3 | Not started | - |
 | 15. Passport Sharing and Social | v2.0 | 0/? | Not started | - |
