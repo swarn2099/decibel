@@ -5,13 +5,13 @@ milestone_name: "The Passport"
 status: executing
 stopped_at: null
 last_updated: "2026-03-07"
-last_activity: 2026-03-07 — Completed 11-01-PLAN.md (Passport Visual Overhaul)
+last_activity: 2026-03-07 — Completed 11-02-PLAN.md (Public Passport & Sharing)
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 1
-  completed_plans: 1
-  percent: 20
+  completed_phases: 1
+  total_plans: 2
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 11 of 15 (Passport Visual Overhaul)
-Plan: 1 of 1 complete
+Phase: 11 of 15 (Passport Visual Overhaul) -- COMPLETE
+Plan: 2 of 2 complete
 Status: Executing
-Last activity: 2026-03-07 — Completed 11-01-PLAN.md
+Last activity: 2026-03-07 — Completed 11-02-PLAN.md
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -46,6 +46,9 @@ Progress: [██░░░░░░░░] 20%
 - [11-01] Fan slug computed at query time (no DB migration) — slugify name or first 8 chars of ID
 - [11-01] Stats fetched client-side via /api/passport/stats to keep page SSR fast
 - [11-01] /profile redirects to /passport for backward compatibility
+- [11-02] OG and story card use query params for data (edge runtime can't use Supabase Node client)
+- [11-02] Stats section hidden on public passport since stats API requires auth
+- [11-02] Web Share API used on mobile with download fallback on desktop
 
 Decisions are logged in PROJECT.md Key Decisions table.
 

@@ -11,9 +11,9 @@
 - [x] **PASS-02**: Verified collections display with full color, solid badge, and tier indicator
 - [x] **PASS-03**: Discovered collections display with muted style, outline badge, "discovered" tag
 - [x] **PASS-04**: Fan can view "Your Year in Sound" stats (dancefloors, cities, artists, venues, streaks, favorite genre)
-- [ ] **PASS-05**: Fan can generate a 1080x1920 story-ready shareable passport card
-- [ ] **PASS-06**: Fan has a public passport URL (/passport/[fan-slug]) viewable without login
-- [ ] **PASS-07**: Public passport generates OG meta preview card with stats
+- [x] **PASS-05**: Fan can generate a 1080x1920 story-ready shareable passport card
+- [x] **PASS-06**: Fan has a public passport URL (/passport/[fan-slug]) viewable without login
+- [x] **PASS-07**: Public passport generates OG meta preview card with stats
 
 ### Discovery
 
@@ -82,9 +82,9 @@
 | PASS-02 | Phase 11 | Complete |
 | PASS-03 | Phase 11 | Complete |
 | PASS-04 | Phase 11 | Complete |
-| PASS-05 | Phase 11 | Pending |
-| PASS-06 | Phase 11 | Pending |
-| PASS-07 | Phase 11 | Pending |
+| PASS-05 | Phase 11 | Complete |
+| PASS-06 | Phase 11 | Complete |
+| PASS-07 | Phase 11 | Complete |
 | DISC-01 | Phase 12 | Pending |
 | DISC-02 | Phase 12 | Pending |
 | DISC-03 | Phase 12 | Pending |

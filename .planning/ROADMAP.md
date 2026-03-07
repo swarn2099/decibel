@@ -41,7 +41,7 @@
 
 **Milestone Goal:** Transform the fan passport into a rich, visual, shareable experience that fans screenshot and post -- the hero screen of the entire product.
 
-- [ ] **Phase 11: Passport Visual Overhaul** - Rich passport layout with timeline, stats dashboard, story-ready sharing, and public passport URL
+- [x] **Phase 11: Passport Visual Overhaul** - Rich passport layout with timeline, stats dashboard, story-ready sharing, and public passport URL
 - [ ] **Phase 12: Online Discovery + Add From Anywhere** - Fan-driven artist discovery via links, Spotify import, and smart recommendations
 - [ ] **Phase 13: Badges and Gamification** - Badge system rewarding attendance, discovery, streaks, exploration, and social activity
 - [ ] **Phase 14: Enhanced Artist Profiles** - Rich artist pages with tracks, fan stats, similar artists, and distinct Collect vs Discover flows
@@ -62,7 +62,7 @@
 
 Plans:
 - [x] 11-01-PLAN.md -- Core passport page with timeline (verified vs discovered) and stats dashboard
-- [ ] 11-02-PLAN.md -- Public passport URL with OG meta + story-ready shareable card
+- [x] 11-02-PLAN.md -- Public passport URL with OG meta + story-ready shareable card
 
 ### Phase 12: Online Discovery + Add From Anywhere
 **Goal**: Fans can build their passport without waiting for live shows -- discover artists online from any music platform
@@ -142,7 +142,7 @@ Plans:
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
 | 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
 | 10. Scraper Pipeline | v1.2 | 2/2 | Complete | 2026-03-07 |
-| 11. Passport Visual Overhaul | v2.0 | 1/2 | In progress | - |
+| 11. Passport Visual Overhaul | v2.0 | 2/2 | Complete | 2026-03-07 |
 | 12. Online Discovery | v2.0 | 0/? | Not started | - |
 | 13. Badges and Gamification | v2.0 | 0/? | Not started | - |
 | 14. Enhanced Artist Profiles | v2.0 | 0/? | Not started | - |
