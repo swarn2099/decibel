@@ -12,6 +12,7 @@ import {
   Clock,
   History,
   BadgeCheck,
+  Crown,
 } from "lucide-react";
 import { PerformerImage } from "@/components/performer-image";
 import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
@@ -188,6 +189,29 @@ async function getPastEvents(performerId: string): Promise<Event[]> {
   })) as Event[];
 }
 
+async function getFounder(
+  performerId: string
+): Promise<{ name: string; awarded_at: string } | null> {
+  const supabase = await createSupabaseServer();
+  const { data: badge } = await supabase
+    .from("founder_badges")
+    .select("awarded_at, fans(name, email)")
+    .eq("performer_id", performerId)
+    .maybeSingle();
+
+  if (!badge) return null;
+
+  const fan = badge.fans as unknown as {
+    name: string | null;
+    email: string;
+  } | null;
+
+  return {
+    name: fan?.name || fan?.email?.split("@")[0] || "A fan",
+    awarded_at: badge.awarded_at,
+  };
+}
+
 async function getFanCount(performerId: string): Promise<number> {
   const supabase = await createSupabaseServer();
   const { count, error } = await supabase
@@ -287,13 +311,14 @@ export default async function ArtistPage({ params }: { params: Params }) {
   if (!performer) notFound();
 
   const [gradFrom, gradTo] = getGradient(performer.name);
-  const [upcomingEvents, pastEvents, fanCount, fanStats, similarArtists] =
+  const [upcomingEvents, pastEvents, fanCount, fanStats, similarArtists, founder] =
     await Promise.all([
       getUpcomingEvents(performer.id),
       getPastEvents(performer.id),
       getFanCount(performer.id),
       getFanStats(performer.id),
       getSimilarArtists(performer.id, performer.genres),
+      getFounder(performer.id),
     ]);
 
   const spotifyArtistId = performer.spotify_url
@@ -482,6 +507,19 @@ export default async function ArtistPage({ params }: { params: Params }) {
       {!performer.claimed && (
         <div className="mx-auto max-w-4xl px-6 pb-6">
           <ClaimBanner performerId={performer.id} performerName={performer.name} />
+        </div>
+      )}
+
+      {/* ───── Founder Badge ───── */}
+      {founder && (
+        <div className="mx-auto max-w-4xl px-6 pb-4">
+          <div className="flex items-center gap-2 rounded-xl border border-yellow/20 bg-yellow/5 px-4 py-3">
+            <Crown size={16} className="shrink-0 text-yellow" />
+            <p className="text-sm text-yellow">
+              Added to Decibel by{" "}
+              <span className="font-semibold">{founder.name}</span>
+            </p>
+          </div>
         </div>
       )}
 

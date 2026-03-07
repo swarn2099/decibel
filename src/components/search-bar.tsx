@@ -90,38 +90,56 @@ export function SearchBar({ className = "" }: { className?: string }) {
       {open && query.length >= 2 && (
         <div className="absolute left-0 right-0 top-full mt-2 max-h-[70vh] overflow-y-auto rounded-xl border border-light-gray/15 bg-bg-card shadow-2xl shadow-black/40 backdrop-blur-xl z-50">
           {results.length === 0 ? (
-            <p className="px-4 py-6 text-center text-sm text-gray">
-              No artists match &ldquo;{query}&rdquo;
-            </p>
-          ) : (
-            results.map((p) => (
+            <div className="px-4 py-6 text-center">
+              <p className="text-sm text-gray">
+                No artists match &ldquo;{query}&rdquo;
+              </p>
               <Link
-                key={p.slug}
-                href={`/artist/${p.slug}`}
+                href={`/add?q=${encodeURIComponent(query)}`}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-light-gray/10 first:rounded-t-xl last:rounded-b-xl"
+                className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-pink hover:text-pink/80 transition-colors"
               >
-                {p.photo_url ? (
-                  <img
-                    src={p.photo_url}
-                    alt={p.name}
-                    className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-light-gray/20"
-                  />
-                ) : (
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink/20 to-purple/20 text-sm font-bold text-gray">
-                    {p.name[0]}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{p.name}</p>
-                  {p.genres && p.genres.length > 0 && (
-                    <p className="truncate text-xs text-light-gray">
-                      {p.genres.slice(0, 3).join(" · ")}
-                    </p>
-                  )}
-                </div>
+                Add them to Decibel &rarr;
               </Link>
-            ))
+            </div>
+          ) : (
+            <>
+              {results.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/artist/${p.slug}`}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-light-gray/10 first:rounded-t-xl"
+                >
+                  {p.photo_url ? (
+                    <img
+                      src={p.photo_url}
+                      alt={p.name}
+                      className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-light-gray/20"
+                    />
+                  ) : (
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink/20 to-purple/20 text-sm font-bold text-gray">
+                      {p.name[0]}
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{p.name}</p>
+                    {p.genres && p.genres.length > 0 && (
+                      <p className="truncate text-xs text-light-gray">
+                        {p.genres.slice(0, 3).join(" · ")}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ))}
+              <Link
+                href={`/add?q=${encodeURIComponent(query)}`}
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center gap-1 border-t border-light-gray/10 px-4 py-3 text-sm font-medium text-pink hover:bg-light-gray/5 rounded-b-xl transition-colors"
+              >
+                Not here? Add them to Decibel &rarr;
+              </Link>
+            </>
           )}
         </div>
       )}

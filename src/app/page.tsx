@@ -100,6 +100,13 @@ export default async function Home() {
         </p>
         <div className="flex h-1 w-24 rounded-full bg-gradient-to-r from-pink to-purple" />
         <SearchBar className="mx-auto mt-2" />
+        <Link
+          href="/add"
+          className="mt-2 inline-flex items-center gap-2 rounded-full border border-yellow/20 bg-yellow/5 px-5 py-2 text-sm font-medium text-yellow transition-colors hover:bg-yellow/10"
+        >
+          <span className="text-base">+</span>
+          Add an Artist &amp; earn a Founder badge
+        </Link>
       </div>
 
       {/* Weekend Shows */}

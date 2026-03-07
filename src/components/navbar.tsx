@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { User, LogIn, MapPin, Trophy } from "lucide-react";
+import { User, LogIn, MapPin, Trophy, Plus } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { SearchBar } from "./search-bar";
 
@@ -44,6 +44,19 @@ export function Navbar() {
       {!isLanding && <SearchBar className="mx-auto" />}
 
       <div className="flex shrink-0 items-center gap-2">
+        {/* Add Artist link */}
+        <Link
+          href="/add"
+          className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm backdrop-blur-sm transition-colors ${
+            pathname === "/add"
+              ? "border-yellow/50 bg-bg-card/80 text-yellow"
+              : "border-light-gray/20 bg-bg-card/80 text-gray hover:border-yellow/30 hover:text-yellow"
+          }`}
+        >
+          <Plus size={16} />
+          <span className="hidden sm:inline">Add Artist</span>
+        </Link>
+
         {/* Leaderboard link */}
         <Link
           href="/leaderboard"
