@@ -22,6 +22,7 @@ import {
   X,
   Plus,
 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
 import type {
@@ -30,6 +31,7 @@ import type {
   PassportStats,
 } from "@/lib/types/passport";
 import { DiscoverModal } from "./discover-modal";
+import { SpotifyImport } from "./spotify-import";
 import { Recommendations } from "./recommendations";
 
 interface PassportClientProps {
@@ -384,6 +386,8 @@ function ShareMenu({
 }
 
 export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPublic = false }: PassportClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [stats, setStats] = useState<PassportStats | null>(null);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [showDiscoverModal, setShowDiscoverModal] = useState(false);
@@ -398,6 +402,13 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
         .catch(() => {});
     }
   }, [isPublic]);
+
+  // Show Spotify error toast
+  useEffect(() => {
+    if (searchParams.get("spotify") === "error") {
+      toast.error("Failed to connect Spotify. Please try again.");
+    }
+  }, [searchParams]);
 
   const verifiedCount = timeline.filter((t) => t.verified).length;
   const uniqueArtists = new Set(timeline.map((t) => t.performer.id)).size;
@@ -570,6 +581,16 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
 
         {/* Recommendations (authenticated only) */}
         {!isPublic && <Recommendations />}
+
+        {/* Music Connections (authenticated only) */}
+        {!isPublic && (
+          <section className="mb-10">
+            <h2 className="mb-4 text-lg font-bold text-[var(--text)]">
+              Music Connections
+            </h2>
+            <SpotifyImport onImportComplete={() => router.refresh()} />
+          </section>
+        )}
 
         {/* Collection Timeline */}
         <section>
