@@ -49,7 +49,7 @@ export interface SpotifyArtistResult {
 
 export async function searchSpotifyArtists(
   query: string,
-  limit = 5
+  limit = 10
 ): Promise<SpotifyArtistResult[]> {
   const token = await getAccessToken();
 
@@ -71,6 +71,23 @@ export async function searchSpotifyArtists(
 
   const data = await res.json();
   const artists = data.artists?.items || [];
+  if (artists.length === 0) return [];
+
+  // Search endpoint returns followers as 0 with Client Credentials auth.
+  // Batch-fetch real follower counts via /v1/artists endpoint.
+  const ids = artists.map((a: { id: string }) => a.id).join(",");
+  const detailRes = await fetch(
+    `https://api.spotify.com/v1/artists?ids=${ids}`,
+    { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
+  );
+
+  const followerMap = new Map<string, number>();
+  if (detailRes.ok) {
+    const detailData = await detailRes.json();
+    for (const a of detailData.artists || []) {
+      followerMap.set(a.id, a.followers?.total ?? 0);
+    }
+  }
 
   return artists.map(
     (a: {
@@ -79,15 +96,14 @@ export async function searchSpotifyArtists(
       images?: { url: string }[];
       genres?: string[];
       external_urls?: { spotify?: string };
-      followers?: { total?: number };
     }) => ({
       id: a.id,
       name: a.name,
       photo_url: a.images?.[0]?.url || null,
-      monthly_listeners: null, // not available via search, fetched separately
+      monthly_listeners: null,
       genres: a.genres || [],
       spotify_url: a.external_urls?.spotify || `https://open.spotify.com/artist/${a.id}`,
-      followers: a.followers?.total || 0,
+      followers: followerMap.get(a.id) ?? 0,
     })
   );
 }
