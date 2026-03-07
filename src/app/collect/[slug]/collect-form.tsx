@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 const TIER_CONFIG = {
   network: { label: "Network", color: "text-pink", bg: "bg-pink/10", border: "border-pink/30", min: 1 },
@@ -108,7 +109,22 @@ export function CollectForm({ performer }: { performer: Performer }) {
           </p>
         )}
 
-        <div className="mt-4 flex h-0.5 w-16 rounded-full bg-gradient-to-r from-pink to-purple" />
+        <div className="mt-2 flex gap-3">
+          <Link
+            href={`/artist/${performer.slug}`}
+            className="rounded-xl bg-pink/10 px-5 py-2.5 text-sm font-medium text-pink hover:bg-pink/20 transition-colors"
+          >
+            View Artist
+          </Link>
+          <Link
+            href="/passport"
+            className="rounded-xl border border-light-gray/20 px-5 py-2.5 text-sm font-medium text-[var(--text)] hover:border-pink/30 hover:text-pink transition-colors"
+          >
+            My Passport
+          </Link>
+        </div>
+
+        <div className="mt-2 flex h-0.5 w-16 rounded-full bg-gradient-to-r from-pink to-purple" />
         <p className="text-xs text-light-gray">DECIBEL</p>
       </motion.div>
     );
