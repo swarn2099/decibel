@@ -10,6 +10,7 @@ export async function GET(req: NextRequest) {
   const error = req.nextUrl.searchParams.get("error");
 
   if (error || !code) {
+    console.error("[spotify/callback] OAuth error or missing code:", error);
     return NextResponse.redirect(new URL("/passport?spotify=error", siteUrl));
   }
 
@@ -32,6 +33,8 @@ export async function GET(req: NextRequest) {
     });
 
     if (!tokenRes.ok) {
+      const errBody = await tokenRes.text();
+      console.error("[spotify/callback] Token exchange failed:", tokenRes.status, errBody);
       return NextResponse.redirect(new URL("/passport?spotify=error", siteUrl));
     }
 
@@ -40,6 +43,7 @@ export async function GET(req: NextRequest) {
     const refreshToken = tokenData.refresh_token;
 
     if (!accessToken) {
+      console.error("[spotify/callback] No access token in response");
       return NextResponse.redirect(new URL("/passport?spotify=error", siteUrl));
     }
 
@@ -53,16 +57,19 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Store per-user refresh token so we don't need to re-auth every time
-    const state = req.nextUrl.searchParams.get("state"); // user.id passed as state
-    if (state && refreshToken) {
-      // Look up fan by auth user id's email
-      const { data: { user } } = await (await import("@/lib/supabase-server")).createSupabaseServer().then(s => s.auth.getUser());
-      if (user?.email) {
+    // Store per-user refresh token using the auth user ID passed as state
+    const authUserId = req.nextUrl.searchParams.get("state");
+    if (authUserId && refreshToken) {
+      // Look up user email via Supabase admin auth (no cookies needed)
+      const { data: { user: authUser } } = await admin.auth.admin.getUserById(authUserId);
+      if (authUser?.email) {
         await admin
           .from("fans")
           .update({ spotify_refresh_token: refreshToken, spotify_connected_at: new Date().toISOString() })
-          .eq("email", user.email);
+          .eq("email", authUser.email);
+        console.log("[spotify/callback] Stored refresh token for", authUser.email);
+      } else {
+        console.warn("[spotify/callback] Could not find auth user for state:", authUserId);
       }
     }
 
@@ -79,7 +86,8 @@ export async function GET(req: NextRequest) {
     });
 
     return response;
-  } catch {
+  } catch (err) {
+    console.error("[spotify/callback] Unexpected error:", err);
     return NextResponse.redirect(new URL("/passport?spotify=error", siteUrl));
   }
 }

@@ -49,6 +49,7 @@ export async function POST() {
     let spotifyToken = cookieStore.get("spotify_token")?.value;
 
     if (!spotifyToken) {
+      console.log("[spotify/import] No cookie token, trying stored refresh token for", user.email);
       // Try to get a fresh token from the user's stored refresh token
       const { data: fanWithToken } = await supabaseAdmin
         .from("fans")
@@ -57,6 +58,7 @@ export async function POST() {
         .maybeSingle();
 
       if (!fanWithToken?.spotify_refresh_token) {
+        console.error("[spotify/import] No refresh token stored for", user.email);
         return NextResponse.json(
           { error: "Spotify not connected" },
           { status: 401 }
@@ -78,6 +80,8 @@ export async function POST() {
       });
 
       if (!refreshRes.ok) {
+        const errBody = await refreshRes.text();
+        console.error("[spotify/import] Refresh token failed:", refreshRes.status, errBody);
         // Refresh token revoked — clear it
         await supabaseAdmin
           .from("fans")
@@ -110,6 +114,8 @@ export async function POST() {
     );
 
     if (!spotifyRes.ok) {
+      const errBody = await spotifyRes.text();
+      console.error("[spotify/import] Spotify top artists failed:", spotifyRes.status, errBody);
       return NextResponse.json(
         { error: "Failed to fetch Spotify data" },
         { status: 502 }
@@ -252,7 +258,8 @@ export async function POST() {
     });
 
     return response;
-  } catch {
+  } catch (err) {
+    console.error("[spotify/import] Unexpected error:", err);
     return NextResponse.json(
       { error: "Import failed" },
       { status: 500 }

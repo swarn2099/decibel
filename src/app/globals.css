@@ -89,11 +89,13 @@ body {
   z-index: 0 !important;
 }
 
-/* ─── Hide scrollbar for genre pills ─── */
-.no-scrollbar::-webkit-scrollbar {
+/* ─── Hide scrollbar for horizontal scroll areas ─── */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-.no-scrollbar {
+.no-scrollbar,
+.scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
