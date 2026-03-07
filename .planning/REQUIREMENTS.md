@@ -49,7 +49,7 @@
 
 ### Social
 
-- [ ] **SOCL-01**: Fan can generate shareable cards (single-artist, milestone, badge, discovery, stats variants)
+- [x] **SOCL-01**: Fan can generate shareable cards (single-artist, milestone, badge, discovery, stats variants)
 - [ ] **SOCL-02**: Activity feed shows friend collections, discoveries, badge unlocks
 - [ ] **SOCL-03**: Fan can follow/unfollow other fans
 - [ ] **SOCL-04**: Fan sees follower/following counts on passport
@@ -108,7 +108,7 @@
 | PROF-07 | Phase 14 | Complete |
 | PROF-08 | Phase 14 | Complete |
 | PROF-09 | Phase 14 | Complete |
-| SOCL-01 | Phase 15 | Pending |
+| SOCL-01 | Phase 15 | Complete |
 | SOCL-02 | Phase 15 | Pending |
 | SOCL-03 | Phase 15 | Pending |
 | SOCL-04 | Phase 15 | Pending |

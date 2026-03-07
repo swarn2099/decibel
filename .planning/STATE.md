@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: The Passport
-status: completed
-last_updated: "2026-03-07T05:34:35.350Z"
-last_activity: 2026-03-07 — Completed 14-03-PLAN.md
+status: executing
+last_updated: "2026-03-07T06:20:38.445Z"
+last_activity: 2026-03-07 — Completed 15-02-PLAN.md
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 13
+  completed_plans: 12
   percent: 100
 ---
 
@@ -20,21 +20,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v2.0 — The Passport (Phase 14: Enhanced Artist Profiles)
+**Current focus:** v2.0 — The Passport (Phase 15: Passport Sharing & Social)
 
 ## Current Position
 
-Phase: 14 of 15 (Enhanced Artist Profiles)
-Plan: 3 of 3 complete
-Status: Phase Complete
-Last activity: 2026-03-07 — Completed 14-03-PLAN.md
+Phase: 15 of 15 (Passport Sharing & Social)
+Plan: 2 of 3 complete
+Status: In Progress
+Last activity: 2026-03-07 — Completed 15-02-PLAN.md
 
-Progress: [██████████] 100%
+Progress: [██████████] 100% (v2.0 phases) | Plan 2/3 in Phase 15
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 2)
+- Total plans completed: 21 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 4)
 - Average duration: --
 - Total execution time: --
 
@@ -72,6 +72,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 14-03]: Used signInWithOtp with emailRedirectTo claim param for magic link claim flow
 - [Phase 14-03]: Auth callback handles claim query param to auto-claim performer post-verification
 - [Phase 14-03]: Default auth callback redirect changed from /profile to /passport
+- [Phase 15-02]: Follow status checked via followers list scan (not dedicated check endpoint)
+- [Phase 15-02]: Privacy enforcement server-side in public passport page
+- [Phase 15-02]: fan_follows uses DB-level no_self_follow constraint for defense in depth
+- [Phase 15-02]: countOnly query param on followers/following endpoints for efficient count fetching
+- [Phase 15]: All share card endpoints use edge runtime with query params (consistent with Phase 11 decision)
 
 ### Pending Todos
 
