@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: The Passport
-status: completed
-last_updated: "2026-03-07T04:41:13.727Z"
-last_activity: 2026-03-07 — Completed 13-02-PLAN.md
+status: in-progress
+last_updated: "2026-03-07T05:21:30Z"
+last_activity: 2026-03-07 — Completed 14-01-PLAN.md
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
   percent: 100
 ---
 
@@ -20,21 +20,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v2.0 — The Passport (Phase 13: Badges & Gamification)
+**Current focus:** v2.0 — The Passport (Phase 14: Enhanced Artist Profiles)
 
 ## Current Position
 
-Phase: 13 of 15 (Badges & Gamification)
-Plan: 2 of 2 complete
-Status: Phase 13 Complete
-Last activity: 2026-03-07 — Completed 13-02-PLAN.md
+Phase: 14 of 15 (Enhanced Artist Profiles)
+Plan: 1 of 3 complete
+Status: In Progress
+Last activity: 2026-03-07 — Completed 14-01-PLAN.md
 
-Progress: [██████████] 100%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 1)
+- Total plans completed: 19 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 2)
 - Average duration: --
 - Total execution time: --
 
@@ -63,6 +63,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 13-01]: fan_badges table SQL documented as manual prerequisite (Supabase JS client can't run DDL)
 - [Phase 13-01]: Connector badge uses 10+ collections as proxy until share tracking exists
 - [Phase 13-02]: Badge showcase placed between stats and recommendations; public passport fetches badges server-side
+- [Phase 14-01]: Spotify embed uses dark theme (theme=0) at 352px height for top tracks view
+- [Phase 14-01]: Fan stats and similar artists fetched server-side via Promise.all for SSR performance
+- [Phase 14-01]: Similar artists limited to 8, ordered by follower_count desc, using .overlaps() genre matching
 
 ### Pending Todos
 

@@ -37,11 +37,11 @@
 
 ### Artist Profile
 
-- [ ] **PROF-01**: Artist profile shows top tracks/mixes, genres, bio, social links, photo
-- [ ] **PROF-02**: Artist profile shows upcoming and past shows with venue history
-- [ ] **PROF-03**: Artist profile shows fan stats (total collectors, discoverers, tier breakdown)
-- [ ] **PROF-04**: Artist profile shows similar artists based on genre overlap
-- [ ] **PROF-05**: Artist profile has Spotify embed/link alongside SoundCloud embed
+- [x] **PROF-01**: Artist profile shows top tracks/mixes, genres, bio, social links, photo
+- [x] **PROF-02**: Artist profile shows upcoming and past shows with venue history
+- [x] **PROF-03**: Artist profile shows fan stats (total collectors, discoverers, tier breakdown)
+- [x] **PROF-04**: Artist profile shows similar artists based on genre overlap
+- [x] **PROF-05**: Artist profile has Spotify embed/link alongside SoundCloud embed
 - [ ] **PROF-06**: "Discover" button adds artist as a discovery to fan's passport
 - [ ] **PROF-07**: "Collect" button shows next show info or QR context
 - [ ] **PROF-08**: Fan sees tier progress and journey state (discovered -> collecting -> inner circle)
@@ -99,11 +99,11 @@
 | BADGE-06 | Phase 13 | Complete |
 | BADGE-07 | Phase 13 | Complete |
 | BADGE-08 | Phase 13 | Complete |
-| PROF-01 | Phase 14 | Pending |
-| PROF-02 | Phase 14 | Pending |
-| PROF-03 | Phase 14 | Pending |
-| PROF-04 | Phase 14 | Pending |
-| PROF-05 | Phase 14 | Pending |
+| PROF-01 | Phase 14 | Complete |
+| PROF-02 | Phase 14 | Complete |
+| PROF-03 | Phase 14 | Complete |
+| PROF-04 | Phase 14 | Complete |
+| PROF-05 | Phase 14 | Complete |
 | PROF-06 | Phase 14 | Pending |
 | PROF-07 | Phase 14 | Pending |
 | PROF-08 | Phase 14 | Pending |
