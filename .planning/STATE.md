@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Polish, Map, and Pipeline Fixes
-status: in_progress
-stopped_at: Completed 10-01-PLAN.md
-last_updated: "2026-03-06T23:56:17Z"
+status: completed
+stopped_at: Completed 10-02-PLAN.md
+last_updated: "2026-03-07T00:02:55.543Z"
 last_activity: 2026-03-06 — Completed Phase 10 Plan 1 scraper pipeline cleanup
 progress:
   total_phases: 3
-  completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  completed_phases: 3
+  total_plans: 5
+  completed_plans: 5
   percent: 100
 ---
 
@@ -45,6 +45,7 @@ Progress: [██████████] 100%
 | 09    | 01   | 3min     | 2     | 3     |
 | 09    | 02   | 3min     | 2     | 5     |
 | 10    | 01   | 2min     | 2     | 3     |
+| Phase 10 P02 | 7min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 10, Plan 1]: Dry-run by default for cleanup script to prevent accidental data loss
 - [Phase 10, Plan 1]: Only auto-delete performers with 0-1 events; flag 2+ events for manual review
 - [Phase 10, Plan 1]: URL parsing with regex fallback for Instagram handle normalization
+- [Phase 10]: Pivoted from Bandsintown to 19hz.info -- Bandsintown API fully locked down, 19hz is electronic-music-specific and better fit
 
 ### Pending Todos
 
@@ -75,6 +77,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-06
-Stopped at: Completed 10-01-PLAN.md
+Last session: 2026-03-07T00:02:55.537Z
+Stopped at: Completed 10-02-PLAN.md
 Resume file: None
