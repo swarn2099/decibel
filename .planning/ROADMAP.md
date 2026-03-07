@@ -61,7 +61,7 @@
 **Plans**: 2 plans
 
 Plans:
-- [ ] 11-01-PLAN.md -- Core passport page with timeline (verified vs discovered) and stats dashboard
+- [x] 11-01-PLAN.md -- Core passport page with timeline (verified vs discovered) and stats dashboard
 - [ ] 11-02-PLAN.md -- Public passport URL with OG meta + story-ready shareable card
 
 ### Phase 12: Online Discovery + Add From Anywhere
@@ -142,7 +142,7 @@ Plans:
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
 | 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
 | 10. Scraper Pipeline | v1.2 | 2/2 | Complete | 2026-03-07 |
-| 11. Passport Visual Overhaul | v2.0 | 0/2 | In progress | - |
+| 11. Passport Visual Overhaul | v2.0 | 1/2 | In progress | - |
 | 12. Online Discovery | v2.0 | 0/? | Not started | - |
 | 13. Badges and Gamification | v2.0 | 0/? | Not started | - |
 | 14. Enhanced Artist Profiles | v2.0 | 0/? | Not started | - |

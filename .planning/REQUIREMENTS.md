@@ -7,10 +7,10 @@
 
 ### Passport
 
-- [ ] **PASS-01**: Fan can view passport with chronological timeline of verified and discovered collections
-- [ ] **PASS-02**: Verified collections display with full color, solid badge, and tier indicator
-- [ ] **PASS-03**: Discovered collections display with muted style, outline badge, "discovered" tag
-- [ ] **PASS-04**: Fan can view "Your Year in Sound" stats (dancefloors, cities, artists, venues, streaks, favorite genre)
+- [x] **PASS-01**: Fan can view passport with chronological timeline of verified and discovered collections
+- [x] **PASS-02**: Verified collections display with full color, solid badge, and tier indicator
+- [x] **PASS-03**: Discovered collections display with muted style, outline badge, "discovered" tag
+- [x] **PASS-04**: Fan can view "Your Year in Sound" stats (dancefloors, cities, artists, venues, streaks, favorite genre)
 - [ ] **PASS-05**: Fan can generate a 1080x1920 story-ready shareable passport card
 - [ ] **PASS-06**: Fan has a public passport URL (/passport/[fan-slug]) viewable without login
 - [ ] **PASS-07**: Public passport generates OG meta preview card with stats
@@ -78,10 +78,10 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PASS-01 | Phase 11 | Pending |
-| PASS-02 | Phase 11 | Pending |
-| PASS-03 | Phase 11 | Pending |
-| PASS-04 | Phase 11 | Pending |
+| PASS-01 | Phase 11 | Complete |
+| PASS-02 | Phase 11 | Complete |
+| PASS-03 | Phase 11 | Complete |
+| PASS-04 | Phase 11 | Complete |
 | PASS-05 | Phase 11 | Pending |
 | PASS-06 | Phase 11 | Pending |
 | PASS-07 | Phase 11 | Pending |

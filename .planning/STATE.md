@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "The Passport"
-status: ready_to_plan
+status: executing
 stopped_at: null
 last_updated: "2026-03-07"
-last_activity: 2026-03-07 — Roadmap created for v2.0
+last_activity: 2026-03-07 — Completed 11-01-PLAN.md (Passport Visual Overhaul)
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 1
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 11 of 15 (Passport Visual Overhaul)
-Plan: --
-Status: Ready to plan
-Last activity: 2026-03-07 — Roadmap created for v2.0
+Plan: 1 of 1 complete
+Status: Executing
+Last activity: 2026-03-07 — Completed 11-01-PLAN.md
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -42,6 +42,10 @@ Progress: [░░░░░░░░░░] 0%
 ## Accumulated Context
 
 ### Decisions
+
+- [11-01] Fan slug computed at query time (no DB migration) — slugify name or first 8 chars of ID
+- [11-01] Stats fetched client-side via /api/passport/stats to keep page SSR fast
+- [11-01] /profile redirects to /passport for backward compatibility
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
