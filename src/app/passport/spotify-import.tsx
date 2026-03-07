@@ -56,6 +56,7 @@ export function SpotifyImport({ onImportComplete }: SpotifyImportProps) {
   const [importStatus, setImportStatus] = useState<
     "idle" | "importing" | "done" | "error"
   >("idle");
+  const [errorMessage, setErrorMessage] = useState("");
   const [importResults, setImportResults] = useState<ImportResults | null>(
     null
   );
@@ -73,14 +74,17 @@ export function SpotifyImport({ onImportComplete }: SpotifyImportProps) {
     setImportStatus("importing");
     try {
       const res = await fetch("/api/spotify/import", { method: "POST" });
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error("Import failed");
+        setErrorMessage(data.error || "Import failed");
+        setImportStatus("error");
+        return;
       }
-      const data: ImportResults = await res.json();
-      setImportResults(data);
+      setImportResults(data as ImportResults);
       setImportStatus("done");
       onImportComplete();
     } catch {
+      setErrorMessage("Network error. Try again.");
       setImportStatus("error");
     }
   }
@@ -205,7 +209,7 @@ export function SpotifyImport({ onImportComplete }: SpotifyImportProps) {
                   Import failed
                 </h3>
                 <p className="text-sm text-gray">
-                  Something went wrong. Try again.
+                  {errorMessage || "Something went wrong. Try again."}
                 </p>
               </div>
             </div>

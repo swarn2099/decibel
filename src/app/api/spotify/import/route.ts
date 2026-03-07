@@ -119,8 +119,11 @@ export async function POST() {
     if (!spotifyRes.ok) {
       const errBody = await spotifyRes.text();
       console.error("[spotify/import] Spotify top artists failed:", spotifyRes.status, errBody);
+      const isDevMode = errBody.includes("not registered");
       return NextResponse.json(
-        { error: "Failed to fetch Spotify data" },
+        { error: isDevMode
+            ? "Spotify app is in Development Mode. Add your account as a test user in the Spotify Developer Dashboard."
+            : `Spotify API error (${spotifyRes.status}): ${errBody.slice(0, 200)}` },
         { status: 502 }
       );
     }

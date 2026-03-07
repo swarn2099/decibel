@@ -28,7 +28,7 @@ async function getAccessToken(): Promise<string> {
       .from("spotify_tokens")
       .select("refresh_token")
       .eq("id", 1)
-      .single();
+      .maybeSingle();
 
     if (tokenRow?.refresh_token) {
       const res = await fetch("https://accounts.spotify.com/api/token", {
@@ -61,10 +61,15 @@ async function getAccessToken(): Promise<string> {
         }
 
         return cachedToken.token;
+      } else {
+        const errBody = await res.text();
+        console.error("[spotify] Refresh token exchange failed:", res.status, errBody);
       }
+    } else {
+      console.warn("[spotify] No refresh token in spotify_tokens table");
     }
-  } catch {
-    // Fall through to Client Credentials
+  } catch (err) {
+    console.error("[spotify] Error during refresh token flow:", err);
   }
 
   // Fallback: Client Credentials (no followers/genres in responses)
