@@ -1,10 +1,5 @@
-import { Suspense } from "react";
-import { AddArtistClient } from "./add-client";
+import { redirect } from "next/navigation";
 
 export default function AddPage() {
-  return (
-    <Suspense>
-      <AddArtistClient />
-    </Suspense>
-  );
+  redirect("/passport?add=true");
 }

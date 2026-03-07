@@ -623,7 +623,7 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
   const searchParams = useSearchParams();
   const [stats, setStats] = useState<PassportStats | null>(null);
   const [showShareMenu, setShowShareMenu] = useState(false);
-  const [showDiscoverModal, setShowDiscoverModal] = useState(false);
+  const [showDiscoverModal, setShowDiscoverModal] = useState(searchParams.get("add") === "true");
   const [timeline, setTimeline] = useState<PassportTimelineEntry[]>(initialTimeline);
   const [badges, setBadges] = useState<BadgeWithDefinition[]>(initialBadges || []);
   const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<BadgeDefinition[]>([]);

@@ -422,8 +422,8 @@ export default async function ArtistPage({ params }: { params: Params }) {
               </div>
             )}
 
-            <h1 className="mb-2 flex items-center gap-3 text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-              {performer.name}
+            <h1 className="mb-2 flex items-center gap-3 text-3xl font-extrabold tracking-tight break-words sm:text-5xl lg:text-6xl">
+              <span className="min-w-0 break-words">{performer.name}</span>
               {performer.claimed && (
                 <BadgeCheck className="h-7 w-7 shrink-0 text-teal sm:h-9 sm:w-9" aria-label="Verified performer" />
               )}
@@ -503,12 +503,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
         </div>
       </div>
 
-      {/* ───── Claim Banner (unclaimed only) ───── */}
-      {!performer.claimed && (
-        <div className="mx-auto max-w-4xl px-6 pb-6">
-          <ClaimBanner performerId={performer.id} performerName={performer.name} />
-        </div>
-      )}
+      {/* Claim Banner — hidden until verification flow is built */}
 
       {/* ───── Founder Badge ───── */}
       {founder && (

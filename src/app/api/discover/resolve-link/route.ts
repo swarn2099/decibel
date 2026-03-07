@@ -183,30 +183,43 @@ async function scrapeLinkInBio(
   }
 }
 
-/* ── Probe SoundCloud to check if handle exists ── */
-async function probeSoundCloud(
-  identifier: string
+/* ── Search SoundCloud for artist by name ── */
+async function searchSoundCloud(
+  query: string
 ): Promise<{ soundcloud_url?: string; name?: string; photo_url?: string }> {
   try {
-    const scUrl = `https://soundcloud.com/${identifier}`;
-    const apiUrl = `https://api-widget.soundcloud.com/resolve?url=${encodeURIComponent(
-      scUrl
-    )}&format=json&client_id=${SOUNDCLOUD_CLIENT_ID}`;
-    const res = await fetch(apiUrl, { signal: AbortSignal.timeout(4000) });
+    const apiUrl = `https://api-v2.soundcloud.com/search/users?q=${encodeURIComponent(
+      query
+    )}&client_id=${SOUNDCLOUD_CLIENT_ID}&limit=5`;
+    const res = await fetch(apiUrl, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) return {};
     const data = await res.json();
-    if (data.kind !== "user") return {};
+    const users = data.collection || [];
+    if (users.length === 0) return {};
+
+    // Pick best match — prefer most followers among close name matches
+    const queryNorm = query.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const match =
+      users.find(
+        (u: Record<string, unknown>) =>
+          (u.username as string).toLowerCase().replace(/[^a-z0-9]/g, "") === queryNorm
+      ) ||
+      users.sort(
+        (a: Record<string, unknown>, b: Record<string, unknown>) =>
+          ((b.followers_count as number) || 0) - ((a.followers_count as number) || 0)
+      )[0];
+
     return {
-      soundcloud_url: data.permalink_url || scUrl,
-      name: data.username || undefined,
-      photo_url: data.avatar_url?.replace("-large", "-t500x500"),
+      soundcloud_url: (match.permalink_url as string) || `https://soundcloud.com/${match.permalink}`,
+      name: (match.username as string) || undefined,
+      photo_url: (match.avatar_url as string)?.replace("-large", "-t500x500"),
     };
   } catch {
     return {};
   }
 }
 
-/* ── Search Spotify for artist by name ── */
+/* ── Search Spotify for artist by name (strict match only) ── */
 async function probeSpotify(
   name: string
 ): Promise<{
@@ -220,12 +233,14 @@ async function probeSpotify(
     const results = await searchSpotifyArtists(name, 5);
     if (!results || results.length === 0) return {};
 
-    // Find best match — exact or close name match
+    // Only return if there's an exact normalized name match
     const nameLower = name.toLowerCase().replace(/[^a-z0-9]/g, "");
-    const match =
-      results.find(
-        (r) => r.name.toLowerCase().replace(/[^a-z0-9]/g, "") === nameLower
-      ) || results[0];
+    const match = results.find(
+      (r) => r.name.toLowerCase().replace(/[^a-z0-9]/g, "") === nameLower
+    );
+
+    // No exact match = don't guess (avoids false positives)
+    if (!match) return {};
 
     return {
       spotify_id: match.id,
@@ -303,9 +318,11 @@ async function resolveInstagram(
     }
   }
 
-  // 3. Probe SoundCloud with same handle (very common for DJs)
+  // 3. Search SoundCloud for the artist name
   if (!result.soundcloud_url) {
-    const scData = await probeSoundCloud(identifier);
+    // Use the best name we have — extracted from IG or formatted from handle
+    const searchName = result.name !== identifier ? result.name! : formatName(identifier.replace(/dj$/i, "").replace(/^dj/i, ""));
+    const scData = await searchSoundCloud(searchName);
     if (scData.soundcloud_url) {
       result.soundcloud_url = scData.soundcloud_url;
       if (!result.photo_url && scData.photo_url) result.photo_url = scData.photo_url;
