@@ -98,4 +98,4 @@ Phases 8, 9, and 10 are independent and can execute in any order.
 | 7. Content Generator | v1.1 | 2/2 | Complete | 2026-03-06 |
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
 | 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
-| 10. Scraper Pipeline | 2/2 | Complete   | 2026-03-07 | - |
+| 10. Scraper Pipeline | 2/2 | Complete    | 2026-03-07 | - |
