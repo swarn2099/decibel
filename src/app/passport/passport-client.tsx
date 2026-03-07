@@ -30,6 +30,7 @@ import type {
   PassportStats,
 } from "@/lib/types/passport";
 import { DiscoverModal } from "./discover-modal";
+import { Recommendations } from "./recommendations";
 
 interface PassportClientProps {
   fan: PassportFan;
@@ -566,6 +567,9 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
             )}
           </section>
         )}
+
+        {/* Recommendations (authenticated only) */}
+        {!isPublic && <Recommendations />}
 
         {/* Collection Timeline */}
         <section>
