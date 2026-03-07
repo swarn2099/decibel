@@ -145,6 +145,6 @@ Plans:
 | 10. Scraper Pipeline | v1.2 | 2/2 | Complete | 2026-03-07 |
 | 11. Passport Visual Overhaul | v2.0 | Complete    | 2026-03-07 | 2026-03-07 |
 | 12. Online Discovery | 3/3 | Complete    | 2026-03-07 | - |
-| 13. Badges and Gamification | 2/2 | Complete   | 2026-03-07 | - |
+| 13. Badges and Gamification | 2/2 | Complete    | 2026-03-07 | - |
 | 14. Enhanced Artist Profiles | v2.0 | 0/? | Not started | - |
 | 15. Passport Sharing and Social | v2.0 | 0/? | Not started | - |
