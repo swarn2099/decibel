@@ -17,8 +17,8 @@
 
 ### Discovery
 
-- [ ] **DISC-01**: Fan can paste a link (Spotify/SoundCloud/RA/Instagram/TikTok/YouTube) to add an artist as a discovery
-- [ ] **DISC-02**: If artist doesn't exist in DB, auto-scraping pipeline creates their profile
+- [x] **DISC-01**: Fan can paste a link (Spotify/SoundCloud/RA/Instagram/TikTok/YouTube) to add an artist as a discovery
+- [x] **DISC-02**: If artist doesn't exist in DB, auto-scraping pipeline creates their profile
 - [ ] **DISC-03**: Fan can connect Spotify via OAuth and import top artists as discoveries
 - [ ] **DISC-04**: Matched Spotify artists with upcoming local shows surface a "collect in person" prompt
 - [ ] **DISC-05**: Fan sees "Artists you might like" recommendations based on collection + listening data
@@ -85,8 +85,8 @@
 | PASS-05 | Phase 11 | Complete |
 | PASS-06 | Phase 11 | Complete |
 | PASS-07 | Phase 11 | Complete |
-| DISC-01 | Phase 12 | Pending |
-| DISC-02 | Phase 12 | Pending |
+| DISC-01 | Phase 12 | Complete |
+| DISC-02 | Phase 12 | Complete |
 | DISC-03 | Phase 12 | Pending |
 | DISC-04 | Phase 12 | Pending |
 | DISC-05 | Phase 12 | Pending |
