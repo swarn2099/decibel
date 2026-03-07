@@ -124,7 +124,7 @@ function formatTime(timeStr: string): string {
 function getSoundCloudEmbedUrl(profileUrl: string): string {
   // Normalize: strip www. prefix — the widget doesn't resolve www.soundcloud.com
   const normalizedUrl = profileUrl.replace("www.soundcloud.com", "soundcloud.com");
-  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(normalizedUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&visual=false`;
+  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(normalizedUrl)}&color=%23FF4D6A&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true`;
 }
 
 function getSpotifyArtistId(spotifyUrl: string): string | null {
@@ -530,7 +530,7 @@ export default async function ArtistPage({ params }: { params: Params }) {
               <iframe
                 title={`${performer.name} on SoundCloud`}
                 width="100%"
-                height="166"
+                height="300"
                 scrolling="no"
                 frameBorder="no"
                 allow="autoplay"
