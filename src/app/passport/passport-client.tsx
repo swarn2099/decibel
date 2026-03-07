@@ -638,12 +638,26 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
         .then(setStats)
         .catch(() => {});
 
-      if (!initialBadges) {
-        fetch("/api/badges")
-          .then((r) => r.json())
-          .then((data) => setBadges(data.badges || []))
-          .catch(() => {});
-      }
+      // Evaluate badges on load — awards any newly qualified badges, then refresh list
+      fetch("/api/badges/evaluate", { method: "POST" })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.newBadges && data.newBadges.length > 0) {
+            const newDefs = (data.newBadges as string[])
+              .map((id) => BADGE_DEFINITIONS[id as keyof typeof BADGE_DEFINITIONS])
+              .filter(Boolean);
+            if (newDefs.length > 0) {
+              setNewlyEarnedBadges(newDefs);
+              setShowUnlockToast(true);
+              newDefs.forEach((b) => toast.success(`Badge unlocked: ${b.name}!`));
+            }
+          }
+          // Refresh badge list
+          return fetch("/api/badges");
+        })
+        .then((r) => r.json())
+        .then((data) => setBadges(data.badges || []))
+        .catch(() => {});
     }
   }, [isPublic, initialBadges]);
 

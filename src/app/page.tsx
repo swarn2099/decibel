@@ -84,11 +84,22 @@ export default async function Home() {
     venue: Array.isArray(e.venue) ? e.venue[0] ?? null : e.venue,
   })) as WeekendEvent[];
 
-  // Group by date
+  // Group by date, then by venue within each date
   const grouped = weekendEvents.reduce<Record<string, WeekendEvent[]>>((acc, ev) => {
     (acc[ev.event_date] ??= []).push(ev);
     return acc;
   }, {});
+
+  type VenueGroup = { venue: string; events: WeekendEvent[] };
+  function groupByVenue(events: WeekendEvent[]): VenueGroup[] {
+    const map = new Map<string, WeekendEvent[]>();
+    for (const ev of events) {
+      const key = ev.venue?.name || "TBA";
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(ev);
+    }
+    return Array.from(map.entries()).map(([venue, evts]) => ({ venue, events: evts }));
+  }
 
   const dayLabel = (dateStr: string) => {
     const d = new Date(dateStr + "T00:00:00");
@@ -136,60 +147,97 @@ export default async function Home() {
                   {dayLabel(date)}
                 </h3>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {events.map((event) => {
-                    const Wrapper = event.external_url ? "a" : "div";
-                    const wrapperProps = event.external_url
-                      ? { href: event.external_url, target: "_blank" as const, rel: "noopener noreferrer" }
+                  {groupByVenue(events).map((group) => {
+                    const ticketUrl = group.events.find((e) => e.external_url)?.external_url;
+                    const Wrapper = ticketUrl ? "a" : "div";
+                    const wrapperProps = ticketUrl
+                      ? { href: ticketUrl, target: "_blank" as const, rel: "noopener noreferrer" }
                       : {};
+
+                    if (group.events.length === 1) {
+                      // Single artist at venue — original card layout
+                      const event = group.events[0];
+                      return (
+                        <Wrapper
+                          key={event.id}
+                          {...wrapperProps}
+                          className="group flex items-center gap-4 rounded-xl border border-light-gray/15 bg-bg-card px-5 py-4 transition-all hover:border-pink/20"
+                        >
+                          {event.performer?.photo_url ? (
+                            <PerformerImage
+                              src={event.performer.photo_url}
+                              alt={event.performer.name}
+                              className="h-12 w-12 shrink-0 rounded-full object-cover"
+                              fallbackClassName="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-sm font-bold"
+                            />
+                          ) : (
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-sm font-bold">
+                              {event.performer?.name?.[0] || "?"}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            {event.performer && (
+                              <Link
+                                href={`/artist/${event.performer.slug}`}
+                                className="truncate text-sm font-semibold hover:text-pink"
+                              >
+                                {event.performer.name}
+                              </Link>
+                            )}
+                            <p className="flex items-center gap-1 text-xs text-gray">
+                              <MapPin size={10} />
+                              {group.venue}
+                            </p>
+                          </div>
+                          {ticketUrl && (
+                            <ExternalLink size={14} className="shrink-0 text-light-gray transition-colors group-hover:text-pink" />
+                          )}
+                        </Wrapper>
+                      );
+                    }
+
+                    // Multiple artists at same venue — grouped card
                     return (
                       <Wrapper
-                        key={event.id}
+                        key={group.venue}
                         {...wrapperProps}
-                        className="group flex items-center gap-4 rounded-xl border border-light-gray/15 bg-bg-card px-5 py-4 transition-all hover:border-pink/20"
+                        className="group rounded-xl border border-light-gray/15 bg-bg-card px-5 py-4 transition-all hover:border-pink/20"
                       >
-                        {/* Artist photo */}
-                        {event.performer?.photo_url ? (
-                          <PerformerImage
-                            src={event.performer.photo_url}
-                            alt={event.performer.name}
-                            className="h-12 w-12 shrink-0 rounded-full object-cover"
-                            fallbackClassName="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-sm font-bold"
-                          />
-                        ) : (
-                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-sm font-bold">
-                            {event.performer?.name?.[0] || "?"}
-                          </div>
-                        )}
-
-                        {/* Info */}
-                        <div className="min-w-0 flex-1">
-                          {event.performer && (
-                            <Link
-                              href={`/artist/${event.performer.slug}`}
-                              className="truncate text-sm font-semibold hover:text-pink"
-                            >
-                              {event.performer.name}
-                            </Link>
+                        <div className="mb-3 flex items-center justify-between">
+                          <p className="flex items-center gap-1.5 text-xs font-semibold text-gray">
+                            <MapPin size={12} className="text-pink" />
+                            {group.venue}
+                          </p>
+                          {ticketUrl && (
+                            <ExternalLink size={12} className="text-light-gray transition-colors group-hover:text-pink" />
                           )}
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                            {event.venue && (
-                              <p className="flex items-center gap-1 text-xs text-gray">
-                                <MapPin size={10} />
-                                {event.venue.name}
-                              </p>
-                            )}
-                            {event.start_time && (
-                              <p className="flex items-center gap-1 text-xs text-light-gray">
-                                <Clock size={10} />
-                                {formatTime(event.start_time)}
-                              </p>
-                            )}
-                          </div>
                         </div>
-
-                        {event.external_url && (
-                          <ExternalLink size={14} className="shrink-0 text-light-gray transition-colors group-hover:text-pink" />
-                        )}
+                        <div className="flex flex-wrap gap-3">
+                          {group.events.map((event) => (
+                            <div key={event.id} className="flex items-center gap-2">
+                              {event.performer?.photo_url ? (
+                                <PerformerImage
+                                  src={event.performer.photo_url}
+                                  alt={event.performer.name}
+                                  className="h-8 w-8 shrink-0 rounded-full object-cover"
+                                  fallbackClassName="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-xs font-bold"
+                                />
+                              ) : (
+                                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-xs font-bold">
+                                  {event.performer?.name?.[0] || "?"}
+                                </div>
+                              )}
+                              {event.performer && (
+                                <Link
+                                  href={`/artist/${event.performer.slug}`}
+                                  className="text-sm font-medium hover:text-pink transition-colors"
+                                >
+                                  {event.performer.name}
+                                </Link>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </Wrapper>
                     );
                   })}
