@@ -17,6 +17,7 @@ interface ImportedArtist {
 interface ImportResults {
   imported: number;
   already_had: number;
+  skipped_mainstream: number;
   artists: ImportedArtist[];
 }
 
@@ -140,9 +141,12 @@ export function SpotifyImport({ onImportComplete }: SpotifyImportProps) {
                   Imported {importResults.imported} artist
                   {importResults.imported !== 1 ? "s" : ""} to your passport
                 </h3>
-                {importResults.already_had > 0 && (
+                {(importResults.already_had > 0 || importResults.skipped_mainstream > 0) && (
                   <p className="text-xs text-gray">
-                    {importResults.already_had} already in your collection
+                    {[
+                      importResults.already_had > 0 && `${importResults.already_had} already collected`,
+                      importResults.skipped_mainstream > 0 && `${importResults.skipped_mainstream} mainstream skipped`,
+                    ].filter(Boolean).join(" · ")}
                   </p>
                 )}
               </div>

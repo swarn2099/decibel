@@ -1,10 +1,13 @@
 import { createSupabaseServer, createSupabaseAdmin } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
+const MAINSTREAM_FOLLOWER_THRESHOLD = 1_000_000;
+
 interface SpotifyArtist {
   name: string;
   images: { url: string; width: number; height: number }[];
   genres: string[];
+  followers: { total: number };
   external_urls: { spotify: string };
 }
 
@@ -154,7 +157,16 @@ export async function POST() {
     const importedArtists: ImportedArtist[] = [];
     let alreadyHadCount = 0;
 
+    let skippedMainstream = 0;
+
     for (const artist of spotifyArtists) {
+      // Skip mainstream artists (1M+ followers)
+      if (artist.followers?.total >= MAINSTREAM_FOLLOWER_THRESHOLD) {
+        console.log(`[spotify/import] Skipping mainstream artist: ${artist.name} (${(artist.followers.total / 1_000_000).toFixed(1)}M followers)`);
+        skippedMainstream++;
+        continue;
+      }
+
       const photoUrl = artist.images?.[0]?.url || null;
 
       // Check if performer exists by name (case-insensitive)
@@ -247,6 +259,7 @@ export async function POST() {
     const response = NextResponse.json({
       imported: importedArtists.length - alreadyHadCount,
       already_had: alreadyHadCount,
+      skipped_mainstream: skippedMainstream,
       artists: importedArtists,
     });
     response.cookies.set("spotify_token", "", {
