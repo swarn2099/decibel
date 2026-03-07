@@ -25,7 +25,6 @@ async function createPerformer(
 ) {
   let slug = generateSlug(artist.name);
 
-  // Check slug uniqueness
   const { data: existing } = await supabase
     .from("performers")
     .select("id")
@@ -45,6 +44,8 @@ async function createPerformer(
       soundcloud_url: artist.soundcloud_url || null,
       ra_url: artist.ra_url || null,
       instagram_handle: artist.instagram_handle || null,
+      spotify_id: artist.spotify_id || null,
+      spotify_url: artist.spotify_url || null,
       city: null,
       genres: artist.genres || [],
       claimed: false,
@@ -58,7 +59,6 @@ async function createPerformer(
 
 export async function POST(req: NextRequest) {
   try {
-    // Auth check
     const supabaseAuth = await createSupabaseServer();
     const {
       data: { user },
@@ -82,15 +82,17 @@ export async function POST(req: NextRequest) {
 
     const supabaseAdmin = createSupabaseAdmin();
 
-    // Get fan by auth email
+    // Get or create fan
+    let fanId: string;
     const { data: fan } = await supabaseAdmin
       .from("fans")
       .select("id")
       .eq("email", user.email)
       .maybeSingle();
 
-    if (!fan) {
-      // Auto-create fan record
+    if (fan) {
+      fanId = fan.id;
+    } else {
       const { data: newFan, error: fanErr } = await supabaseAdmin
         .from("fans")
         .upsert({ email: user.email }, { onConflict: "email" })
@@ -102,83 +104,95 @@ export async function POST(req: NextRequest) {
           { status: 500 }
         );
       }
-      return handleDiscovery(supabaseAdmin, newFan.id, performer_id, resolved_artist);
+      fanId = newFan.id;
     }
 
-    return handleDiscovery(supabaseAdmin, fan.id, performer_id, resolved_artist);
+    let targetPerformerId = performer_id;
+    let performerName = "";
+    let performerSlug = "";
+    let isNewPerformer = false;
+
+    if (!targetPerformerId && resolved_artist) {
+      const performer = await createPerformer(supabaseAdmin, resolved_artist);
+      targetPerformerId = performer.id;
+      performerName = performer.name;
+      performerSlug = performer.slug;
+      isNewPerformer = true;
+    } else if (targetPerformerId) {
+      const { data } = await supabaseAdmin
+        .from("performers")
+        .select("name, slug")
+        .eq("id", targetPerformerId)
+        .maybeSingle();
+      performerName = data?.name || "";
+      performerSlug = data?.slug || "";
+    }
+
+    if (!targetPerformerId) {
+      return NextResponse.json(
+        { success: false } satisfies DiscoverResponse,
+        { status: 400 }
+      );
+    }
+
+    // Insert collection
+    const { data: collection, error: collectionError } = await supabaseAdmin
+      .from("collections")
+      .insert({
+        fan_id: fanId,
+        performer_id: targetPerformerId,
+        capture_method: "online",
+        verified: false,
+      })
+      .select("id")
+      .single();
+
+    if (collectionError?.code === "23505") {
+      return NextResponse.json({
+        success: true,
+        performer_id: targetPerformerId,
+        performer_name: performerName,
+        performer_slug: performerSlug,
+        already_discovered: true,
+      } satisfies DiscoverResponse);
+    }
+
+    if (collectionError) {
+      return NextResponse.json(
+        { success: false } satisfies DiscoverResponse,
+        { status: 500 }
+      );
+    }
+
+    // Award founder badge (first person to discover/add this artist)
+    let isFounder = false;
+    try {
+      const { error: founderError } = await supabaseAdmin
+        .from("founder_badges")
+        .insert({
+          fan_id: fanId,
+          performer_id: targetPerformerId,
+        });
+      if (!founderError) {
+        isFounder = true;
+      }
+    } catch {
+      // Unique constraint violation = someone else was first, that's fine
+    }
+
+    return NextResponse.json({
+      success: true,
+      collection_id: collection.id,
+      performer_id: targetPerformerId,
+      performer_name: performerName,
+      performer_slug: performerSlug,
+      already_discovered: false,
+      is_founder: isFounder,
+    } satisfies DiscoverResponse);
   } catch {
     return NextResponse.json(
       { success: false } satisfies DiscoverResponse,
       { status: 500 }
     );
   }
-}
-
-async function handleDiscovery(
-  supabase: ReturnType<typeof createSupabaseAdmin>,
-  fanId: string,
-  performerId?: string,
-  resolvedArtist?: ResolvedArtist
-) {
-  let targetPerformerId = performerId;
-  let performerName = "";
-
-  if (!targetPerformerId && resolvedArtist) {
-    // Auto-create performer
-    const performer = await createPerformer(supabase, resolvedArtist);
-    targetPerformerId = performer.id;
-    performerName = performer.name;
-  } else if (targetPerformerId) {
-    // Get performer name for response
-    const { data } = await supabase
-      .from("performers")
-      .select("name")
-      .eq("id", targetPerformerId)
-      .maybeSingle();
-    performerName = data?.name || "";
-  }
-
-  if (!targetPerformerId) {
-    return NextResponse.json(
-      { success: false } satisfies DiscoverResponse,
-      { status: 400 }
-    );
-  }
-
-  // Insert collection
-  const { data: collection, error: collectionError } = await supabase
-    .from("collections")
-    .insert({
-      fan_id: fanId,
-      performer_id: targetPerformerId,
-      capture_method: "online",
-      verified: false,
-    })
-    .select("id")
-    .single();
-
-  // Handle unique constraint violation (already discovered)
-  if (collectionError?.code === "23505") {
-    return NextResponse.json({
-      success: true,
-      performer_id: targetPerformerId,
-      performer_name: performerName,
-      already_discovered: true,
-    } satisfies DiscoverResponse);
-  }
-
-  if (collectionError) {
-    return NextResponse.json(
-      { success: false } satisfies DiscoverResponse,
-      { status: 500 }
-    );
-  }
-
-  return NextResponse.json({
-    success: true,
-    collection_id: collection.id,
-    performer_id: targetPerformerId,
-    performer_name: performerName,
-    already_discovered: false,
-  } satisfies DiscoverResponse);
 }

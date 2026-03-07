@@ -14,6 +14,8 @@ export interface ResolvedArtist {
   soundcloud_url?: string;
   ra_url?: string;
   instagram_handle?: string;
+  spotify_id?: string;
+  spotify_url?: string;
   genres?: string[];
 }
 
@@ -27,7 +29,9 @@ export interface DiscoverResponse {
   collection_id?: string;
   performer_id?: string;
   performer_name?: string;
+  performer_slug?: string;
   already_discovered?: boolean;
+  is_founder?: boolean;
 }
 
 export interface LinkResolveResponse {

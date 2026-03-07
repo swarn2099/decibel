@@ -2,7 +2,17 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { X, Search, Check, ArrowLeft, Loader2, Music } from "lucide-react";
+import Link from "next/link";
+import {
+  X,
+  Search,
+  Check,
+  ArrowLeft,
+  Loader2,
+  Music,
+  Crown,
+  ExternalLink,
+} from "lucide-react";
 import type { PassportTimelineEntry } from "@/lib/types/passport";
 import type {
   LinkResolveResponse,
@@ -27,6 +37,26 @@ const PLATFORM_LABELS: Record<string, string> = {
   youtube: "YouTube",
 };
 
+function SocialBadge({
+  label,
+  url,
+}: {
+  label: string;
+  url: string;
+}) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 rounded-full border border-light-gray/20 px-2.5 py-1 text-[11px] text-gray hover:border-pink/30 hover:text-pink transition-colors"
+    >
+      {label}
+      <ExternalLink size={10} />
+    </a>
+  );
+}
+
 export function DiscoverModal({
   isOpen,
   onClose,
@@ -39,7 +69,11 @@ export function DiscoverModal({
   const [resolveData, setResolveData] = useState<LinkResolveResponse | null>(
     null
   );
-  const [discoveredName, setDiscoveredName] = useState("");
+  const [discoverResult, setDiscoverResult] = useState<{
+    name: string;
+    slug: string;
+    isFounder: boolean;
+  } | null>(null);
 
   if (!isOpen) return null;
 
@@ -49,7 +83,7 @@ export function DiscoverModal({
     setLoading(false);
     setError("");
     setResolveData(null);
-    setDiscoveredName("");
+    setDiscoverResult(null);
   }
 
   function handleClose() {
@@ -116,7 +150,16 @@ export function DiscoverModal({
         resolveData.existing_performer?.name ||
         resolveData.artist?.name ||
         "Artist";
-      setDiscoveredName(artistName);
+      const artistSlug =
+        data.performer_slug ||
+        resolveData.existing_performer?.slug ||
+        artistName.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+      setDiscoverResult({
+        name: artistName,
+        slug: artistSlug,
+        isFounder: data.is_founder || false,
+      });
 
       // Build timeline entry for immediate UI update
       const entry: PassportTimelineEntry = {
@@ -124,9 +167,7 @@ export function DiscoverModal({
         performer: {
           id: data.performer_id || "",
           name: artistName,
-          slug:
-            resolveData.existing_performer?.slug ||
-            artistName.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+          slug: artistSlug,
           photo_url:
             resolveData.existing_performer?.photo_url ||
             resolveData.artist?.photo_url ||
@@ -145,7 +186,6 @@ export function DiscoverModal({
 
       setStep("success");
 
-      // Slight delay so user sees the success animation
       setTimeout(() => {
         onDiscovered(entry);
       }, 100);
@@ -161,6 +201,7 @@ export function DiscoverModal({
     photo_url: string | null;
     platform?: string;
     isExisting: boolean;
+    artist?: ResolvedArtist;
   } | null = resolveData
     ? resolveData.existing_performer
       ? {
@@ -168,6 +209,7 @@ export function DiscoverModal({
           photo_url: resolveData.existing_performer.photo_url,
           platform: resolveData.artist?.platform,
           isExisting: true,
+          artist: resolveData.artist,
         }
       : resolveData.artist
         ? {
@@ -175,9 +217,24 @@ export function DiscoverModal({
             photo_url: resolveData.artist.photo_url || null,
             platform: resolveData.artist.platform,
             isExisting: false,
+            artist: resolveData.artist,
           }
         : null
     : null;
+
+  // Collect social links to display
+  const socialLinks: { label: string; url: string }[] = [];
+  if (resolveData?.artist) {
+    const a = resolveData.artist;
+    if (a.spotify_url) socialLinks.push({ label: "Spotify", url: a.spotify_url });
+    if (a.soundcloud_url) socialLinks.push({ label: "SoundCloud", url: a.soundcloud_url });
+    if (a.ra_url) socialLinks.push({ label: "RA", url: a.ra_url });
+    if (a.instagram_handle)
+      socialLinks.push({
+        label: "Instagram",
+        url: `https://instagram.com/${a.instagram_handle}`,
+      });
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B0B0F]/95 backdrop-blur-sm">
@@ -198,7 +255,7 @@ export function DiscoverModal({
               Discover an Artist
             </h2>
             <p className="mb-6 text-sm text-gray">
-              Paste a link from any music platform to add them to your passport.
+              Paste a link from any platform — we&apos;ll pull their info automatically.
             </p>
 
             <div className="relative">
@@ -210,7 +267,7 @@ export function DiscoverModal({
                   setError("");
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleResolve()}
-                placeholder="Paste a Spotify, SoundCloud, RA, Instagram, TikTok, or YouTube link..."
+                placeholder="Paste an Instagram, SoundCloud, Spotify, or RA link..."
                 className="w-full rounded-xl border border-light-gray/20 bg-bg px-4 py-3 pr-12 text-sm text-[var(--text)] placeholder:text-light-gray/50 focus:border-pink/50 focus:outline-none focus:ring-1 focus:ring-pink/30 transition-colors"
                 autoFocus
               />
@@ -240,7 +297,7 @@ export function DiscoverModal({
             </button>
 
             <p className="mt-4 text-center text-xs text-light-gray/50">
-              Supported: Spotify, SoundCloud, Resident Advisor, Instagram,
+              Supported: Instagram, SoundCloud, Spotify, Resident Advisor,
               TikTok, YouTube
             </p>
           </div>
@@ -282,11 +339,17 @@ export function DiscoverModal({
                 {displayArtist.name}
               </h3>
 
+              {/* Genres */}
+              {displayArtist.artist?.genres && displayArtist.artist.genres.length > 0 && (
+                <p className="mt-1 text-xs text-gray">
+                  {displayArtist.artist.genres.slice(0, 3).join(" · ")}
+                </p>
+              )}
+
               {/* Platform badge */}
               {displayArtist.platform && (
                 <span className="mt-2 inline-block rounded-full border border-light-gray/20 px-3 py-0.5 text-xs text-gray">
-                  {PLATFORM_LABELS[displayArtist.platform] ||
-                    displayArtist.platform}
+                  via {PLATFORM_LABELS[displayArtist.platform] || displayArtist.platform}
                 </span>
               )}
 
@@ -295,6 +358,19 @@ export function DiscoverModal({
                 <span className="mt-2 inline-block rounded-full bg-teal/10 px-3 py-0.5 text-xs font-medium text-teal">
                   Already in Decibel
                 </span>
+              )}
+
+              {/* Social links found */}
+              {socialLinks.length > 0 && (
+                <div className="mt-3 flex flex-wrap justify-center gap-2">
+                  {socialLinks.map((link) => (
+                    <SocialBadge
+                      key={link.label}
+                      label={link.label}
+                      url={link.url}
+                    />
+                  ))}
+                </div>
               )}
             </div>
 
@@ -320,23 +396,52 @@ export function DiscoverModal({
         )}
 
         {/* Step: Success */}
-        {step === "success" && (
+        {step === "success" && discoverResult && (
           <div className="flex flex-col items-center py-4 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-teal/10">
-              <Check size={32} className="text-teal" />
+            {discoverResult.isFounder ? (
+              <>
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-yellow/10">
+                  <Crown size={32} className="text-yellow" />
+                </div>
+                <h3 className="mb-1 text-lg font-bold text-[var(--text)]">
+                  {discoverResult.name}
+                </h3>
+                <p className="mb-1 text-sm text-gray">
+                  added to your passport!
+                </p>
+                <p className="mb-6 text-xs font-medium text-yellow">
+                  You&apos;re the Founder — first to add this artist!
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-teal/10">
+                  <Check size={32} className="text-teal" />
+                </div>
+                <h3 className="mb-1 text-lg font-bold text-[var(--text)]">
+                  {discoverResult.name}
+                </h3>
+                <p className="mb-6 text-sm text-gray">
+                  added to your passport!
+                </p>
+              </>
+            )}
+
+            <div className="flex gap-3">
+              <Link
+                href={`/artist/${discoverResult.slug}`}
+                className="rounded-xl bg-pink/10 px-6 py-2.5 text-sm font-medium text-pink hover:bg-pink/20 transition-colors"
+                onClick={handleClose}
+              >
+                View Profile
+              </Link>
+              <button
+                onClick={handleClose}
+                className="rounded-xl border border-light-gray/20 px-6 py-2.5 text-sm font-medium text-[var(--text)] hover:border-pink/30 hover:text-pink transition-colors"
+              >
+                Done
+              </button>
             </div>
-            <h3 className="mb-1 text-lg font-bold text-[var(--text)]">
-              {discoveredName}
-            </h3>
-            <p className="mb-6 text-sm text-gray">
-              added to your passport!
-            </p>
-            <button
-              onClick={handleClose}
-              className="rounded-xl border border-light-gray/20 px-8 py-2.5 text-sm font-medium text-[var(--text)] hover:border-pink/30 hover:text-pink transition-colors"
-            >
-              Done
-            </button>
           </div>
         )}
       </div>
