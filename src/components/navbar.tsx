@@ -72,11 +72,15 @@ export function Navbar() {
 
         {user ? (
           <Link
-            href="/profile"
-            className="flex shrink-0 items-center gap-2 rounded-full border border-light-gray/20 bg-bg-card/80 px-3 py-2 text-sm text-gray backdrop-blur-sm transition-colors hover:border-pink/30 hover:text-pink"
+            href="/passport"
+            className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-2 text-sm backdrop-blur-sm transition-colors ${
+              pathname.startsWith("/passport")
+                ? "border-pink/50 bg-bg-card/80 text-pink"
+                : "border-light-gray/20 bg-bg-card/80 text-gray hover:border-pink/30 hover:text-pink"
+            }`}
           >
             <User size={16} />
-            <span className="hidden sm:inline">Profile</span>
+            <span className="hidden sm:inline">Passport</span>
           </Link>
         ) : (
           <Link

@@ -31,7 +31,8 @@ export async function middleware(req: NextRequest) {
   if (
     (path.startsWith("/dashboard") ||
       path.startsWith("/profile") ||
-      path.startsWith("/settings")) &&
+      path.startsWith("/settings") ||
+      path.startsWith("/passport")) &&
     !user
   ) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
@@ -41,5 +42,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/profile/:path*", "/settings/:path*"],
+  matcher: ["/dashboard/:path*", "/profile/:path*", "/settings/:path*", "/passport/:path*"],
 };
