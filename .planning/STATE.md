@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: The Passport
 status: executing
-last_updated: "2026-03-07T02:22:50.672Z"
-last_activity: 2026-03-07 — Completed 12-01-PLAN.md
+last_updated: "2026-03-07T04:08:58.128Z"
+last_activity: 2026-03-07 — Completed 12-03-PLAN.md
 progress:
   total_phases: 5
-  completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
-  percent: 60
+  completed_phases: 1
+  total_plans: 5
+  completed_plans: 4
+  percent: 90
 ---
 
 # Project State
@@ -24,12 +24,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 12 of 15 (Online Discovery — Add From Anywhere) -- COMPLETE
-Plan: 1 of 1 complete
+Phase: 12 of 15 (Online Discovery — Add From Anywhere)
+Plan: 3 of 3 complete
 Status: Executing
-Last activity: 2026-03-07 — Completed 12-01-PLAN.md
+Last activity: 2026-03-07 — Completed 12-03-PLAN.md
 
-Progress: [██████░░░░] 60%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -51,6 +51,9 @@ Progress: [██████░░░░] 60%
 - [12-01] SoundCloud widget API for rich metadata; other platforms extract from URL slug
 - [12-01] Auto-create fan record via upsert if missing during discovery flow
 - [12-01] Timeline lifted to React state for instant discovery prepend
+- [12-03] Genre overlap via Supabase .overlaps() filter for recommendation matching
+- [12-03] Performers with upcoming events prioritized in recommendations
+- [12-03] Fallback to popular performers when no genre overlap exists
 
 Decisions are logged in PROJECT.md Key Decisions table.
 
