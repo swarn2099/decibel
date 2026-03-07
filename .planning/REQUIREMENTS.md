@@ -1,46 +1,68 @@
-# Requirements: Decibel
+# Requirements: Decibel v2.0 — The Passport
 
-**Defined:** 2026-03-06
-**Core Value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
+**Defined:** 2026-03-07
+**Core Value:** The passport is the hero screen — every design decision should make someone want to screenshot their passport and share it.
 
-## v1.2 Requirements
+## v2.0 Requirements
 
-Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phases.
+### Passport
 
-### Bug Fixes
+- [ ] **PASS-01**: Fan can view passport with chronological timeline of verified and discovered collections
+- [ ] **PASS-02**: Verified collections display with full color, solid badge, and tier indicator
+- [ ] **PASS-03**: Discovered collections display with muted style, outline badge, "discovered" tag
+- [ ] **PASS-04**: Fan can view "Your Year in Sound" stats (dancefloors, cities, artists, venues, streaks, favorite genre)
+- [ ] **PASS-05**: Fan can generate a 1080x1920 story-ready shareable passport card
+- [ ] **PASS-06**: Fan has a public passport URL (/passport/[fan-slug]) viewable without login
+- [ ] **PASS-07**: Public passport generates OG meta preview card with stats
 
-- [x] **BUG-01**: Artist profile Instagram links display correctly (username, not double-URL)
-- [x] **BUG-02**: Fan count shows "0 fans" label or hides when zero (no bare "0")
-- [x] **BUG-03**: Empty sections (Tracks, etc.) are hidden when no data exists
-- [x] **BUG-04**: Leaderboard displays fan display names instead of raw emails
-- [x] **BUG-05**: Leaderboard tier badges use brand colors (pink/purple/blue/teal)
-- [x] **BUG-06**: "Collect" button is dominant CTA (larger, full-width on mobile, branded color)
+### Discovery
 
-### Scene Map
+- [ ] **DISC-01**: Fan can paste a link (Spotify/SoundCloud/RA/Instagram/TikTok/YouTube) to add an artist as a discovery
+- [ ] **DISC-02**: If artist doesn't exist in DB, auto-scraping pipeline creates their profile
+- [ ] **DISC-03**: Fan can connect Spotify via OAuth and import top artists as discoveries
+- [ ] **DISC-04**: Matched Spotify artists with upcoming local shows surface a "collect in person" prompt
+- [ ] **DISC-05**: Fan sees "Artists you might like" recommendations based on collection + listening data
+- [ ] **DISC-06**: Apple Music stub UI ("Coming soon — connect Apple Music in the mobile app")
 
-- [x] **MAP-01**: Interactive map page at /map with dark theme styling
-- [x] **MAP-02**: Every venue rendered as a dot sized/colored by activity level
-- [x] **MAP-03**: Tapping a venue shows popup with name, upcoming shows, top performers
-- [x] **MAP-04**: Genre filter allows filtering venues by genre (house, techno, bass, etc.)
-- [x] **MAP-05**: "Tonight" mode shows only venues with events today with pulsing animation
-- [x] **MAP-06**: Map is fully mobile responsive
+### Badges
 
-### Scraper Pipeline
+- [ ] **BADGE-01**: Discovery badges award (Trailblazer, First 100, First 10 Verified)
+- [ ] **BADGE-02**: Attendance badges award (Regular, Devotee, Inner Circle, Venue Local, Venue Legend)
+- [ ] **BADGE-03**: Exploration badges award (Genre Explorer, City Hopper, Night Owl, Scene Veteran, Centurion)
+- [ ] **BADGE-04**: Streak badges award (On Fire, Unstoppable, Year-Round)
+- [ ] **BADGE-05**: Social badges award (Tastemaker, Connector)
+- [ ] **BADGE-06**: Badges display on passport with icon, name, description, date earned, rarity tier
+- [ ] **BADGE-07**: Badge unlock triggers visual feedback (animation/toast)
+- [ ] **BADGE-08**: Badges retroactively awarded for existing collection data on feature launch
 
-- [x] **SCRP-01**: Event-name-as-artist entries are identified and cleaned from DB
-- [x] **SCRP-02**: Instagram handles stored as usernames (not full URLs) across all scrapers
-- [x] **SCRP-03**: Scraper added for additional Chicago venues not yet covered
+### Artist Profile
+
+- [ ] **PROF-01**: Artist profile shows top tracks/mixes, genres, bio, social links, photo
+- [ ] **PROF-02**: Artist profile shows upcoming and past shows with venue history
+- [ ] **PROF-03**: Artist profile shows fan stats (total collectors, discoverers, tier breakdown)
+- [ ] **PROF-04**: Artist profile shows similar artists based on genre overlap
+- [ ] **PROF-05**: Artist profile has Spotify embed/link alongside SoundCloud embed
+- [ ] **PROF-06**: "Discover" button adds artist as a discovery to fan's passport
+- [ ] **PROF-07**: "Collect" button shows next show info or QR context
+- [ ] **PROF-08**: Fan sees tier progress and journey state (discovered -> collecting -> inner circle)
+- [ ] **PROF-09**: Unclaimed profiles show "Claim this profile" with magic link verification flow
+
+### Social
+
+- [ ] **SOCL-01**: Fan can generate shareable cards (single-artist, milestone, badge, discovery, stats variants)
+- [ ] **SOCL-02**: Activity feed shows friend collections, discoveries, badge unlocks
+- [ ] **SOCL-03**: Fan can follow/unfollow other fans
+- [ ] **SOCL-04**: Fan sees follower/following counts on passport
+- [ ] **SOCL-05**: Privacy setting controls who sees activity (mutual followers / public / private)
+- [ ] **SOCL-06**: "Someone you know joined" notification when phone contact signs up
 
 ## Future Requirements
 
-### Mobile App
-- **MOB-01**: React Native app with location-based passive detection
-- **MOB-02**: Push notifications for nearby events
-- **MOB-03**: Email receipt parsing for ticket history
-
-### Messaging
-- **MSG-01**: Real SendGrid email delivery for performer messages
-- **MSG-02**: SMS OTP auth for performers
+### Mobile-Dependent
+- **MOBILE-01**: Apple Music integration via MusicKit (requires iOS app)
+- **MOBILE-02**: Location-based passive detection for auto-collection
+- **MOBILE-03**: Push notifications via FCM for badge unlocks and friend activity
+- **MOBILE-04**: Phone contact sync for "someone you know joined" notifications
 
 ## Out of Scope
 
@@ -48,35 +70,21 @@ Requirements for v1.2 Polish, Map, and Pipeline Fixes. Each maps to roadmap phas
 |---------|--------|
 | Payments/credits | Fans are always free — core product rule |
 | Song requests / tipping | Anti-features for underground scene |
-| React Native mobile app | Future milestone |
-| Real-time fan count (Supabase Realtime) | Nice-to-have, not needed yet |
-| Performer analytics dashboard v2 | Current dashboard sufficient for now |
+| SMS OTP auth | Deferred to mobile milestone |
+| Email receipt parsing | Deferred to mobile milestone |
+| Real-time chat between fans | High complexity, not core to passport value |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUG-01 | Phase 8 | Complete |
-| BUG-02 | Phase 8 | Complete |
-| BUG-03 | Phase 8 | Complete |
-| BUG-04 | Phase 8 | Complete |
-| BUG-05 | Phase 8 | Complete |
-| BUG-06 | Phase 8 | Complete |
-| MAP-01 | Phase 9 | Complete |
-| MAP-02 | Phase 9 | Complete |
-| MAP-03 | Phase 9 | Complete |
-| MAP-04 | Phase 9 | Complete |
-| MAP-05 | Phase 9 | Complete |
-| MAP-06 | Phase 9 | Complete |
-| SCRP-01 | Phase 10 | Complete |
-| SCRP-02 | Phase 10 | Complete |
-| SCRP-03 | Phase 10 | Complete |
+| (populated during roadmap creation) | | |
 
 **Coverage:**
-- v1.2 requirements: 15 total
-- Mapped to phases: 15
-- Unmapped: 0
+- v2.0 requirements: 30 total
+- Mapped to phases: 0
+- Unmapped: 30
 
 ---
-*Requirements defined: 2026-03-06*
-*Last updated: 2026-03-06 after initial definition*
+*Requirements defined: 2026-03-07*
+*Last updated: 2026-03-07 after initial definition*
