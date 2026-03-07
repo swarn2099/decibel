@@ -78,13 +78,48 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| PASS-01 | Phase 11 | Pending |
+| PASS-02 | Phase 11 | Pending |
+| PASS-03 | Phase 11 | Pending |
+| PASS-04 | Phase 11 | Pending |
+| PASS-05 | Phase 11 | Pending |
+| PASS-06 | Phase 11 | Pending |
+| PASS-07 | Phase 11 | Pending |
+| DISC-01 | Phase 12 | Pending |
+| DISC-02 | Phase 12 | Pending |
+| DISC-03 | Phase 12 | Pending |
+| DISC-04 | Phase 12 | Pending |
+| DISC-05 | Phase 12 | Pending |
+| DISC-06 | Phase 12 | Pending |
+| BADGE-01 | Phase 13 | Pending |
+| BADGE-02 | Phase 13 | Pending |
+| BADGE-03 | Phase 13 | Pending |
+| BADGE-04 | Phase 13 | Pending |
+| BADGE-05 | Phase 13 | Pending |
+| BADGE-06 | Phase 13 | Pending |
+| BADGE-07 | Phase 13 | Pending |
+| BADGE-08 | Phase 13 | Pending |
+| PROF-01 | Phase 14 | Pending |
+| PROF-02 | Phase 14 | Pending |
+| PROF-03 | Phase 14 | Pending |
+| PROF-04 | Phase 14 | Pending |
+| PROF-05 | Phase 14 | Pending |
+| PROF-06 | Phase 14 | Pending |
+| PROF-07 | Phase 14 | Pending |
+| PROF-08 | Phase 14 | Pending |
+| PROF-09 | Phase 14 | Pending |
+| SOCL-01 | Phase 15 | Pending |
+| SOCL-02 | Phase 15 | Pending |
+| SOCL-03 | Phase 15 | Pending |
+| SOCL-04 | Phase 15 | Pending |
+| SOCL-05 | Phase 15 | Pending |
+| SOCL-06 | Phase 15 | Pending |
 
 **Coverage:**
-- v2.0 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30
+- v2.0 requirements: 36 total
+- Mapped to phases: 36
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after initial definition*
+*Last updated: 2026-03-07 after roadmap creation*

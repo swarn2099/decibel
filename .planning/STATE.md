@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: "The Passport"
-status: defining_requirements
+status: ready_to_plan
 stopped_at: null
 last_updated: "2026-03-07"
-last_activity: 2026-03-07 — Milestone v2.0 started
+last_activity: 2026-03-07 — Roadmap created for v2.0
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,22 +20,24 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-03-07)
 
-**Core value:** Fans scan a QR code at a live show and instantly collect that performer — no app install, no friction — building a verified attendance record with tiered access rewards.
-**Current focus:** v2.0 — The Passport (Defining requirements)
+**Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
+**Current focus:** v2.0 — The Passport (Phase 11: Passport Visual Overhaul)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-07 — Milestone v2.0 started
+Phase: 11 of 15 (Passport Visual Overhaul)
+Plan: --
+Status: Ready to plan
+Last activity: 2026-03-07 — Roadmap created for v2.0
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 17 (v1.0: 8, v1.1: 5, v1.2: 4)
-- Average duration: —
-- Total execution time: —
+- Average duration: --
+- Total execution time: --
 
 ## Accumulated Context
 
@@ -49,4 +51,4 @@ None.
 
 ### Blockers/Concerns
 
-- [Phase 1]: RLS policies written but not yet applied — need DB password or Supabase CLI login to deploy
+- [Phase 1]: RLS policies written but not yet applied -- need DB password or Supabase CLI login to deploy
