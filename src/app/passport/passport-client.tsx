@@ -30,15 +30,20 @@ import type {
   PassportTimelineEntry,
   PassportStats,
 } from "@/lib/types/passport";
+import type { BadgeWithDefinition, BadgeDefinition } from "@/lib/types/badges";
+import { BADGE_DEFINITIONS } from "@/lib/badges/definitions";
 import { DiscoverModal } from "./discover-modal";
 import { SpotifyImport } from "./spotify-import";
 import { Recommendations } from "./recommendations";
+import { BadgeShowcase } from "./badge-showcase";
+import { BadgeUnlockToast } from "./badge-unlock-toast";
 
 interface PassportClientProps {
   fan: PassportFan;
   fanSlug: string;
   timeline: PassportTimelineEntry[];
   isPublic?: boolean;
+  badges?: BadgeWithDefinition[];
 }
 
 const CAPTURE_ICONS = {
@@ -385,23 +390,61 @@ function ShareMenu({
   );
 }
 
-export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPublic = false }: PassportClientProps) {
+export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPublic = false, badges: initialBadges }: PassportClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [stats, setStats] = useState<PassportStats | null>(null);
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [showDiscoverModal, setShowDiscoverModal] = useState(false);
   const [timeline, setTimeline] = useState<PassportTimelineEntry[]>(initialTimeline);
+  const [badges, setBadges] = useState<BadgeWithDefinition[]>(initialBadges || []);
+  const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<BadgeDefinition[]>([]);
+  const [showUnlockToast, setShowUnlockToast] = useState(false);
 
   useEffect(() => {
-    // Only fetch stats on authenticated view (stats endpoint requires auth)
     if (!isPublic) {
+      // Fetch stats
       fetch("/api/passport/stats")
         .then((r) => r.json())
         .then(setStats)
         .catch(() => {});
+
+      // Fetch badges (unless provided via props from public view)
+      if (!initialBadges) {
+        fetch("/api/badges")
+          .then((r) => r.json())
+          .then((data) => setBadges(data.badges || []))
+          .catch(() => {});
+      }
     }
-  }, [isPublic]);
+  }, [isPublic, initialBadges]);
+
+  async function evaluateBadges() {
+    try {
+      const res = await fetch("/api/badges/evaluate", { method: "POST" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.newBadges && data.newBadges.length > 0) {
+        // Look up definitions for newly earned badges
+        const newDefs = (data.newBadges as string[])
+          .map((id) => BADGE_DEFINITIONS[id as keyof typeof BADGE_DEFINITIONS])
+          .filter(Boolean);
+        if (newDefs.length > 0) {
+          setNewlyEarnedBadges(newDefs);
+          setShowUnlockToast(true);
+          newDefs.forEach((b) => toast.success(`Badge unlocked: ${b.name}!`));
+        }
+        // Re-fetch badges to update showcase
+        const badgeRes = await fetch("/api/badges");
+        if (badgeRes.ok) {
+          const badgeData = await badgeRes.json();
+          setBadges(badgeData.badges || []);
+        }
+      }
+    } catch {
+      // Silent fail on badge evaluation
+    }
+  }
 
   // Show Spotify error toast
   useEffect(() => {
@@ -579,6 +622,9 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
           </section>
         )}
 
+        {/* Badges */}
+        <BadgeShowcase badges={badges} isPublic={isPublic} />
+
         {/* Recommendations (authenticated only) */}
         {!isPublic && <Recommendations />}
 
@@ -588,7 +634,7 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
             <h2 className="mb-4 text-lg font-bold text-[var(--text)]">
               Music Connections
             </h2>
-            <SpotifyImport onImportComplete={() => router.refresh()} />
+            <SpotifyImport onImportComplete={() => { router.refresh(); evaluateBadges(); }} />
           </section>
         )}
 
@@ -655,6 +701,18 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
           onDiscovered={(entry) => {
             setTimeline((prev) => [entry, ...prev]);
             setShowDiscoverModal(false);
+            evaluateBadges();
+          }}
+        />
+      )}
+
+      {/* Badge Unlock Toast */}
+      {showUnlockToast && newlyEarnedBadges.length > 0 && (
+        <BadgeUnlockToast
+          badges={newlyEarnedBadges}
+          onDismiss={() => {
+            setShowUnlockToast(false);
+            setNewlyEarnedBadges([]);
           }}
         />
       )}

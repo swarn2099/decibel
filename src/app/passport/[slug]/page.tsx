@@ -2,10 +2,12 @@ import { createSupabaseAdmin } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import { PassportClient } from "../passport-client";
 import { generateFanSlug } from "@/lib/fan-slug";
+import { BADGE_DEFINITIONS } from "@/lib/badges/definitions";
 import type {
   PassportFan,
   PassportTimelineEntry,
 } from "@/lib/types/passport";
+import type { BadgeWithDefinition } from "@/lib/types/badges";
 import type { Metadata } from "next";
 
 interface Props {
@@ -81,6 +83,30 @@ async function getPassportData(fanId: string) {
   return timeline;
 }
 
+async function getFanBadges(fanId: string): Promise<BadgeWithDefinition[]> {
+  const admin = createSupabaseAdmin();
+  const { data: earnedBadges } = await admin
+    .from("fan_badges")
+    .select("badge_id, fan_id, earned_at")
+    .eq("fan_id", fanId)
+    .order("earned_at", { ascending: false });
+
+  if (!earnedBadges || earnedBadges.length === 0) return [];
+
+  return earnedBadges
+    .map((eb) => {
+      const definition = BADGE_DEFINITIONS[eb.badge_id as keyof typeof BADGE_DEFINITIONS];
+      if (!definition) return null;
+      return {
+        badge_id: eb.badge_id,
+        fan_id: eb.fan_id,
+        earned_at: eb.earned_at,
+        definition,
+      } as BadgeWithDefinition;
+    })
+    .filter(Boolean) as BadgeWithDefinition[];
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const fan = await findFanBySlug(slug);
@@ -130,7 +156,10 @@ export default async function PublicPassportPage({ params }: Props) {
     created_at: fan.created_at,
   };
 
-  const timeline = await getPassportData(fan.id);
+  const [timeline, badges] = await Promise.all([
+    getPassportData(fan.id),
+    getFanBadges(fan.id),
+  ]);
 
   return (
     <PassportClient
@@ -138,6 +167,7 @@ export default async function PublicPassportPage({ params }: Props) {
       fanSlug={slug}
       timeline={timeline}
       isPublic
+      badges={badges}
     />
   );
 }
