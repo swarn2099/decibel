@@ -164,8 +164,11 @@ export function DiscoverModal({
         const data = await res.json();
         setExistingResults(data.existing || []);
         setSpotifyResults(data.results || []);
-      } catch {
-        // Silent fail for search
+        if (data.spotify_error) {
+          console.warn("[discover] Spotify search error:", data.spotify_error);
+        }
+      } catch (err) {
+        console.error("[discover] Search fetch failed:", err);
       } finally {
         setSearching(false);
       }
