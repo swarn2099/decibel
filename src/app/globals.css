@@ -84,6 +84,11 @@ body {
   color: var(--gray) !important;
 }
 
+/* ─── Force Leaflet below the navbar z-index ─── */
+.leaflet-container {
+  z-index: 0 !important;
+}
+
 /* ─── Hide scrollbar for genre pills ─── */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

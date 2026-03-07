@@ -92,7 +92,7 @@ export default function MapClient() {
   const dotRadius = (count: number) => Math.min(6 + count * 1.5, 14);
 
   return (
-    <div className="flex flex-col pt-[72px]">
+    <div className="flex flex-col pt-[56px] sm:pt-[72px]">
       {/* Filter bar */}
       <div className="flex items-center gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
         {/* Tonight toggle */}
@@ -140,7 +140,7 @@ export default function MapClient() {
       </div>
 
       {/* Map */}
-      <div className="relative h-[calc(100vh-128px)]">
+      <div className="relative h-[calc(100vh-104px)] sm:h-[calc(100vh-128px)]">
         {loading && (
           <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-bg/60">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-pink border-t-transparent" />

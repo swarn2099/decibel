@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Search, X } from "lucide-react";
+import { Search, X, User } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
+import { generateFanSlug } from "@/lib/fan-slug";
 
 interface SearchResult {
   name: string;
@@ -13,10 +14,18 @@ interface SearchResult {
   genres: string[] | null;
 }
 
+interface FanResult {
+  id: string;
+  name: string;
+  slug: string;
+  avatar_url: string | null;
+}
+
 export function SearchBar({ className = "" }: { className?: string }) {
   const pathname = usePathname();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [fanResults, setFanResults] = useState<FanResult[]>([]);
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -42,6 +51,7 @@ export function SearchBar({ className = "" }: { className?: string }) {
 
     if (value.length < 2) {
       setResults([]);
+      setFanResults([]);
       setOpen(false);
       return;
     }
@@ -49,14 +59,31 @@ export function SearchBar({ className = "" }: { className?: string }) {
     debounceRef.current = setTimeout(async () => {
       const supabase = createSupabaseBrowser();
       const q = value.toLowerCase();
-      const { data } = await supabase
-        .from("performers")
-        .select("name, slug, photo_url, genres")
-        .or(`name.ilike.%${q}%,genres.cs.{${q}}`)
-        .order("follower_count", { ascending: false })
-        .limit(8);
+      const [{ data: performers }, { data: fans }] = await Promise.all([
+        supabase
+          .from("performers")
+          .select("name, slug, photo_url, genres")
+          .or(`name.ilike.%${q}%,genres.cs.{${q}}`)
+          .order("follower_count", { ascending: false })
+          .limit(8),
+        supabase
+          .from("fans")
+          .select("id, name, email, avatar_url")
+          .or(`name.ilike.%${q}%,email.ilike.%${q}%`)
+          .limit(5),
+      ]);
 
-      setResults(data || []);
+      setResults(performers || []);
+      setFanResults(
+        (fans || [])
+          .filter((f) => f.name || f.email)
+          .map((f) => ({
+            id: f.id,
+            name: f.name || f.email!,
+            slug: generateFanSlug({ name: f.name, id: f.id }),
+            avatar_url: f.avatar_url,
+          }))
+      );
       setOpen(true);
     }, 150);
   }
@@ -64,6 +91,7 @@ export function SearchBar({ className = "" }: { className?: string }) {
   function clearSearch() {
     setQuery("");
     setResults([]);
+    setFanResults([]);
     setOpen(false);
   }
 
@@ -89,21 +117,22 @@ export function SearchBar({ className = "" }: { className?: string }) {
 
       {open && query.length >= 2 && (
         <div className="absolute left-0 right-0 top-full mt-2 max-h-[70vh] overflow-y-auto rounded-xl border border-light-gray/15 bg-bg-card shadow-2xl shadow-black/40 backdrop-blur-xl z-50">
-          {results.length === 0 ? (
+          {results.length === 0 && fanResults.length === 0 ? (
             <div className="px-4 py-6 text-center">
               <p className="text-sm text-gray">
-                No artists match &ldquo;{query}&rdquo;
+                No results for &ldquo;{query}&rdquo;
               </p>
               <Link
                 href={`/add?q=${encodeURIComponent(query)}`}
                 onClick={() => setOpen(false)}
                 className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-pink hover:text-pink/80 transition-colors"
               >
-                Add them to Decibel &rarr;
+                Add an artist to Decibel &rarr;
               </Link>
             </div>
           ) : (
             <>
+              {/* Artist results */}
               {results.map((p) => (
                 <Link
                   key={p.slug}
@@ -132,6 +161,42 @@ export function SearchBar({ className = "" }: { className?: string }) {
                   </div>
                 </Link>
               ))}
+
+              {/* Fan results */}
+              {fanResults.length > 0 && (
+                <>
+                  {results.length > 0 && (
+                    <div className="border-t border-light-gray/10 px-4 py-1.5">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-light-gray">People</p>
+                    </div>
+                  )}
+                  {fanResults.map((f) => (
+                    <Link
+                      key={f.id}
+                      href={`/passport/${f.slug}`}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-light-gray/10"
+                    >
+                      {f.avatar_url ? (
+                        <img
+                          src={f.avatar_url}
+                          alt={f.name}
+                          className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-light-gray/20"
+                        />
+                      ) : (
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal/20 to-blue/20 text-gray">
+                          <User size={16} />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{f.name}</p>
+                        <p className="text-xs text-light-gray">Fan passport</p>
+                      </div>
+                    </Link>
+                  ))}
+                </>
+              )}
+
               <Link
                 href={`/add?q=${encodeURIComponent(query)}`}
                 onClick={() => setOpen(false)}

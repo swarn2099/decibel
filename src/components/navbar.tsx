@@ -35,7 +35,7 @@ export function Navbar() {
   const showLogo = !isLanding;
 
   const navLinks = [
-    { href: "/add", label: "Add Artist", icon: Plus, activeColor: "text-yellow", activeBorder: "border-yellow/50", hoverColor: "hover:text-yellow hover:border-yellow/30" },
+    { href: "/add", label: "Add Artist", icon: Plus, activeColor: "text-pink", activeBorder: "border-pink/50", hoverColor: "hover:text-pink hover:border-pink/30" },
     { href: "/leaderboard", label: "Leaderboard", icon: Trophy, activeColor: "text-pink", activeBorder: "border-pink/50", hoverColor: "hover:text-pink hover:border-pink/30", matchPrefix: true },
     { href: "/map", label: "Map", icon: MapPin, activeColor: "text-pink", activeBorder: "border-pink/50", hoverColor: "hover:text-pink hover:border-pink/30" },
   ];

@@ -7,31 +7,40 @@ import { PerformerImage } from "@/components/performer-image";
 
 export const revalidate = 300;
 
-function getNextWeekendRange(): { friday: string; saturday: string; label: string } {
+function getUpcomingWeekendRange(): { start: string; end: string; label: string; sectionTitle: string } {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun, 5=Fri, 6=Sat
-  // Find next Friday (or today if it's Fri/Sat)
-  let daysToFri = (5 - day + 7) % 7;
-  if (daysToFri === 0 && day !== 5) daysToFri = 7;
-  // If it's Sat, go back to yesterday's Fri
-  if (day === 6) daysToFri = -1;
-  // If it's Sun, use the coming Fri
-  if (day === 0) daysToFri = 5;
-
-  const friday = new Date(now);
-  friday.setDate(now.getDate() + daysToFri);
-  const saturday = new Date(friday);
-  saturday.setDate(friday.getDate() + 1);
-
+  const day = now.getDay(); // 0=Sun, 1=Mon, ..., 5=Fri, 6=Sat
   const fmt = (d: Date) => d.toISOString().split("T")[0];
   const monthDay = (d: Date) =>
     d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
-  return {
-    friday: fmt(friday),
-    saturday: fmt(saturday),
-    label: `${monthDay(friday)} – ${monthDay(saturday)}`,
-  };
+  const today = fmt(now);
+
+  if (day === 5) {
+    // Friday — show Fri + Sat
+    const sat = new Date(now);
+    sat.setDate(now.getDate() + 1);
+    return { start: today, end: fmt(sat), label: `${monthDay(now)} – ${monthDay(sat)}`, sectionTitle: "This Weekend" };
+  }
+  if (day === 6) {
+    // Saturday — show today only (Friday is past)
+    return { start: today, end: today, label: monthDay(now), sectionTitle: "Tonight" };
+  }
+  if (day === 0) {
+    // Sunday — show next Fri + Sat
+    const fri = new Date(now);
+    fri.setDate(now.getDate() + 5);
+    const sat = new Date(fri);
+    sat.setDate(fri.getDate() + 1);
+    return { start: fmt(fri), end: fmt(sat), label: `${monthDay(fri)} – ${monthDay(sat)}`, sectionTitle: "Next Weekend" };
+  }
+  // Mon–Thu — show upcoming Fri + Sat
+  const daysToFri = 5 - day;
+  const fri = new Date(now);
+  fri.setDate(now.getDate() + daysToFri);
+  const sat = new Date(fri);
+  sat.setDate(fri.getDate() + 1);
+  return { start: fmt(fri), end: fmt(sat), label: `${monthDay(fri)} – ${monthDay(sat)}`, sectionTitle: "This Weekend" };
 }
 
 function formatTime(timeStr: string): string {
@@ -51,7 +60,7 @@ interface WeekendEvent {
 export default async function Home() {
   const supabase = await createSupabaseServer();
 
-  const { friday, saturday, label: weekendLabel } = getNextWeekendRange();
+  const { start, end, label: weekendLabel, sectionTitle } = getUpcomingWeekendRange();
 
   const [{ data: performers }, { data: rawEvents }] = await Promise.all([
     supabase
@@ -63,8 +72,8 @@ export default async function Home() {
     supabase
       .from("events")
       .select("id, event_date, start_time, external_url, performer:performers(name, slug, photo_url), venue:venues(name)")
-      .gte("event_date", friday)
-      .lte("event_date", saturday)
+      .gte("event_date", start)
+      .lte("event_date", end)
       .order("event_date", { ascending: true })
       .limit(20),
   ]);
@@ -96,13 +105,13 @@ export default async function Home() {
           </span>
         </h1>
         <p className="max-w-md text-lg font-light text-gray">
-          The more you show up, the more you get in.
+          Your live music passport. Collect artists, earn access, own your scene.
         </p>
         <div className="flex h-1 w-24 rounded-full bg-gradient-to-r from-pink to-purple" />
         <SearchBar className="mx-auto mt-2" />
         <Link
           href="/add"
-          className="mt-2 inline-flex items-center gap-2 rounded-full border border-yellow/20 bg-yellow/5 px-5 py-2 text-sm font-medium text-yellow transition-colors hover:bg-yellow/10"
+          className="mt-2 inline-flex items-center gap-2 rounded-full border border-pink/20 bg-pink/5 px-5 py-2 text-sm font-medium text-pink transition-colors hover:bg-pink/10"
         >
           <span className="text-base">+</span>
           Add an Artist &amp; earn a Founder badge
@@ -115,7 +124,7 @@ export default async function Home() {
           <div className="mb-6 flex flex-col items-center gap-1 text-center">
             <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-gray">
               <Calendar size={14} className="text-pink" />
-              This Weekend
+              {sectionTitle}
             </h2>
             <p className="text-xs text-light-gray">{weekendLabel}</p>
           </div>
