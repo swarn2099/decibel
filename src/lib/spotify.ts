@@ -20,6 +20,7 @@ async function getAccessToken(): Promise<string> {
       Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
     },
     body: "grant_type=client_credentials",
+    cache: "no-store",
   });
 
   if (!res.ok) {
@@ -59,7 +60,7 @@ export async function searchSpotifyArtists(
 
   const res = await fetch(
     `https://api.spotify.com/v1/search?${params.toString()}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
   );
 
   if (!res.ok) {
@@ -96,7 +97,7 @@ export async function getSpotifyArtist(
 
   const res = await fetch(
     `https://api.spotify.com/v1/artists/${artistId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
   );
 
   if (!res.ok) return null;

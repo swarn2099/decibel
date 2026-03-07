@@ -20,10 +20,12 @@ export async function GET(req: NextRequest) {
 
   // Search Spotify
   let spotifyResults: Awaited<ReturnType<typeof searchSpotifyArtists>> = [];
+  let spotifyError: string | undefined;
   try {
     spotifyResults = await searchSpotifyArtists(q, 5);
-  } catch {
-    // Spotify may not be configured yet — return DB results only
+  } catch (err) {
+    spotifyError = err instanceof Error ? err.message : "Unknown Spotify error";
+    console.error("Spotify search error:", spotifyError);
   }
 
   // Filter out Spotify results that already exist in Decibel (by spotify_url or exact name match)
@@ -41,5 +43,6 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     existing: existing || [],
     results: filtered,
+    ...(spotifyError && { spotify_error: spotifyError }),
   });
 }
