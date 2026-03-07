@@ -34,10 +34,13 @@ export async function GET(req: NextRequest) {
     (existing || []).map((p) => p.spotify_url).filter(Boolean)
   );
 
+  const MAX_FOLLOWERS = 1_000_000;
+
   const filtered = spotifyResults.filter(
     (s) =>
       !existingNames.has(s.name.toLowerCase()) &&
-      !existingSpotifyUrls.has(s.spotify_url)
+      !existingSpotifyUrls.has(s.spotify_url) &&
+      s.followers < MAX_FOLLOWERS
   );
 
   return NextResponse.json({
