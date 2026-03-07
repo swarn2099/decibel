@@ -22,6 +22,8 @@ import {
   X,
   Plus,
   Settings,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -92,41 +94,189 @@ function groupByMonth(
   return groups;
 }
 
-function PerformerAvatar({
-  performer,
-  verified,
-}: {
-  performer: PassportTimelineEntry["performer"];
-  verified: boolean;
-}) {
-  const initials = performer.name
+/* ─── Stamp: circular artist photo with tier-colored ring ─── */
+function ArtistStamp({ entry }: { entry: PassportTimelineEntry }) {
+  const tierRingColor = entry.verified
+    ? entry.current_tier === "inner_circle"
+      ? "ring-teal shadow-[0_0_12px_rgba(0,212,170,0.4)]"
+      : entry.current_tier === "secret"
+      ? "ring-blue shadow-[0_0_12px_rgba(77,154,255,0.4)]"
+      : entry.current_tier === "early_access"
+      ? "ring-purple shadow-[0_0_12px_rgba(155,109,255,0.4)]"
+      : "ring-pink shadow-[0_0_10px_rgba(255,77,106,0.3)]"
+    : "ring-light-gray/20";
+
+  const tierLabel = entry.current_tier ? TIER_LABELS[entry.current_tier] : null;
+  const tierColor = entry.current_tier ? TIER_COLORS[entry.current_tier] : null;
+
+  const initials = entry.performer.name
     .split(" ")
     .map((w) => w[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
 
-  if (performer.photo_url) {
+  return (
+    <Link
+      href={`/artist/${entry.performer.slug}`}
+      className="group flex flex-col items-center gap-1.5"
+    >
+      <div
+        className={`relative h-[72px] w-[72px] rounded-full ring-2 ${tierRingColor} transition-transform group-hover:scale-105 ${
+          !entry.verified ? "opacity-60" : ""
+        }`}
+      >
+        {entry.performer.photo_url ? (
+          <Image
+            src={entry.performer.photo_url}
+            alt={entry.performer.name}
+            fill
+            className="rounded-full object-cover"
+            sizes="72px"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-pink to-purple text-sm font-bold text-white">
+            {initials}
+          </div>
+        )}
+        {/* Verified badge dot */}
+        {entry.verified && (
+          <div className="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full border-2 border-bg bg-teal flex items-center justify-center">
+            <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+              <path d="M1.5 4L3 5.5L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+        )}
+      </div>
+      <div className="w-[80px] text-center">
+        <p className={`truncate text-xs font-medium ${entry.verified ? "text-[var(--text)]" : "text-gray"}`}>
+          {entry.performer.name}
+        </p>
+        {tierLabel && tierColor ? (
+          <span className={`text-[10px] font-medium ${tierColor.text}`}>
+            {tierLabel}
+          </span>
+        ) : !entry.verified ? (
+          <span className="text-[10px] text-light-gray">Discovered</span>
+        ) : (
+          <span className="text-[10px] text-pink">Network</span>
+        )}
+      </div>
+    </Link>
+  );
+}
+
+/* ─── Passport Stats Bar ─── */
+function PassportStatsBar({ stats, fan }: { stats: PassportStats | null; fan: PassportFan }) {
+  if (!stats) {
     return (
-      <div className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-full ${!verified ? "opacity-70" : ""}`}>
-        <Image
-          src={performer.photo_url}
-          alt={performer.name}
-          fill
-          className="object-cover"
-          sizes="56px"
-        />
+      <div className="grid grid-cols-4 gap-2">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-16 animate-pulse rounded-lg bg-bg-card border border-light-gray/10" />
+        ))}
       </div>
     );
   }
 
+  const items = [
+    { label: "Shows", value: stats.totalShows, icon: Disc3, color: "text-pink" },
+    { label: "Artists", value: stats.totalArtists + stats.totalDiscovered, icon: Users, color: "text-purple" },
+    { label: "Venues", value: stats.uniqueVenues, icon: Building2, color: "text-blue" },
+    { label: "Streak", value: stats.currentStreak > 0 ? `${stats.currentStreak}w` : "--", icon: Flame, color: "text-teal" },
+  ];
+
   return (
-    <div
-      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink to-purple text-lg font-bold text-white ${
-        !verified ? "opacity-70" : ""
-      }`}
-    >
-      {initials}
+    <div className="grid grid-cols-4 gap-2">
+      {items.map((item) => (
+        <div
+          key={item.label}
+          className="rounded-lg border border-light-gray/10 bg-bg-card p-3 text-center"
+        >
+          <div className={`text-xl font-bold ${item.color}`}>{item.value}</div>
+          <div className="text-[10px] uppercase tracking-wider text-gray">{item.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Full Stats Grid (expandable) ─── */
+function FullStatsGrid({
+  stats,
+  fan,
+  fanSlug,
+}: {
+  stats: PassportStats;
+  fan: PassportFan;
+  fanSlug: string;
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-3">
+      <StatCard
+        label="Dancefloors"
+        value={stats.totalShows}
+        icon={Disc3}
+        milestoneParams={getMilestoneForStat(stats.totalShows) ? {
+          milestone: `${getMilestoneForStat(stats.totalShows)} Shows Attended`,
+          value: String(getMilestoneForStat(stats.totalShows)),
+          label: "shows",
+          fanName: fan.name || "Fan",
+          slug: fanSlug,
+        } : null}
+      />
+      <StatCard label="Cities" value={stats.uniqueCities || "--"} icon={Compass} />
+      <StatCard
+        label="Artists Collected"
+        value={stats.totalArtists}
+        icon={Users}
+        milestoneParams={getMilestoneForStat(stats.totalArtists) ? {
+          milestone: `${getMilestoneForStat(stats.totalArtists)} Artists Collected`,
+          value: String(getMilestoneForStat(stats.totalArtists)),
+          label: "artists",
+          fanName: fan.name || "Fan",
+          slug: fanSlug,
+        } : null}
+      />
+      <StatCard label="Artists Discovered" value={stats.totalDiscovered} icon={Globe} />
+      <StatCard
+        label="Venues"
+        value={stats.uniqueVenues}
+        icon={Building2}
+        milestoneParams={getMilestoneForStat(stats.uniqueVenues) ? {
+          milestone: `${getMilestoneForStat(stats.uniqueVenues)} Venues Visited`,
+          value: String(getMilestoneForStat(stats.uniqueVenues)),
+          label: "venues",
+          fanName: fan.name || "Fan",
+          slug: fanSlug,
+        } : null}
+      />
+      <StatCard label="Favorite Genre" value={stats.favoriteGenre || "--"} icon={Music} />
+      <StatCard
+        label="Current Streak"
+        value={stats.currentStreak > 0 ? `${stats.currentStreak}w` : "--"}
+        icon={Flame}
+      />
+      <StatCard
+        label="Member Since"
+        value={new Date(fan.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+        icon={Star}
+      />
+      {stats.mostCollectedArtist && (
+        <StatCard
+          label="Most Collected"
+          value={`${stats.mostCollectedArtist.name} (${stats.mostCollectedArtist.count})`}
+          icon={Star}
+          span2
+        />
+      )}
+      {stats.mostVisitedVenue && (
+        <StatCard
+          label="Most Visited Venue"
+          value={`${stats.mostVisitedVenue.name} (${stats.mostVisitedVenue.count})`}
+          icon={Ticket}
+          span2
+        />
+      )}
     </div>
   );
 }
@@ -170,6 +320,45 @@ function StatCard({
   );
 }
 
+function PerformerAvatar({
+  performer,
+  verified,
+}: {
+  performer: PassportTimelineEntry["performer"];
+  verified: boolean;
+}) {
+  const initials = performer.name
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  if (performer.photo_url) {
+    return (
+      <div className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-full ${!verified ? "opacity-70" : ""}`}>
+        <Image
+          src={performer.photo_url}
+          alt={performer.name}
+          fill
+          className="object-cover"
+          sizes="56px"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-pink to-purple text-lg font-bold text-white ${
+        !verified ? "opacity-70" : ""
+      }`}
+    >
+      {initials}
+    </div>
+  );
+}
+
 function TimelineEntry({ entry, fanName, fanSlug, showShare }: { entry: PassportTimelineEntry; fanName?: string; fanSlug?: string; showShare?: boolean }) {
   const CaptureIcon = CAPTURE_ICONS[entry.capture_method] || Globe;
   const tierColor = entry.current_tier
@@ -180,7 +369,6 @@ function TimelineEntry({ entry, fanName, fanSlug, showShare }: { entry: Passport
     : null;
 
   if (entry.verified) {
-    // Verified entry: full color, solid badge, glow
     const glowColor =
       entry.current_tier === "inner_circle"
         ? "shadow-[0_0_15px_rgba(0,212,170,0.15)]"
@@ -255,7 +443,6 @@ function TimelineEntry({ entry, fanName, fanSlug, showShare }: { entry: Passport
     );
   }
 
-  // Discovered entry: muted, outline badge
   return (
     <div className="rounded-xl border border-light-gray/10 bg-bg-card/50 p-4">
       <div className="flex items-start gap-3">
@@ -332,7 +519,6 @@ function ShareMenu({
     timeline.filter((t) => t.venue).map((t) => t.venue!.name)
   ).size;
 
-  // Get top artists by collection count
   const artistCounts = new Map<string, { name: string; count: number }>();
   for (const t of timeline) {
     const existing = artistCounts.get(t.performer.id);
@@ -370,7 +556,6 @@ function ShareMenu({
       const blob = await response.blob();
       const file = new File([blob], "decibel-passport.png", { type: "image/png" });
 
-      // Try Web Share API on mobile
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           files: [file],
@@ -378,7 +563,6 @@ function ShareMenu({
         });
         toast.success("Shared successfully!");
       } else {
-        // Desktop fallback: download
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -445,16 +629,16 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
   const [badges, setBadges] = useState<BadgeWithDefinition[]>(initialBadges || []);
   const [newlyEarnedBadges, setNewlyEarnedBadges] = useState<BadgeDefinition[]>([]);
   const [showUnlockToast, setShowUnlockToast] = useState(false);
+  const [showFullStats, setShowFullStats] = useState(false);
+  const [showFullTimeline, setShowFullTimeline] = useState(false);
 
   useEffect(() => {
     if (!isPublic) {
-      // Fetch stats
       fetch("/api/passport/stats")
         .then((r) => r.json())
         .then(setStats)
         .catch(() => {});
 
-      // Fetch badges (unless provided via props from public view)
       if (!initialBadges) {
         fetch("/api/badges")
           .then((r) => r.json())
@@ -470,7 +654,6 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
       if (!res.ok) return;
       const data = await res.json();
       if (data.newBadges && data.newBadges.length > 0) {
-        // Look up definitions for newly earned badges
         const newDefs = (data.newBadges as string[])
           .map((id) => BADGE_DEFINITIONS[id as keyof typeof BADGE_DEFINITIONS])
           .filter(Boolean);
@@ -479,7 +662,6 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
           setShowUnlockToast(true);
           newDefs.forEach((b) => toast.success(`Badge unlocked: ${b.name}!`));
         }
-        // Re-fetch badges to update showcase
         const badgeRes = await fetch("/api/badges");
         if (badgeRes.ok) {
           const badgeData = await badgeRes.json();
@@ -487,11 +669,10 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
         }
       }
     } catch {
-      // Silent fail on badge evaluation
+      // Silent fail
     }
   }
 
-  // Show Spotify error toast
   useEffect(() => {
     if (searchParams.get("spotify") === "error") {
       toast.error("Failed to connect Spotify. Please try again.");
@@ -520,24 +701,83 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
 
   const grouped = groupByMonth(timeline);
 
+  // Dedupe artists for stamps — show each artist once, prefer verified entry with highest tier
+  const artistStampMap = new Map<string, PassportTimelineEntry>();
+  for (const entry of timeline) {
+    const existing = artistStampMap.get(entry.performer.id);
+    if (!existing || (entry.verified && !existing.verified) || (entry.verified && existing.verified && (entry.scan_count || 0) > (existing.scan_count || 0))) {
+      artistStampMap.set(entry.performer.id, entry);
+    }
+  }
+  const stamps = Array.from(artistStampMap.values());
+  // Sort: verified first (by scan count desc), then discovered
+  stamps.sort((a, b) => {
+    if (a.verified && !b.verified) return -1;
+    if (!a.verified && b.verified) return 1;
+    return (b.scan_count || 0) - (a.scan_count || 0);
+  });
+
   return (
     <div className="min-h-screen bg-bg pb-24 pt-20">
       <div className="mx-auto max-w-2xl px-4">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="relative inline-block">
-            <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-pink to-purple text-2xl font-bold text-white">
-              {initials}
+
+        {/* ═══════════════════════════════════════════════════════ */}
+        {/* PASSPORT HEADER — compact, like a real passport cover  */}
+        {/* ═══════════════════════════════════════════════════════ */}
+        <div className="relative mb-6 rounded-2xl border border-light-gray/10 bg-gradient-to-b from-bg-card to-bg p-6 overflow-hidden">
+          {/* Subtle passport texture */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 20px, currentColor 20px, currentColor 21px)",
+          }} />
+
+          <div className="relative flex items-start gap-4">
+            {/* Avatar */}
+            <div className="relative shrink-0">
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-pink to-purple flex items-center justify-center text-xl font-bold text-white ring-2 ring-pink/30">
+                {initials}
+              </div>
             </div>
-            {/* Share button (own passport only) */}
+
+            {/* Info */}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h1 className="truncate text-xl font-bold text-[var(--text)]">
+                  {fan.name || "Anonymous Fan"}
+                </h1>
+                {!isPublic && (
+                  <Link
+                    href="/settings"
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-light-gray/20 text-gray hover:text-pink hover:border-pink/30 transition-colors"
+                    aria-label="Settings"
+                  >
+                    <Settings size={12} />
+                  </Link>
+                )}
+              </div>
+              <p className="text-sm text-gray">
+                {fan.city && <span>{fan.city} · </span>}
+                Since {memberSince}
+              </p>
+
+              {/* Quick stats inline */}
+              <div className="mt-2 flex items-center gap-3 text-xs">
+                <span><span className="font-bold text-pink">{uniqueArtists}</span> <span className="text-gray">artists</span></span>
+                <span><span className="font-bold text-purple">{verifiedCount}</span> <span className="text-gray">verified</span></span>
+                <span><span className="font-bold text-blue">{timeline.length}</span> <span className="text-gray">shows</span></span>
+              </div>
+
+              <SocialCounts fanId={fan.id} isOwner={!isPublic} currentUserId={viewerFanId} />
+            </div>
+
+            {/* Share button */}
             {!isPublic && (
-              <div className="absolute -right-12 top-0 relative inline-block">
+              <div className="relative shrink-0">
                 <button
                   onClick={() => setShowShareMenu(!showShareMenu)}
-                  className="absolute -right-14 top-2 flex h-9 w-9 items-center justify-center rounded-full border border-light-gray/20 bg-bg-card text-gray hover:text-pink hover:border-pink/30 transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-light-gray/20 bg-bg-card text-gray hover:text-pink hover:border-pink/30 transition-colors"
                   aria-label="Share passport"
                 >
-                  {showShareMenu ? <X size={16} /> : <Share2 size={16} />}
+                  {showShareMenu ? <X size={14} /> : <Share2 size={14} />}
                 </button>
                 {showShareMenu && (
                   <ShareMenu
@@ -551,162 +791,118 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
               </div>
             )}
           </div>
-          <div className="flex items-center justify-center gap-2">
-            <h1 className="text-2xl font-bold text-[var(--text)]">
-              {fan.name || "Anonymous Fan"}
-            </h1>
-            {!isPublic && (
-              <Link
-                href="/settings"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-light-gray/20 text-gray hover:text-pink hover:border-pink/30 transition-colors"
-                aria-label="Settings"
-              >
-                <Settings size={14} />
-              </Link>
-            )}
-          </div>
-          <p className="mt-1 text-sm text-gray">
-            {fan.city && <span>{fan.city} &middot; </span>}
-            Member since {memberSince}
-          </p>
-
-          {/* Discover button (authenticated only) */}
-          {!isPublic && (
-            <button
-              onClick={() => setShowDiscoverModal(true)}
-              className="mt-4 inline-flex items-center gap-2 rounded-full border border-pink/30 px-4 py-2 text-sm font-medium text-pink hover:bg-pink/10 transition-colors"
-            >
-              <Plus size={16} />
-              Discover an Artist
-            </button>
-          )}
-
-          {/* Summary stats row */}
-          <div className="mt-4 flex items-center justify-center gap-4 text-sm">
-            <span>
-              <span className="font-bold text-pink">{uniqueArtists}</span>{" "}
-              <span className="text-gray">Artists</span>
-            </span>
-            <span className="text-light-gray/30">|</span>
-            <span>
-              <span className="font-bold text-purple">{verifiedCount}</span>{" "}
-              <span className="text-gray">Verified</span>
-            </span>
-            <span className="text-light-gray/30">|</span>
-            <span>
-              <span className="font-bold text-blue">{timeline.length}</span>{" "}
-              <span className="text-gray">Shows</span>
-            </span>
-            <span className="text-light-gray/30">|</span>
-            <span>
-              <span className="font-bold text-teal">{uniqueVenues}</span>{" "}
-              <span className="text-gray">Venues</span>
-            </span>
-          </div>
-
-          {/* Social counts (followers/following) */}
-          <SocialCounts
-            fanId={fan.id}
-            isOwner={!isPublic}
-            currentUserId={viewerFanId}
-          />
         </div>
 
-        {/* Sound Stats (hidden on public view since stats endpoint requires auth) */}
-        {!isPublic && (
-          <section className="mb-10">
-            <h2 className="mb-4 text-lg font-bold text-[var(--text)]">
-              Your Sound Stats
+        {/* ═══════════════════════════════════════════════════════ */}
+        {/* ARTIST STAMPS — the hero section, like passport stamps */}
+        {/* ═══════════════════════════════════════════════════════ */}
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-[var(--text)]">
+              Your Collection
             </h2>
-            {stats ? (
-              <div className="grid grid-cols-2 gap-3">
-                <StatCard
-                  label="Dancefloors"
-                  value={stats.totalShows}
-                  icon={Disc3}
-                  milestoneParams={getMilestoneForStat(stats.totalShows) ? {
-                    milestone: `${getMilestoneForStat(stats.totalShows)} Shows Attended`,
-                    value: String(getMilestoneForStat(stats.totalShows)),
-                    label: "shows",
-                    fanName: fan.name || "Fan",
-                    slug: fanSlug,
-                  } : null}
-                />
-                <StatCard
-                  label="Cities"
-                  value={stats.uniqueCities || "--"}
-                  icon={Compass}
-                />
-                <StatCard
-                  label="Artists Collected"
-                  value={stats.totalArtists}
-                  icon={Users}
-                  milestoneParams={getMilestoneForStat(stats.totalArtists) ? {
-                    milestone: `${getMilestoneForStat(stats.totalArtists)} Artists Collected`,
-                    value: String(getMilestoneForStat(stats.totalArtists)),
-                    label: "artists",
-                    fanName: fan.name || "Fan",
-                    slug: fanSlug,
-                  } : null}
-                />
-                <StatCard
-                  label="Artists Discovered"
-                  value={stats.totalDiscovered}
-                  icon={Globe}
-                />
-                <StatCard
-                  label="Venues"
-                  value={stats.uniqueVenues}
-                  icon={Building2}
-                  milestoneParams={getMilestoneForStat(stats.uniqueVenues) ? {
-                    milestone: `${getMilestoneForStat(stats.uniqueVenues)} Venues Visited`,
-                    value: String(getMilestoneForStat(stats.uniqueVenues)),
-                    label: "venues",
-                    fanName: fan.name || "Fan",
-                    slug: fanSlug,
-                  } : null}
-                />
-                <StatCard
-                  label="Favorite Genre"
-                  value={stats.favoriteGenre || "--"}
-                  icon={Music}
-                />
-                <StatCard
-                  label="Current Streak"
-                  value={stats.currentStreak > 0 ? `${stats.currentStreak}w` : "--"}
-                  icon={Flame}
-                />
-                <StatCard
-                  label="Member Since"
-                  value={new Date(fan.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
-                  icon={Star}
-                />
-                {stats.mostCollectedArtist && (
-                  <StatCard
-                    label="Most Collected"
-                    value={`${stats.mostCollectedArtist.name} (${stats.mostCollectedArtist.count})`}
-                    icon={Star}
-                    span2
-                  />
-                )}
-                {stats.mostVisitedVenue && (
-                  <StatCard
-                    label="Most Visited Venue"
-                    value={`${stats.mostVisitedVenue.name} (${stats.mostVisitedVenue.count})`}
-                    icon={Ticket}
-                    span2
-                  />
-                )}
+            {!isPublic && (
+              <button
+                onClick={() => setShowDiscoverModal(true)}
+                className="flex items-center gap-1.5 rounded-full bg-pink/10 px-3 py-1.5 text-xs font-medium text-pink hover:bg-pink/20 transition-colors"
+              >
+                <Plus size={14} />
+                Add Artist
+              </button>
+            )}
+          </div>
+
+          {stamps.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-light-gray/20 bg-bg-card/50 p-10 text-center">
+              <div className="mx-auto mb-4 h-20 w-20 rounded-full border-2 border-dashed border-pink/30 flex items-center justify-center">
+                <Plus size={32} className="text-pink/40" />
               </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-20 animate-pulse rounded-xl border border-light-gray/10 bg-bg-card"
-                  />
+              <p className="font-medium text-[var(--text)]">
+                {isPublic ? "No stamps yet" : "Start your collection"}
+              </p>
+              <p className="mt-1 text-sm text-gray">
+                {isPublic
+                  ? "This fan hasn't collected any artists yet."
+                  : "Scan a QR at a show or discover artists to earn stamps."}
+              </p>
+              {!isPublic && (
+                <div className="mt-4 flex justify-center gap-3">
+                  <button
+                    onClick={() => setShowDiscoverModal(true)}
+                    className="rounded-full bg-pink px-4 py-2 text-sm font-medium text-white hover:bg-pink/90 transition-colors"
+                  >
+                    Discover an Artist
+                  </button>
+                  <Link
+                    href="/add"
+                    className="rounded-full border border-yellow/30 px-4 py-2 text-sm font-medium text-yellow hover:bg-yellow/10 transition-colors"
+                  >
+                    Add to Decibel
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-light-gray/10 bg-bg-card/50 p-5">
+              {/* Stamp grid */}
+              <div className="grid grid-cols-4 gap-y-5 gap-x-2 justify-items-center">
+                {stamps.map((entry) => (
+                  <ArtistStamp key={entry.performer.id} entry={entry} />
                 ))}
+                {/* Add more CTA */}
+                {!isPublic && (
+                  <button
+                    onClick={() => setShowDiscoverModal(true)}
+                    className="flex flex-col items-center gap-1.5 group"
+                  >
+                    <div className="h-[72px] w-[72px] rounded-full border-2 border-dashed border-light-gray/20 flex items-center justify-center group-hover:border-pink/40 transition-colors">
+                      <Plus size={24} className="text-light-gray/40 group-hover:text-pink/60 transition-colors" />
+                    </div>
+                    <span className="text-xs text-light-gray/60">Add more</span>
+                  </button>
+                )}
               </div>
+
+              {/* Legend */}
+              <div className="mt-5 flex items-center justify-center gap-4 border-t border-light-gray/10 pt-4 text-[10px] text-gray">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-pink" /> Network
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-purple" /> Early Access
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-blue" /> Secret
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-teal" /> Inner Circle
+                </span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════ */}
+        {/* STATS — compact bar, expandable to full grid            */}
+        {/* ═══════════════════════════════════════════════════════ */}
+        {!isPublic && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-bold text-[var(--text)]">Sound Stats</h2>
+              {stats && (
+                <button
+                  onClick={() => setShowFullStats(!showFullStats)}
+                  className="flex items-center gap-1 text-xs text-gray hover:text-pink transition-colors"
+                >
+                  {showFullStats ? "Less" : "More"}
+                  {showFullStats ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+              )}
+            </div>
+            {showFullStats && stats ? (
+              <FullStatsGrid stats={stats} fan={fan} fanSlug={fanSlug} />
+            ) : (
+              <PassportStatsBar stats={stats} fan={fan} />
             )}
           </section>
         )}
@@ -714,7 +910,7 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
         {/* Badges */}
         <BadgeShowcase badges={badges} isPublic={isPublic} fanName={fan.name || "Fan"} fanSlug={fanSlug} />
 
-        {/* Contact Suggestions + Activity Feed (authenticated only) */}
+        {/* Contact Suggestions + Activity Feed */}
         {!isPublic && (
           <>
             <ContactSuggestions />
@@ -722,10 +918,10 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
           </>
         )}
 
-        {/* Recommendations (authenticated only) */}
+        {/* Recommendations */}
         {!isPublic && <Recommendations />}
 
-        {/* Music Connections (authenticated only) */}
+        {/* Music Connections */}
         {!isPublic && (
           <section className="mb-10">
             <h2 className="mb-4 text-lg font-bold text-[var(--text)]">
@@ -735,11 +931,24 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
           </section>
         )}
 
-        {/* Collection Timeline */}
+        {/* ═══════════════════════════════════════════════════════ */}
+        {/* COLLECTION TIMELINE — detailed history below the fold  */}
+        {/* ═══════════════════════════════════════════════════════ */}
         <section>
-          <h2 className="mb-4 text-lg font-bold text-[var(--text)]">
-            Collection Timeline
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-[var(--text)]">
+              Collection Timeline
+            </h2>
+            {timeline.length > 5 && (
+              <button
+                onClick={() => setShowFullTimeline(!showFullTimeline)}
+                className="flex items-center gap-1 text-xs text-gray hover:text-pink transition-colors"
+              >
+                {showFullTimeline ? "Show less" : `Show all (${timeline.length})`}
+                {showFullTimeline ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            )}
+          </div>
 
           {timeline.length === 0 ? (
             <div className="rounded-xl border border-light-gray/10 bg-bg-card p-8 text-center">
@@ -755,27 +964,64 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
             </div>
           ) : (
             <div className="relative border-l-2 border-pink/30 pl-6">
-              {Array.from(grouped.entries()).map(([monthKey, entries]) => (
-                <div key={monthKey} className="mb-6">
-                  <div className="sticky top-16 z-10 -ml-6 mb-3 flex items-center">
-                    <div className="h-3 w-3 rounded-full bg-pink" />
-                    <span className="ml-3 text-sm font-semibold text-gray">
-                      {formatMonthYear(entries[0].created_at)}
-                    </span>
+              {Array.from(grouped.entries()).map(([monthKey, entries], groupIdx) => {
+                // If not showing full timeline, only show first 5 entries total
+                if (!showFullTimeline) {
+                  let countBefore = 0;
+                  for (const [k] of grouped.entries()) {
+                    if (k === monthKey) break;
+                    countBefore += grouped.get(k)!.length;
+                  }
+                  if (countBefore >= 5) return null;
+                  const remaining = 5 - countBefore;
+                  const visibleEntries = entries.slice(0, remaining);
+                  if (visibleEntries.length === 0) return null;
+
+                  return (
+                    <div key={monthKey} className="mb-6">
+                      <div className="sticky top-16 z-10 -ml-6 mb-3 flex items-center">
+                        <div className="h-3 w-3 rounded-full bg-pink" />
+                        <span className="ml-3 text-sm font-semibold text-gray">
+                          {formatMonthYear(entries[0].created_at)}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        {visibleEntries.map((entry) => (
+                          <TimelineEntry
+                            key={entry.id}
+                            entry={entry}
+                            fanName={fan.name || "Fan"}
+                            fanSlug={fanSlug}
+                            showShare={!isPublic}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={monthKey} className="mb-6">
+                    <div className="sticky top-16 z-10 -ml-6 mb-3 flex items-center">
+                      <div className="h-3 w-3 rounded-full bg-pink" />
+                      <span className="ml-3 text-sm font-semibold text-gray">
+                        {formatMonthYear(entries[0].created_at)}
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      {entries.map((entry) => (
+                        <TimelineEntry
+                          key={entry.id}
+                          entry={entry}
+                          fanName={fan.name || "Fan"}
+                          fanSlug={fanSlug}
+                          showShare={!isPublic}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-3">
-                    {entries.map((entry) => (
-                      <TimelineEntry
-                        key={entry.id}
-                        entry={entry}
-                        fanName={fan.name || "Fan"}
-                        fanSlug={fanSlug}
-                        showShare={!isPublic}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>
