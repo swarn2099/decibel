@@ -39,6 +39,8 @@ import { BadgeShowcase } from "./badge-showcase";
 import { BadgeUnlockToast } from "./badge-unlock-toast";
 import { SocialCounts } from "./social-counts";
 import { ShareCardButton, getMilestoneForStat } from "./share-cards";
+import { ActivityFeed } from "./activity-feed";
+import { ContactSuggestions } from "./contact-suggestions";
 
 interface PassportClientProps {
   fan: PassportFan;
@@ -694,6 +696,14 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
 
         {/* Badges */}
         <BadgeShowcase badges={badges} isPublic={isPublic} fanName={fan.name || "Fan"} fanSlug={fanSlug} />
+
+        {/* Contact Suggestions + Activity Feed (authenticated only) */}
+        {!isPublic && (
+          <>
+            <ContactSuggestions />
+            <ActivityFeed />
+          </>
+        )}
 
         {/* Recommendations (authenticated only) */}
         {!isPublic && <Recommendations />}
