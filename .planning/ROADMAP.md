@@ -124,7 +124,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 15-01-PLAN.md -- Shareable card variants (artist, badge, milestone, discovery, stats)
+- [x] 15-01-PLAN.md -- Shareable card variants (artist, badge, milestone, discovery, stats)
 - [x] 15-02-PLAN.md -- Follow system, follower/following counts, privacy settings
 - [ ] 15-03-PLAN.md -- Activity feed and contact-check for friend discovery
 
