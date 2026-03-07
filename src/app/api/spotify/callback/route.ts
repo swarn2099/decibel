@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://decibel-swarn-singhs-projects.vercel.app";
+    "https://decibel-three.vercel.app";
 
   const code = req.nextUrl.searchParams.get("code");
   const error = req.nextUrl.searchParams.get("error");
