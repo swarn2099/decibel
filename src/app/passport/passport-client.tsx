@@ -37,6 +37,8 @@ import { SpotifyImport } from "./spotify-import";
 import { Recommendations } from "./recommendations";
 import { BadgeShowcase } from "./badge-showcase";
 import { BadgeUnlockToast } from "./badge-unlock-toast";
+import { SocialCounts } from "./social-counts";
+import { ShareCardButton, getMilestoneForStat } from "./share-cards";
 
 interface PassportClientProps {
   fan: PassportFan;
@@ -44,6 +46,7 @@ interface PassportClientProps {
   timeline: PassportTimelineEntry[];
   isPublic?: boolean;
   badges?: BadgeWithDefinition[];
+  viewerFanId?: string;
 }
 
 const CAPTURE_ICONS = {
@@ -130,11 +133,13 @@ function StatCard({
   value,
   icon: Icon,
   span2,
+  milestoneParams,
 }: {
   label: string;
   value: string | number;
   icon: React.ElementType;
   span2?: boolean;
+  milestoneParams?: { milestone: string; value: string; label: string; fanName: string; slug: string } | null;
 }) {
   return (
     <div
@@ -142,9 +147,18 @@ function StatCard({
         span2 ? "col-span-2" : ""
       }`}
     >
-      <div className="mb-1 flex items-center gap-2 text-gray">
-        <Icon size={14} />
-        <span className="text-xs uppercase tracking-wider">{label}</span>
+      <div className="mb-1 flex items-center justify-between text-gray">
+        <div className="flex items-center gap-2">
+          <Icon size={14} />
+          <span className="text-xs uppercase tracking-wider">{label}</span>
+        </div>
+        {milestoneParams && (
+          <ShareCardButton
+            variant="milestone"
+            params={milestoneParams}
+            label={`Share ${label} milestone`}
+          />
+        )}
       </div>
       <div className="bg-gradient-to-r from-pink via-purple to-blue bg-clip-text text-3xl font-bold text-transparent">
         {value}
@@ -153,7 +167,7 @@ function StatCard({
   );
 }
 
-function TimelineEntry({ entry }: { entry: PassportTimelineEntry }) {
+function TimelineEntry({ entry, fanName, fanSlug, showShare }: { entry: PassportTimelineEntry; fanName?: string; fanSlug?: string; showShare?: boolean }) {
   const CaptureIcon = CAPTURE_ICONS[entry.capture_method] || Globe;
   const tierColor = entry.current_tier
     ? TIER_COLORS[entry.current_tier]
@@ -216,6 +230,21 @@ function TimelineEntry({ entry }: { entry: PassportTimelineEntry }) {
               {entry.scan_count !== null && (
                 <span>{entry.scan_count} scan{entry.scan_count !== 1 ? "s" : ""}</span>
               )}
+              {showShare && fanName && fanSlug && (
+                <ShareCardButton
+                  variant="artist"
+                  params={{
+                    name: entry.performer.name,
+                    photo: entry.performer.photo_url || "",
+                    tier: entry.current_tier || "network",
+                    scans: String(entry.scan_count || 1),
+                    venue: entry.venue?.name || "",
+                    fanName,
+                    slug: fanSlug,
+                  }}
+                  label={`Share ${entry.performer.name} card`}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -249,6 +278,19 @@ function TimelineEntry({ entry }: { entry: PassportTimelineEntry }) {
               <CaptureIcon size={12} />
               {entry.capture_method.toUpperCase()}
             </span>
+            {showShare && fanName && fanSlug && (
+              <ShareCardButton
+                variant="discovery"
+                params={{
+                  artistName: entry.performer.name,
+                  artistPhoto: entry.performer.photo_url || "",
+                  genres: (entry.performer.genres || []).join(","),
+                  fanName,
+                  slug: fanSlug,
+                }}
+                label={`Share ${entry.performer.name} discovery`}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -390,7 +432,7 @@ function ShareMenu({
   );
 }
 
-export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPublic = false, badges: initialBadges }: PassportClientProps) {
+export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPublic = false, badges: initialBadges, viewerFanId }: PassportClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [stats, setStats] = useState<PassportStats | null>(null);
@@ -547,6 +589,13 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
               <span className="text-gray">Venues</span>
             </span>
           </div>
+
+          {/* Social counts (followers/following) */}
+          <SocialCounts
+            fanId={fan.id}
+            isOwner={!isPublic}
+            currentUserId={viewerFanId}
+          />
         </div>
 
         {/* Sound Stats (hidden on public view since stats endpoint requires auth) */}
@@ -561,6 +610,13 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
                   label="Dancefloors"
                   value={stats.totalShows}
                   icon={Disc3}
+                  milestoneParams={getMilestoneForStat(stats.totalShows) ? {
+                    milestone: `${getMilestoneForStat(stats.totalShows)} Shows Attended`,
+                    value: String(getMilestoneForStat(stats.totalShows)),
+                    label: "shows",
+                    fanName: fan.name || "Fan",
+                    slug: fanSlug,
+                  } : null}
                 />
                 <StatCard
                   label="Cities"
@@ -571,6 +627,13 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
                   label="Artists Collected"
                   value={stats.totalArtists}
                   icon={Users}
+                  milestoneParams={getMilestoneForStat(stats.totalArtists) ? {
+                    milestone: `${getMilestoneForStat(stats.totalArtists)} Artists Collected`,
+                    value: String(getMilestoneForStat(stats.totalArtists)),
+                    label: "artists",
+                    fanName: fan.name || "Fan",
+                    slug: fanSlug,
+                  } : null}
                 />
                 <StatCard
                   label="Artists Discovered"
@@ -581,6 +644,13 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
                   label="Venues"
                   value={stats.uniqueVenues}
                   icon={Building2}
+                  milestoneParams={getMilestoneForStat(stats.uniqueVenues) ? {
+                    milestone: `${getMilestoneForStat(stats.uniqueVenues)} Venues Visited`,
+                    value: String(getMilestoneForStat(stats.uniqueVenues)),
+                    label: "venues",
+                    fanName: fan.name || "Fan",
+                    slug: fanSlug,
+                  } : null}
                 />
                 <StatCard
                   label="Favorite Genre"
@@ -623,7 +693,7 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
         )}
 
         {/* Badges */}
-        <BadgeShowcase badges={badges} isPublic={isPublic} />
+        <BadgeShowcase badges={badges} isPublic={isPublic} fanName={fan.name || "Fan"} fanSlug={fanSlug} />
 
         {/* Recommendations (authenticated only) */}
         {!isPublic && <Recommendations />}
@@ -668,7 +738,13 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
                   </div>
                   <div className="flex flex-col gap-3">
                     {entries.map((entry) => (
-                      <TimelineEntry key={entry.id} entry={entry} />
+                      <TimelineEntry
+                        key={entry.id}
+                        entry={entry}
+                        fanName={fan.name || "Fan"}
+                        fanSlug={fanSlug}
+                        showShare={!isPublic}
+                      />
                     ))}
                   </div>
                 </div>

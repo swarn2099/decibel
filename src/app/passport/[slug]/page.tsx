@@ -1,4 +1,4 @@
-import { createSupabaseAdmin } from "@/lib/supabase";
+import { createSupabaseAdmin, createSupabaseServer } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import { PassportClient } from "../passport-client";
 import { generateFanSlug } from "@/lib/fan-slug";
@@ -8,6 +8,7 @@ import type {
   PassportTimelineEntry,
 } from "@/lib/types/passport";
 import type { BadgeWithDefinition } from "@/lib/types/badges";
+import type { PrivacySetting } from "@/lib/types/social";
 import type { Metadata } from "next";
 
 interface Props {
@@ -142,6 +143,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+async function getPrivacySetting(fanId: string): Promise<PrivacySetting> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("fan_privacy")
+    .select("visibility")
+    .eq("fan_id", fanId)
+    .maybeSingle();
+  return (data?.visibility as PrivacySetting) || "public";
+}
+
+async function checkIsFollowing(followerId: string, followingId: string): Promise<boolean> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("fan_follows")
+    .select("id")
+    .eq("follower_id", followerId)
+    .eq("following_id", followingId)
+    .maybeSingle();
+  return !!data;
+}
+
 export default async function PublicPassportPage({ params }: Props) {
   const { slug } = await params;
   const fan = await findFanBySlug(slug);
@@ -156,18 +178,94 @@ export default async function PublicPassportPage({ params }: Props) {
     created_at: fan.created_at,
   };
 
+  // Check viewer identity
+  let viewerFanId: string | undefined;
+  try {
+    const supabase = await createSupabaseServer();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      const admin = createSupabaseAdmin();
+      const { data: viewerFan } = await admin
+        .from("fans")
+        .select("id")
+        .eq("email", user.email)
+        .single();
+      viewerFanId = viewerFan?.id;
+    }
+  } catch {
+    // Not logged in -- continue as anonymous
+  }
+
+  // Check privacy setting
+  const privacy = await getPrivacySetting(fan.id);
+  let canViewFull = true;
+
+  if (privacy === "private" && viewerFanId !== fan.id) {
+    // Private: only the fan themselves can see full passport
+    if (viewerFanId) {
+      canViewFull = await checkIsFollowing(viewerFanId, fan.id);
+    } else {
+      canViewFull = false;
+    }
+  } else if (privacy === "mutual" && viewerFanId !== fan.id) {
+    // Mutual: both must follow each other
+    if (viewerFanId) {
+      const [viewerFollows, fanFollows] = await Promise.all([
+        checkIsFollowing(viewerFanId, fan.id),
+        checkIsFollowing(fan.id, viewerFanId),
+      ]);
+      canViewFull = viewerFollows && fanFollows;
+    } else {
+      canViewFull = false;
+    }
+  }
+
   const [timeline, badges] = await Promise.all([
-    getPassportData(fan.id),
-    getFanBadges(fan.id),
+    canViewFull ? getPassportData(fan.id) : Promise.resolve([]),
+    canViewFull ? getFanBadges(fan.id) : Promise.resolve([]),
   ]);
 
   return (
-    <PassportClient
-      fan={passportFan}
-      fanSlug={slug}
-      timeline={timeline}
-      isPublic
-      badges={badges}
-    />
+    <>
+      <PassportClient
+        fan={passportFan}
+        fanSlug={slug}
+        timeline={timeline}
+        isPublic
+        badges={badges}
+        viewerFanId={viewerFanId}
+      />
+      {!canViewFull && (
+        <div className="mx-auto max-w-2xl px-4 -mt-16 pb-12">
+          <div className="rounded-xl border border-light-gray/20 bg-bg-card p-8 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-light-gray/10">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-gray"
+              >
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+            </div>
+            <h3 className="mb-2 text-lg font-bold text-[var(--text)]">
+              Private Passport
+            </h3>
+            <p className="text-sm text-gray">
+              {privacy === "private"
+                ? "This passport is private. Follow this fan to see their activity."
+                : "This passport is visible to mutual followers only."}
+            </p>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, LogOut } from "lucide-react";
+import { ArrowLeft, Save, LogOut, Eye, EyeOff, Users } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { toast } from "sonner";
+import type { PrivacySetting } from "@/lib/types/social";
 
 type Fan = {
   id: string;
@@ -23,6 +24,38 @@ export function SettingsClient({
   const router = useRouter();
   const [name, setName] = useState(fan?.name || "");
   const [saving, setSaving] = useState(false);
+  const [privacy, setPrivacy] = useState<PrivacySetting>("public");
+  const [privacyLoading, setPrivacyLoading] = useState(true);
+  const [privacySaving, setPrivacySaving] = useState(false);
+
+  // Fetch privacy setting on mount
+  useEffect(() => {
+    fetch("/api/social/privacy")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.visibility) setPrivacy(data.visibility);
+      })
+      .catch(() => {})
+      .finally(() => setPrivacyLoading(false));
+  }, []);
+
+  async function handlePrivacyChange(newVisibility: PrivacySetting) {
+    setPrivacy(newVisibility);
+    setPrivacySaving(true);
+    try {
+      const res = await fetch("/api/social/privacy", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ visibility: newVisibility }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      toast.success("Privacy setting updated");
+    } catch {
+      toast.error("Failed to update privacy");
+    } finally {
+      setPrivacySaving(false);
+    }
+  }
 
   async function handleSave() {
     if (!name.trim()) {
@@ -101,6 +134,76 @@ export function SettingsClient({
             <Save size={14} />
             {saving ? "Saving..." : "Save"}
           </button>
+        </section>
+
+        {/* Privacy */}
+        <section className="rounded-xl border border-light-gray/10 bg-bg-card p-5">
+          <h2 className="mb-3 text-sm font-semibold text-gray">Passport Privacy</h2>
+          {privacyLoading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-14 animate-pulse rounded-lg bg-light-gray/10" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {([
+                {
+                  value: "public" as const,
+                  label: "Public",
+                  description: "Anyone can see your passport",
+                  icon: Eye,
+                },
+                {
+                  value: "mutual" as const,
+                  label: "Mutual Followers",
+                  description: "Only people you both follow",
+                  icon: Users,
+                },
+                {
+                  value: "private" as const,
+                  label: "Private",
+                  description: "Only you can see your passport",
+                  icon: EyeOff,
+                },
+              ]).map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => handlePrivacyChange(option.value)}
+                  disabled={privacySaving}
+                  className={`flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all ${
+                    privacy === option.value
+                      ? "border-pink/40 bg-pink/5"
+                      : "border-light-gray/10 hover:border-light-gray/30"
+                  } disabled:opacity-50`}
+                >
+                  <option.icon
+                    size={18}
+                    className={
+                      privacy === option.value ? "text-pink" : "text-gray"
+                    }
+                  />
+                  <div className="flex-1">
+                    <div
+                      className={`text-sm font-medium ${
+                        privacy === option.value
+                          ? "text-[var(--text)]"
+                          : "text-gray"
+                      }`}
+                    >
+                      {option.label}
+                    </div>
+                    <div className="text-xs text-light-gray">
+                      {option.description}
+                    </div>
+                  </div>
+                  {privacy === option.value && (
+                    <div className="h-2 w-2 rounded-full bg-pink" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Account */}
