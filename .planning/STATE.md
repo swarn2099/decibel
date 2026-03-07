@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: The Passport
 status: executing
-last_updated: "2026-03-07T04:14:32.948Z"
-last_activity: 2026-03-07 — Completed 12-03-PLAN.md
+last_updated: "2026-03-07T04:33:10.425Z"
+last_activity: 2026-03-07 — Completed 13-01-PLAN.md
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
-  percent: 90
+  total_plans: 7
+  completed_plans: 6
+  percent: 92
 ---
 
 # Project State
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v2.0 — The Passport (Phase 12: Online Discovery — Add From Anywhere)
+**Current focus:** v2.0 — The Passport (Phase 13: Badges & Gamification)
 
 ## Current Position
 
-Phase: 12 of 15 (Online Discovery — Add From Anywhere)
-Plan: 3 of 3 complete
+Phase: 13 of 15 (Badges & Gamification)
+Plan: 1 of 2 complete
 Status: Executing
-Last activity: 2026-03-07 — Completed 12-03-PLAN.md
+Last activity: 2026-03-07 — Completed 13-01-PLAN.md
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -59,6 +59,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 12-02]: Spotify token stored in httpOnly cookie and deleted after import (one-time-use pattern)
 - [Phase 12-02]: Artist matching uses case-insensitive ILIKE on performer name
 - [Phase 12-02]: Auto-create performer from Spotify data if not in DB
+- [Phase 13-01]: Badge evaluation is a pure function (evaluateBadges) with no DB calls for testability
+- [Phase 13-01]: fan_badges table SQL documented as manual prerequisite (Supabase JS client can't run DDL)
+- [Phase 13-01]: Connector badge uses 10+ collections as proxy until share tracking exists
 
 ### Pending Todos
 

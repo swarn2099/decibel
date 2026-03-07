@@ -26,14 +26,14 @@
 
 ### Badges
 
-- [ ] **BADGE-01**: Discovery badges award (Trailblazer, First 100, First 10 Verified)
-- [ ] **BADGE-02**: Attendance badges award (Regular, Devotee, Inner Circle, Venue Local, Venue Legend)
-- [ ] **BADGE-03**: Exploration badges award (Genre Explorer, City Hopper, Night Owl, Scene Veteran, Centurion)
-- [ ] **BADGE-04**: Streak badges award (On Fire, Unstoppable, Year-Round)
-- [ ] **BADGE-05**: Social badges award (Tastemaker, Connector)
+- [x] **BADGE-01**: Discovery badges award (Trailblazer, First 100, First 10 Verified)
+- [x] **BADGE-02**: Attendance badges award (Regular, Devotee, Inner Circle, Venue Local, Venue Legend)
+- [x] **BADGE-03**: Exploration badges award (Genre Explorer, City Hopper, Night Owl, Scene Veteran, Centurion)
+- [x] **BADGE-04**: Streak badges award (On Fire, Unstoppable, Year-Round)
+- [x] **BADGE-05**: Social badges award (Tastemaker, Connector)
 - [ ] **BADGE-06**: Badges display on passport with icon, name, description, date earned, rarity tier
 - [ ] **BADGE-07**: Badge unlock triggers visual feedback (animation/toast)
-- [ ] **BADGE-08**: Badges retroactively awarded for existing collection data on feature launch
+- [x] **BADGE-08**: Badges retroactively awarded for existing collection data on feature launch
 
 ### Artist Profile
 
@@ -91,14 +91,14 @@
 | DISC-04 | Phase 12 | Complete |
 | DISC-05 | Phase 12 | Complete |
 | DISC-06 | Phase 12 | Complete |
-| BADGE-01 | Phase 13 | Pending |
-| BADGE-02 | Phase 13 | Pending |
-| BADGE-03 | Phase 13 | Pending |
-| BADGE-04 | Phase 13 | Pending |
-| BADGE-05 | Phase 13 | Pending |
+| BADGE-01 | Phase 13 | Complete |
+| BADGE-02 | Phase 13 | Complete |
+| BADGE-03 | Phase 13 | Complete |
+| BADGE-04 | Phase 13 | Complete |
+| BADGE-05 | Phase 13 | Complete |
 | BADGE-06 | Phase 13 | Pending |
 | BADGE-07 | Phase 13 | Pending |
-| BADGE-08 | Phase 13 | Pending |
+| BADGE-08 | Phase 13 | Complete |
 | PROF-01 | Phase 14 | Pending |
 | PROF-02 | Phase 14 | Pending |
 | PROF-03 | Phase 14 | Pending |
