@@ -149,4 +149,4 @@ Plans:
 | 12. Online Discovery | 3/3 | Complete    | 2026-03-07 | - |
 | 13. Badges and Gamification | 2/2 | Complete    | 2026-03-07 | - |
 | 14. Enhanced Artist Profiles | 3/3 | Complete    | 2026-03-07 | - |
-| 15. Passport Sharing and Social | 3/3 | Complete   | 2026-03-07 | - |
+| 15. Passport Sharing and Social | 3/3 | Complete    | 2026-03-07 | - |
