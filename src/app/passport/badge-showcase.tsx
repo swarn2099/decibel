@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import type { BadgeWithDefinition, BadgeCategory } from "@/lib/types/badges";
+import { ShareCardButton } from "./share-cards";
 
 interface BadgeShowcaseProps {
   badges: BadgeWithDefinition[];
   isPublic?: boolean;
+  fanName?: string;
+  fanSlug?: string;
 }
 
 const RARITY_STYLES = {
@@ -39,7 +42,7 @@ function formatDate(dateStr: string): string {
   });
 }
 
-export function BadgeShowcase({ badges, isPublic = false }: BadgeShowcaseProps) {
+export function BadgeShowcase({ badges, isPublic = false, fanName, fanSlug }: BadgeShowcaseProps) {
   const [activeCategory, setActiveCategory] = useState<BadgeCategory | "all">("all");
 
   // Hide entire section on public view if no badges
@@ -107,6 +110,24 @@ export function BadgeShowcase({ badges, isPublic = false }: BadgeShowcaseProps) 
               <p className="mt-2 text-center text-[10px] text-light-gray">
                 {formatDate(badge.earned_at)}
               </p>
+              {!isPublic && fanName && fanSlug && (
+                <div className="mt-2 flex justify-center">
+                  <ShareCardButton
+                    variant="badge"
+                    params={{
+                      badgeName: badge.definition.name,
+                      badgeDesc: badge.definition.description,
+                      badgeIcon: badge.definition.icon,
+                      rarity: badge.definition.rarity,
+                      category: badge.definition.category,
+                      earnedAt: badge.earned_at,
+                      fanName,
+                      slug: fanSlug,
+                    }}
+                    label={`Share ${badge.definition.name} badge`}
+                  />
+                </div>
+              )}
             </div>
           ))}
         </div>
