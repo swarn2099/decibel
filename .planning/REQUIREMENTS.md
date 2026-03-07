@@ -54,7 +54,7 @@
 - [ ] **SOCL-03**: Fan can follow/unfollow other fans
 - [ ] **SOCL-04**: Fan sees follower/following counts on passport
 - [ ] **SOCL-05**: Privacy setting controls who sees activity (mutual followers / public / private)
-- [ ] **SOCL-06**: "Someone you know joined" notification when phone contact signs up
+- [ ] **SOCL-06**: Fan can discover which contacts are on Decibel via email lookup, with in-app notification for newly joined contacts (push notifications require MOBILE-03/04)
 
 ## Future Requirements
 
@@ -122,4 +122,4 @@
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after roadmap creation*
+*Last updated: 2026-03-07 after plan revision (SOCL-06 downscoped to web-compatible email lookup + in-app notification)*
