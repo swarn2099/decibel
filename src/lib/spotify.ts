@@ -24,7 +24,8 @@ async function getAccessToken(): Promise<string> {
   });
 
   if (!res.ok) {
-    throw new Error(`Spotify token request failed: ${res.status}`);
+    const errorBody = await res.text();
+    throw new Error(`Spotify token request failed: ${res.status} — ${errorBody}`);
   }
 
   const data = await res.json();
@@ -64,7 +65,8 @@ export async function searchSpotifyArtists(
   );
 
   if (!res.ok) {
-    throw new Error(`Spotify search failed: ${res.status}`);
+    const errorBody = await res.text();
+    throw new Error(`Spotify search failed: ${res.status} — ${errorBody}`);
   }
 
   const data = await res.json();
