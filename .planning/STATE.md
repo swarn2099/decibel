@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: The Passport
-status: in-progress
-last_updated: "2026-03-07T05:21:30Z"
-last_activity: 2026-03-07 — Completed 14-01-PLAN.md
+status: executing
+last_updated: "2026-03-07T05:31:04.661Z"
+last_activity: 2026-03-07 — Completed 14-02-PLAN.md
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 10
-  completed_plans: 8
-  percent: 100
+  completed_plans: 9
+  percent: 93
 ---
 
 # Project State
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 14 of 15 (Enhanced Artist Profiles)
-Plan: 1 of 3 complete
+Plan: 2 of 3 complete
 Status: In Progress
-Last activity: 2026-03-07 — Completed 14-01-PLAN.md
+Last activity: 2026-03-07 — Completed 14-02-PLAN.md
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 93%
 
 ## Performance Metrics
 
@@ -66,6 +66,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 14-01]: Spotify embed uses dark theme (theme=0) at 352px height for top tracks view
 - [Phase 14-01]: Fan stats and similar artists fetched server-side via Promise.all for SSR performance
 - [Phase 14-01]: Similar artists limited to 8, ordered by follower_count desc, using .overlaps() genre matching
+- [Phase 14]: Journey state derived from collections + fan_tiers tables (no new DB migration needed)
+- [Phase 14]: ArtistActions fetches journey on mount via client-side fetch for SSR compatibility
+- [Phase 14]: Gradient props passed from server to client component for visual consistency
 
 ### Pending Todos
 

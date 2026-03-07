@@ -42,9 +42,9 @@
 - [x] **PROF-03**: Artist profile shows fan stats (total collectors, discoverers, tier breakdown)
 - [x] **PROF-04**: Artist profile shows similar artists based on genre overlap
 - [x] **PROF-05**: Artist profile has Spotify embed/link alongside SoundCloud embed
-- [ ] **PROF-06**: "Discover" button adds artist as a discovery to fan's passport
-- [ ] **PROF-07**: "Collect" button shows next show info or QR context
-- [ ] **PROF-08**: Fan sees tier progress and journey state (discovered -> collecting -> inner circle)
+- [x] **PROF-06**: "Discover" button adds artist as a discovery to fan's passport
+- [x] **PROF-07**: "Collect" button shows next show info or QR context
+- [x] **PROF-08**: Fan sees tier progress and journey state (discovered -> collecting -> inner circle)
 - [ ] **PROF-09**: Unclaimed profiles show "Claim this profile" with magic link verification flow
 
 ### Social
@@ -104,9 +104,9 @@
 | PROF-03 | Phase 14 | Complete |
 | PROF-04 | Phase 14 | Complete |
 | PROF-05 | Phase 14 | Complete |
-| PROF-06 | Phase 14 | Pending |
-| PROF-07 | Phase 14 | Pending |
-| PROF-08 | Phase 14 | Pending |
+| PROF-06 | Phase 14 | Complete |
+| PROF-07 | Phase 14 | Complete |
+| PROF-08 | Phase 14 | Complete |
 | PROF-09 | Phase 14 | Pending |
 | SOCL-01 | Phase 15 | Pending |
 | SOCL-02 | Phase 15 | Pending |
