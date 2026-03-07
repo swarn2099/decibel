@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import Link from "next/link";
 import type { MapVenue } from "@/lib/types/map";
+import { PerformerImage } from "@/components/performer-image";
 import "leaflet/dist/leaflet.css";
 
 const CHICAGO_CENTER: [number, number] = [41.8827, -87.6233];
@@ -81,7 +82,7 @@ export default function MapClient() {
   const dotRadius = (count: number) => Math.min(6 + count * 1.5, 14);
 
   return (
-    <div className="flex flex-col pt-16">
+    <div className="flex flex-col pt-[72px]">
       {/* Filter bar */}
       <div className="flex items-center gap-2 overflow-x-auto px-4 py-3 no-scrollbar">
         {/* Tonight toggle */}
@@ -129,7 +130,7 @@ export default function MapClient() {
       </div>
 
       {/* Map */}
-      <div className="relative h-[calc(100vh-120px)]">
+      <div className="relative h-[calc(100vh-128px)]">
         {loading && (
           <div className="absolute inset-0 z-[1000] flex items-center justify-center bg-bg/60">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-pink border-t-transparent" />
@@ -169,11 +170,12 @@ export default function MapClient() {
                         .filter((e) => e.performer_photo)
                         .slice(0, 3)
                         .map((e) => (
-                          <img
+                          <PerformerImage
                             key={e.id}
                             src={e.performer_photo!}
                             alt={e.performer_name}
                             className="h-7 w-7 rounded-full border border-light-gray/30 object-cover"
+                            fallbackClassName="flex h-7 w-7 items-center justify-center rounded-full border border-light-gray/30 bg-gradient-to-br from-pink/20 to-purple/20 text-[10px] font-bold text-gray"
                           />
                         ))}
                     </div>

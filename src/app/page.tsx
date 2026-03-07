@@ -3,6 +3,7 @@ import { PerformerGrid } from "@/components/performer-grid";
 import { SearchBar } from "@/components/search-bar";
 import Link from "next/link";
 import { Calendar, MapPin, Clock, ExternalLink } from "lucide-react";
+import { PerformerImage } from "@/components/performer-image";
 
 export const revalidate = 300;
 
@@ -132,10 +133,11 @@ export default async function Home() {
                       >
                         {/* Artist photo */}
                         {event.performer?.photo_url ? (
-                          <img
+                          <PerformerImage
                             src={event.performer.photo_url}
                             alt={event.performer.name}
                             className="h-12 w-12 shrink-0 rounded-full object-cover"
+                            fallbackClassName="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-sm font-bold"
                           />
                         ) : (
                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple to-blue text-sm font-bold">

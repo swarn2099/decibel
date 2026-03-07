@@ -50,7 +50,7 @@ export default async function CollectPage({ params }: { params: Params }) {
   if (!performer) notFound();
 
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center bg-bg px-6 py-12">
+    <main className="flex min-h-dvh flex-col items-center justify-center bg-bg px-6 pb-12 pt-20">
       <CollectForm performer={performer} />
     </main>
   );

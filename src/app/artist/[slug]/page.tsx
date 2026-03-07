@@ -12,6 +12,7 @@ import {
   Clock,
   Play,
 } from "lucide-react";
+import { PerformerImage } from "@/components/performer-image";
 
 type Params = Promise<{ slug: string }>;
 
@@ -231,10 +232,11 @@ export default async function ArtistPage({ params }: { params: Params }) {
         <div className="relative mx-auto flex max-w-4xl items-end gap-6 px-6 pb-8 pt-24 sm:gap-8 sm:pb-10 sm:pt-32">
           {/* Avatar */}
           {performer.photo_url ? (
-            <img
+            <PerformerImage
               src={performer.photo_url}
               alt={performer.name}
               className="h-40 w-40 shrink-0 rounded-full object-cover shadow-2xl ring-2 ring-white/10 sm:h-52 sm:w-52"
+              fallbackClassName={`flex h-40 w-40 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${gradFrom}/30 ${gradTo}/30 text-5xl font-bold text-[var(--text-muted)] shadow-2xl ring-2 ring-white/10 sm:h-52 sm:w-52 sm:text-6xl`}
             />
           ) : (
             <div
