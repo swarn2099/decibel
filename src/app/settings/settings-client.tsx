@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, LogOut, Eye, EyeOff, Users } from "lucide-react";
+import { ArrowLeft, Save, LogOut, Eye, EyeOff, Users, Camera, Loader2 } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { toast } from "sonner";
 import type { PrivacySetting } from "@/lib/types/social";
@@ -12,6 +12,7 @@ type Fan = {
   id: string;
   email: string;
   name: string | null;
+  avatar_url: string | null;
 };
 
 export function SettingsClient({
@@ -24,6 +25,8 @@ export function SettingsClient({
   const router = useRouter();
   const [name, setName] = useState(fan?.name || "");
   const [saving, setSaving] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(fan?.avatar_url || "");
+  const [uploading, setUploading] = useState(false);
   const [privacy, setPrivacy] = useState<PrivacySetting>("public");
   const [privacyLoading, setPrivacyLoading] = useState(true);
   const [privacySaving, setPrivacySaving] = useState(false);
@@ -55,6 +58,27 @@ export function SettingsClient({
     } finally {
       setPrivacySaving(false);
     }
+  }
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be under 5MB");
+      return;
+    }
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("avatar", file);
+      const res = await fetch("/api/settings/avatar", { method: "POST", body: form });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error || "Upload failed"); return; }
+      setAvatarUrl(data.avatar_url);
+      toast.success("Profile picture updated");
+      router.refresh();
+    } catch { toast.error("Upload failed"); }
+    finally { setUploading(false); }
   }
 
   async function handleSave() {
@@ -109,6 +133,35 @@ export function SettingsClient({
       </header>
 
       <main className="mx-auto max-w-md px-6 py-8 space-y-6">
+        {/* Profile Picture */}
+        <section className="rounded-xl border border-light-gray/10 bg-bg-card p-5">
+          <h2 className="mb-4 text-sm font-semibold text-gray">Profile Picture</h2>
+          <div className="flex items-center gap-5">
+            <div className="relative">
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Avatar" className="h-20 w-20 rounded-full object-cover ring-2 ring-light-gray/20" />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-pink/20 to-purple/20 ring-2 ring-light-gray/20">
+                  <Camera size={24} className="text-gray" />
+                </div>
+              )}
+              {uploading && (
+                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-bg/70">
+                  <Loader2 size={20} className="animate-spin text-pink" />
+                </div>
+              )}
+            </div>
+            <div>
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-light-gray/20 px-4 py-2 text-sm font-medium text-[var(--text)] transition-colors hover:border-pink/30 hover:text-pink">
+                <Camera size={14} />
+                {avatarUrl ? "Change" : "Upload"}
+                <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" disabled={uploading} />
+              </label>
+              <p className="mt-1.5 text-xs text-light-gray">JPG, PNG. Max 5MB.</p>
+            </div>
+          </div>
+        </section>
+
         {/* Display Name */}
         <section className="rounded-xl border border-light-gray/10 bg-bg-card p-5">
           <label
@@ -124,7 +177,7 @@ export function SettingsClient({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Your name"
-            className="mb-4 w-full rounded-lg border border-light-gray/20 bg-bg px-4 py-2.5 text-sm text-white placeholder:text-light-gray/50 outline-none transition-colors focus:border-pink"
+            className="mb-4 w-full rounded-lg border border-light-gray/20 bg-bg px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-light-gray/50 outline-none transition-colors focus:border-pink"
           />
           <button
             onClick={handleSave}

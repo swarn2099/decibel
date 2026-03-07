@@ -15,7 +15,7 @@ export default async function SettingsPage() {
 
   const { data: fan } = await admin
     .from("fans")
-    .select("id, email, name")
+    .select("id, email, name, avatar_url")
     .eq("email", user.email!)
     .single();
 
