@@ -28,6 +28,7 @@ interface PassportClientProps {
   fan: PassportFan;
   fanSlug: string;
   timeline: PassportTimelineEntry[];
+  isPublic?: boolean;
 }
 
 const CAPTURE_ICONS = {
@@ -240,7 +241,7 @@ function TimelineEntry({ entry }: { entry: PassportTimelineEntry }) {
   );
 }
 
-export function PassportClient({ fan, fanSlug, timeline }: PassportClientProps) {
+export function PassportClient({ fan, fanSlug, timeline, isPublic = false }: PassportClientProps) {
   const [stats, setStats] = useState<PassportStats | null>(null);
 
   useEffect(() => {
