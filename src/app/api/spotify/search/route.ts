@@ -10,13 +10,18 @@ export async function GET(req: NextRequest) {
 
   const admin = createSupabaseAdmin();
 
-  // Search Decibel DB first
-  const { data: existing } = await admin
+  const MAX_FOLLOWERS = 1_000_000;
+
+  // Search Decibel DB first (exclude mainstream artists with 1M+ followers)
+  const { data: existingRaw } = await admin
     .from("performers")
     .select("id, name, slug, photo_url, genres, follower_count, spotify_url")
     .ilike("name", `%${q}%`)
+    .or(`follower_count.lt.${MAX_FOLLOWERS},follower_count.is.null`)
     .order("follower_count", { ascending: false })
     .limit(5);
+
+  const existing = existingRaw || [];
 
   // Search Spotify
   let spotifyResults: Awaited<ReturnType<typeof searchSpotifyArtists>> = [];
@@ -29,22 +34,20 @@ export async function GET(req: NextRequest) {
   }
 
   // Filter out Spotify results that already exist in Decibel (by spotify_url or exact name match)
-  const existingNames = new Set((existing || []).map((p) => p.name.toLowerCase()));
+  const existingNames = new Set(existing.map((p) => p.name.toLowerCase()));
   const existingSpotifyUrls = new Set(
-    (existing || []).map((p) => p.spotify_url).filter(Boolean)
+    existing.map((p) => p.spotify_url).filter(Boolean)
   );
-
-  const MAX_FOLLOWERS = 1_000_000;
 
   const filtered = spotifyResults.filter(
     (s) =>
       !existingNames.has(s.name.toLowerCase()) &&
       !existingSpotifyUrls.has(s.spotify_url) &&
-      s.followers < MAX_FOLLOWERS
+      (s.followers ?? 0) < MAX_FOLLOWERS
   );
 
   return NextResponse.json({
-    existing: existing || [],
+    existing,
     results: filtered,
     ...(spotifyError && { spotify_error: spotifyError }),
   });
