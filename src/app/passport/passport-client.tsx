@@ -20,6 +20,7 @@ import {
   Download,
   Link2,
   X,
+  Plus,
 } from "lucide-react";
 import { toast } from "sonner";
 import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
@@ -28,6 +29,7 @@ import type {
   PassportTimelineEntry,
   PassportStats,
 } from "@/lib/types/passport";
+import { DiscoverModal } from "./discover-modal";
 
 interface PassportClientProps {
   fan: PassportFan;
@@ -380,9 +382,11 @@ function ShareMenu({
   );
 }
 
-export function PassportClient({ fan, fanSlug, timeline, isPublic = false }: PassportClientProps) {
+export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPublic = false }: PassportClientProps) {
   const [stats, setStats] = useState<PassportStats | null>(null);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showDiscoverModal, setShowDiscoverModal] = useState(false);
+  const [timeline, setTimeline] = useState<PassportTimelineEntry[]>(initialTimeline);
 
   useEffect(() => {
     // Only fetch stats on authenticated view (stats endpoint requires auth)
@@ -454,6 +458,17 @@ export function PassportClient({ fan, fanSlug, timeline, isPublic = false }: Pas
             {fan.city && <span>{fan.city} &middot; </span>}
             Member since {memberSince}
           </p>
+
+          {/* Discover button (authenticated only) */}
+          {!isPublic && (
+            <button
+              onClick={() => setShowDiscoverModal(true)}
+              className="mt-4 inline-flex items-center gap-2 rounded-full border border-pink/30 px-4 py-2 text-sm font-medium text-pink hover:bg-pink/10 transition-colors"
+            >
+              <Plus size={16} />
+              Discover an Artist
+            </button>
+          )}
 
           {/* Summary stats row */}
           <div className="mt-4 flex items-center justify-center gap-4 text-sm">
@@ -606,6 +621,18 @@ export function PassportClient({ fan, fanSlug, timeline, isPublic = false }: Pas
           </div>
         )}
       </div>
+
+      {/* Discover Modal */}
+      {!isPublic && (
+        <DiscoverModal
+          isOpen={showDiscoverModal}
+          onClose={() => setShowDiscoverModal(false)}
+          onDiscovered={(entry) => {
+            setTimeline((prev) => [entry, ...prev]);
+            setShowDiscoverModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
