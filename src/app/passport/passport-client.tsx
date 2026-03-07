@@ -21,7 +21,6 @@ import {
   Link2,
   X,
   Plus,
-  Settings,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -724,13 +723,8 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
         {/* ═══════════════════════════════════════════════════════ */}
         {/* PASSPORT HEADER — compact, like a real passport cover  */}
         {/* ═══════════════════════════════════════════════════════ */}
-        <div className="relative mb-6 rounded-2xl border border-light-gray/10 bg-gradient-to-b from-bg-card to-bg p-6 overflow-hidden">
-          {/* Subtle passport texture */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 20px, currentColor 20px, currentColor 21px)",
-          }} />
-
-          <div className="relative flex items-start gap-4">
+        <div className="relative mb-6 px-2">
+          <div className="flex items-start gap-4">
             {/* Avatar */}
             <div className="relative shrink-0">
               <div className="h-16 w-16 rounded-full bg-gradient-to-br from-pink to-purple flex items-center justify-center text-xl font-bold text-white ring-2 ring-pink/30">
@@ -740,20 +734,9 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
 
             {/* Info */}
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <h1 className="truncate text-xl font-bold text-[var(--text)]">
-                  {fan.name || "Anonymous Fan"}
-                </h1>
-                {!isPublic && (
-                  <Link
-                    href="/settings"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-light-gray/20 text-gray hover:text-pink hover:border-pink/30 transition-colors"
-                    aria-label="Settings"
-                  >
-                    <Settings size={12} />
-                  </Link>
-                )}
-              </div>
+              <h1 className="truncate text-xl font-bold text-[var(--text)]">
+                {fan.name || "Anonymous Fan"}
+              </h1>
               <p className="text-sm text-gray">
                 {fan.city && <span>{fan.city} · </span>}
                 Since {memberSince}
@@ -763,7 +746,7 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
               <div className="mt-2 flex items-center gap-3 text-xs">
                 <span><span className="font-bold text-pink">{uniqueArtists}</span> <span className="text-gray">artists</span></span>
                 <span><span className="font-bold text-purple">{verifiedCount}</span> <span className="text-gray">verified</span></span>
-                <span><span className="font-bold text-blue">{timeline.length}</span> <span className="text-gray">shows</span></span>
+                <span><span className="font-bold text-blue">{verifiedCount}</span> <span className="text-gray">shows</span></span>
               </div>
 
               <SocialCounts fanId={fan.id} isOwner={!isPublic} currentUserId={viewerFanId} />
@@ -791,6 +774,9 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
               </div>
             )}
           </div>
+
+          {/* Divider */}
+          <div className="mt-4 border-t border-light-gray/10" />
         </div>
 
         {/* ═══════════════════════════════════════════════════════ */}
