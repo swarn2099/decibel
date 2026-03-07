@@ -28,7 +28,7 @@ export default async function PassportPage() {
   // Find fan by email
   const { data: fan } = await admin
     .from("fans")
-    .select("id, email, name, city, created_at")
+    .select("id, email, name, city, created_at, avatar_url")
     .eq("email", user.email!)
     .single();
 

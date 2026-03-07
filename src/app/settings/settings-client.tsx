@@ -99,7 +99,7 @@ export function SettingsClient({
       <header className="border-b border-light-gray/10 px-6 py-4">
         <div className="mx-auto flex max-w-md items-center gap-3">
           <Link
-            href="/profile"
+            href="/passport"
             className="flex h-8 w-8 items-center justify-center rounded-lg border border-light-gray/20 text-gray transition-colors hover:border-pink/30 hover:text-pink"
           >
             <ArrowLeft size={16} />

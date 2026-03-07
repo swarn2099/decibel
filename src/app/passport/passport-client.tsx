@@ -21,6 +21,7 @@ import {
   Link2,
   X,
   Plus,
+  Settings,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -550,9 +551,20 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
               </div>
             )}
           </div>
-          <h1 className="text-2xl font-bold text-[var(--text)]">
-            {fan.name || "Anonymous Fan"}
-          </h1>
+          <div className="flex items-center justify-center gap-2">
+            <h1 className="text-2xl font-bold text-[var(--text)]">
+              {fan.name || "Anonymous Fan"}
+            </h1>
+            {!isPublic && (
+              <Link
+                href="/settings"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-light-gray/20 text-gray hover:text-pink hover:border-pink/30 transition-colors"
+                aria-label="Settings"
+              >
+                <Settings size={14} />
+              </Link>
+            )}
+          </div>
           <p className="mt-1 text-sm text-gray">
             {fan.city && <span>{fan.city} &middot; </span>}
             Member since {memberSince}
@@ -607,7 +619,7 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
               Your Sound Stats
             </h2>
             {stats ? (
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3">
                 <StatCard
                   label="Dancefloors"
                   value={stats.totalShows}
@@ -663,6 +675,11 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
                   label="Current Streak"
                   value={stats.currentStreak > 0 ? `${stats.currentStreak}w` : "--"}
                   icon={Flame}
+                />
+                <StatCard
+                  label="Member Since"
+                  value={new Date(fan.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+                  icon={Star}
                 />
                 {stats.mostCollectedArtist && (
                   <StatCard
