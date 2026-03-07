@@ -258,7 +258,7 @@ async function probeSpotify(
 async function resolveSoundCloud(
   identifier: string,
   url: string
-): Promise<Partial<ResolvedArtist>> {
+): Promise<Partial<ResolvedArtist> & { followers_count?: number }> {
   try {
     const scUrl = url.startsWith("http")
       ? url
@@ -273,6 +273,7 @@ async function resolveSoundCloud(
       name: data.username || formatName(identifier),
       photo_url: data.avatar_url?.replace("-large", "-t500x500"),
       soundcloud_url: data.permalink_url || scUrl,
+      followers_count: data.followers_count ?? undefined,
     };
   } catch {
     return {
@@ -457,14 +458,60 @@ export async function POST(req: NextRequest) {
 
     const { platform, identifier } = detected;
 
+    const MAX_FOLLOWERS = 1_000_000;
+
     // Resolve artist metadata (Instagram gets full enrichment)
-    let partial: Partial<ResolvedArtist>;
+    let partial: Partial<ResolvedArtist> & { followers_count?: number; followers?: number };
     if (platform === "instagram") {
       partial = await resolveInstagram(identifier, url.trim());
     } else if (platform === "soundcloud") {
       partial = await resolveSoundCloud(identifier, url.trim());
     } else {
       partial = resolveFromUrl(platform, identifier, url.trim());
+    }
+
+    // For Spotify links, fetch the artist directly to get follower count
+    if (platform === "spotify" && identifier) {
+      try {
+        const { getSpotifyArtist } = await import("@/lib/spotify");
+        const spotifyArtist = await getSpotifyArtist(identifier);
+        if (spotifyArtist) {
+          partial.name = spotifyArtist.name;
+          partial.photo_url = spotifyArtist.photo_url || undefined;
+          partial.genres = spotifyArtist.genres;
+          partial.spotify_id = spotifyArtist.id;
+          partial.spotify_url = spotifyArtist.spotify_url;
+          partial.followers = spotifyArtist.followers;
+        }
+      } catch {
+        // Continue without follower data
+      }
+    }
+
+    // Check follower counts from any platform — reject mainstream artists
+    const followerCount = partial.followers_count ?? partial.followers ?? 0;
+    if (followerCount >= MAX_FOLLOWERS) {
+      return NextResponse.json({
+        resolved: false,
+        error: `This artist has ${(followerCount / 1_000_000).toFixed(1)}M followers — Decibel is for underground and emerging artists.`,
+      } satisfies LinkResolveResponse);
+    }
+
+    // If we found a Spotify match via cross-platform search, check those followers too
+    if (!partial.spotify_id && partial.name) {
+      const spotifyData = await probeSpotify(partial.name);
+      if (spotifyData.followers && spotifyData.followers >= MAX_FOLLOWERS) {
+        return NextResponse.json({
+          resolved: false,
+          error: `This artist has ${(spotifyData.followers / 1_000_000).toFixed(1)}M listeners — Decibel is for underground and emerging artists.`,
+        } satisfies LinkResolveResponse);
+      }
+      if (spotifyData.spotify_id) {
+        partial.spotify_id = spotifyData.spotify_id;
+        partial.spotify_url = spotifyData.spotify_url;
+        if (!partial.photo_url && spotifyData.photo_url) partial.photo_url = spotifyData.photo_url;
+        if (spotifyData.genres?.length) partial.genres = spotifyData.genres;
+      }
     }
 
     const artist: ResolvedArtist = {
