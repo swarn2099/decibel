@@ -177,6 +177,7 @@ export default async function PublicPassportPage({ params }: Props) {
     city: fan.city,
     created_at: fan.created_at,
     avatar_url: fan.avatar_url ?? null,
+    spotify_connected_at: null,
   };
 
   // Check viewer identity

@@ -23,6 +23,7 @@ interface ImportResults {
 
 interface SpotifyImportProps {
   onImportComplete: () => void;
+  isConnected?: boolean;
 }
 
 function SpotifyIcon({ className }: { className?: string }) {
@@ -51,20 +52,19 @@ function AppleMusicIcon({ className }: { className?: string }) {
   );
 }
 
-export function SpotifyImport({ onImportComplete }: SpotifyImportProps) {
+export function SpotifyImport({ onImportComplete, isConnected = false }: SpotifyImportProps) {
   const searchParams = useSearchParams();
   const [importStatus, setImportStatus] = useState<
-    "idle" | "importing" | "done" | "error"
-  >("idle");
+    "idle" | "connected" | "importing" | "done" | "error"
+  >(isConnected ? "connected" : "idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [importResults, setImportResults] = useState<ImportResults | null>(
     null
   );
-  const [spotifyConnected, setSpotifyConnected] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get("spotify") === "connected" && !spotifyConnected) {
-      setSpotifyConnected(true);
+    if (searchParams.get("spotify") === "connected" && importStatus === "idle") {
+      setImportStatus("importing");
       triggerImport();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,6 +120,32 @@ export function SpotifyImport({ onImportComplete }: SpotifyImportProps) {
               className="rounded-full bg-[#1DB954] px-5 py-2 text-sm font-semibold text-black transition-all hover:bg-[#1ed760] hover:scale-105"
             >
               Connect
+            </button>
+          </div>
+        )}
+
+        {importStatus === "connected" && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <SpotifyIcon className="h-8 w-8 text-[#1DB954]" />
+              <div>
+                <h3 className="font-semibold text-[var(--text)]">
+                  Spotify Connected
+                </h3>
+                <p className="text-sm text-gray">
+                  Your top artists have been imported
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setImportStatus("importing");
+                triggerImport();
+              }}
+              className="flex items-center gap-2 rounded-full border border-[#1DB954]/30 px-4 py-2 text-sm font-medium text-[#1DB954] transition-colors hover:bg-[#1DB954]/10"
+            >
+              <RefreshCw size={14} />
+              Re-import
             </button>
           </div>
         )}

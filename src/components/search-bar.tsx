@@ -100,7 +100,7 @@ export function SearchBar({ className = "" }: { className?: string }) {
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-light-gray" />
       <input
         type="text"
-        placeholder="Search artists or genres..."
+        placeholder="Search artists, genres, or users..."
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         onFocus={() => { if (results.length > 0) setOpen(true); }}
@@ -167,7 +167,7 @@ export function SearchBar({ className = "" }: { className?: string }) {
                 <>
                   {results.length > 0 && (
                     <div className="border-t border-light-gray/10 px-4 py-1.5">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-light-gray">People</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-light-gray">Decibel Users</p>
                     </div>
                   )}
                   {fanResults.map((f) => (
@@ -190,7 +190,7 @@ export function SearchBar({ className = "" }: { className?: string }) {
                       )}
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{f.name}</p>
-                        <p className="text-xs text-light-gray">Fan passport</p>
+                        <p className="text-xs text-light-gray">Decibel User</p>
                       </div>
                     </Link>
                   ))}

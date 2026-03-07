@@ -939,7 +939,7 @@ export function PassportClient({ fan, fanSlug, timeline: initialTimeline, isPubl
             <h2 className="mb-4 text-lg font-bold text-[var(--text)]">
               Music Connections
             </h2>
-            <SpotifyImport onImportComplete={() => { router.refresh(); evaluateBadges(); }} />
+            <SpotifyImport onImportComplete={() => { router.refresh(); evaluateBadges(); }} isConnected={!!fan.spotify_connected_at} />
           </section>
         )}
 

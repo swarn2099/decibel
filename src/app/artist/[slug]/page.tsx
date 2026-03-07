@@ -14,8 +14,10 @@ import {
   BadgeCheck,
   Crown,
 } from "lucide-react";
+import Image from "next/image";
 import { PerformerImage } from "@/components/performer-image";
 import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
+import { generateFanSlug } from "@/lib/fan-slug";
 import { ArtistActions } from "./artist-actions";
 import { ClaimBanner } from "./claim-banner";
 
@@ -191,23 +193,29 @@ async function getPastEvents(performerId: string): Promise<Event[]> {
 
 async function getFounder(
   performerId: string
-): Promise<{ name: string; awarded_at: string } | null> {
+): Promise<{ name: string; slug: string; avatar_url: string | null; awarded_at: string } | null> {
   const supabase = await createSupabaseServer();
   const { data: badge } = await supabase
     .from("founder_badges")
-    .select("awarded_at, fans(name, email)")
+    .select("awarded_at, fans(id, name, email, avatar_url)")
     .eq("performer_id", performerId)
     .maybeSingle();
 
   if (!badge) return null;
 
   const fan = badge.fans as unknown as {
+    id: string;
     name: string | null;
     email: string;
+    avatar_url: string | null;
   } | null;
 
+  if (!fan) return null;
+
   return {
-    name: fan?.name || fan?.email?.split("@")[0] || "A fan",
+    name: fan.name || fan.email?.split("@")[0] || "A fan",
+    slug: generateFanSlug({ name: fan.name, id: fan.id }),
+    avatar_url: fan.avatar_url,
     awarded_at: badge.awarded_at,
   };
 }
@@ -508,13 +516,29 @@ export default async function ArtistPage({ params }: { params: Params }) {
       {/* ───── Founder Badge ───── */}
       {founder && (
         <div className="mx-auto max-w-4xl px-6 pb-4">
-          <div className="flex items-center gap-2 rounded-xl border border-yellow/20 bg-yellow/5 px-4 py-3">
+          <Link
+            href={`/passport/${founder.slug}`}
+            className="flex items-center gap-3 rounded-xl border border-yellow/20 bg-yellow/5 px-4 py-3 transition-all hover:border-yellow/40 hover:bg-yellow/10"
+          >
             <Crown size={16} className="shrink-0 text-yellow" />
+            {founder.avatar_url ? (
+              <Image
+                src={founder.avatar_url}
+                alt={founder.name}
+                width={24}
+                height={24}
+                className="h-6 w-6 rounded-full object-cover ring-1 ring-yellow/30"
+              />
+            ) : (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-yellow/20 text-[10px] font-bold text-yellow ring-1 ring-yellow/30">
+                {founder.name.charAt(0).toUpperCase()}
+              </div>
+            )}
             <p className="text-sm text-yellow">
               Added to Decibel by{" "}
               <span className="font-semibold">{founder.name}</span>
             </p>
-          </div>
+          </Link>
         </div>
       )}
 

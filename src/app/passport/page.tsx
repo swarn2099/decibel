@@ -28,7 +28,7 @@ export default async function PassportPage() {
   // Find fan by email
   const { data: fan } = await admin
     .from("fans")
-    .select("id, email, name, city, created_at, avatar_url")
+    .select("id, email, name, city, created_at, avatar_url, spotify_connected_at")
     .eq("email", user.email!)
     .single();
 
@@ -40,6 +40,7 @@ export default async function PassportPage() {
       city: null,
       created_at: new Date().toISOString(),
       avatar_url: null,
+      spotify_connected_at: null,
     };
     return <PassportClient fan={emptyFan} fanSlug={user.id.slice(0, 8)} timeline={[]} />;
   }
@@ -51,6 +52,7 @@ export default async function PassportPage() {
     city: fan.city,
     created_at: fan.created_at,
     avatar_url: fan.avatar_url,
+    spotify_connected_at: fan.spotify_connected_at,
   };
 
   const fanSlug = fan.name ? slugify(fan.name) : fan.id.slice(0, 8);

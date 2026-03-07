@@ -5,6 +5,7 @@ export interface PassportFan {
   city: string | null;
   created_at: string; // "member since" date
   avatar_url: string | null;
+  spotify_connected_at: string | null;
 }
 
 export interface PassportTimelineEntry {
