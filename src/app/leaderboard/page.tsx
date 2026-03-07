@@ -28,6 +28,7 @@ export type FounderEntry = {
   rank: number;
   fanId: string;
   name: string;
+  slug: string;
   avatarUrl: string | null;
   foundedCount: number;
 };
@@ -193,13 +194,19 @@ async function fetchFounderLeaderboard(
     (fans || []).map((f) => [f.id, { name: f.name || "Anonymous", avatarUrl: f.avatar_url }])
   );
 
-  const topFounders: FounderEntry[] = sortedFounders.map(([fanId, count], i) => ({
-    rank: i + 1,
-    fanId,
-    name: fanMap.get(fanId)?.name || "Anonymous",
-    avatarUrl: fanMap.get(fanId)?.avatarUrl || null,
-    foundedCount: count,
-  }));
+  const { generateFanSlug } = await import("@/lib/fan-slug");
+
+  const topFounders: FounderEntry[] = sortedFounders.map(([fanId, count], i) => {
+    const name = fanMap.get(fanId)?.name || "Anonymous";
+    return {
+      rank: i + 1,
+      fanId,
+      name,
+      slug: generateFanSlug({ name: name === "Anonymous" ? null : name, id: fanId }),
+      avatarUrl: fanMap.get(fanId)?.avatarUrl || null,
+      foundedCount: count,
+    };
+  });
 
   // --- Founded artists by follower count ---
   const performerIds = badges.map((b) => b.performer_id);
@@ -225,8 +232,6 @@ async function fetchFounderLeaderboard(
   const allFanMap = new Map(
     (allFans || []).map((f) => [f.id, f.name || "Anonymous"])
   );
-
-  const { generateFanSlug } = await import("@/lib/fan-slug");
 
   const foundedArtists: FoundedArtistEntry[] = (performers || []).map((p, i) => {
     const founderId = performerToFounder.get(p.id) || "";
