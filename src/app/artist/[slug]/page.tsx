@@ -10,11 +10,13 @@ import {
   Music,
   Users,
   Clock,
-  Play,
   History,
+  BadgeCheck,
 } from "lucide-react";
 import { PerformerImage } from "@/components/performer-image";
 import { TIER_COLORS, TIER_LABELS } from "@/lib/tiers";
+import { ArtistActions } from "./artist-actions";
+import { ClaimBanner } from "./claim-banner";
 
 type Params = Promise<{ slug: string }>;
 
@@ -395,8 +397,11 @@ export default async function ArtistPage({ params }: { params: Params }) {
               </div>
             )}
 
-            <h1 className="mb-2 text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="mb-2 flex items-center gap-3 text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
               {performer.name}
+              {performer.claimed && (
+                <BadgeCheck className="h-7 w-7 shrink-0 text-teal sm:h-9 sm:w-9" aria-label="Verified performer" />
+              )}
             </h1>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray">
@@ -428,49 +433,57 @@ export default async function ArtistPage({ params }: { params: Params }) {
 
       {/* ───── Action Bar ───── */}
       <div className="mx-auto max-w-4xl px-6 py-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Link
-            href={`/collect/${performer.slug}`}
-            className={`flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r ${gradFrom} ${gradTo} px-10 py-4 text-base font-extrabold text-[var(--text)] shadow-[0_0_20px_rgba(255,77,106,0.4)] transition-all hover:scale-105 hover:shadow-xl sm:w-auto`}
-          >
-            <Play className="h-5 w-5 fill-current" />
-            Collect
-          </Link>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <ArtistActions
+            performerId={performer.id}
+            performerSlug={performer.slug}
+            performerName={performer.name}
+            nextShowVenue={upcomingEvents[0]?.venue?.name ?? null}
+            gradFrom={gradFrom}
+            gradTo={gradTo}
+          />
+        </div>
 
-          {/* Social link pills (desktop) */}
-          <div className="hidden items-center gap-3 sm:flex">
-            {socialLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center gap-2 rounded-full border border-light-gray/20 px-4 py-2.5 text-xs font-medium transition-all hover:bg-bg-card ${link.hoverBorder}`}
-                title={link.label}
-              >
-                <link.icon className={`h-4 w-4 ${link.color}`} />
-                <span className="text-[var(--text-muted)]">{link.label}</span>
-              </a>
-            ))}
-          </div>
+        {/* Social link pills */}
+        <div className="mt-4 hidden items-center gap-3 sm:flex">
+          {socialLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-2 rounded-full border border-light-gray/20 px-4 py-2.5 text-xs font-medium transition-all hover:bg-bg-card ${link.hoverBorder}`}
+              title={link.label}
+            >
+              <link.icon className={`h-4 w-4 ${link.color}`} />
+              <span className="text-[var(--text-muted)]">{link.label}</span>
+            </a>
+          ))}
+        </div>
 
-          {/* Mobile social icons */}
-          <div className="flex items-center justify-center gap-2 sm:hidden">
-            {socialLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center justify-center rounded-full border border-light-gray/20 p-2.5 transition-all hover:bg-bg-card ${link.hoverBorder}`}
-                title={link.label}
-              >
-                <link.icon className={`h-4 w-4 ${link.color}`} />
-              </a>
-            ))}
-          </div>
+        {/* Mobile social icons */}
+        <div className="mt-4 flex items-center justify-center gap-2 sm:hidden">
+          {socialLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center justify-center rounded-full border border-light-gray/20 p-2.5 transition-all hover:bg-bg-card ${link.hoverBorder}`}
+              title={link.label}
+            >
+              <link.icon className={`h-4 w-4 ${link.color}`} />
+            </a>
+          ))}
         </div>
       </div>
+
+      {/* ───── Claim Banner (unclaimed only) ───── */}
+      {!performer.claimed && (
+        <div className="mx-auto max-w-4xl px-6 pb-6">
+          <ClaimBanner performerId={performer.id} performerName={performer.name} />
+        </div>
+      )}
 
       {/* ───── Content ───── */}
       <div className="mx-auto max-w-4xl px-6 pb-20">
