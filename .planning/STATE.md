@@ -2,14 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
-status: in_progress
-last_updated: "2026-03-08"
-last_activity: 2026-03-08 — Completed 17-01 Home Feed plan
+status: executing
+stopped_at: Completed 17-02-PLAN.md (Artist Profile)
+last_updated: "2026-03-08T23:42:23Z"
+last_activity: 2026-03-08 -- Completed 17-02 Artist Profile (hooks, route, 7 UI components)
 progress:
   total_phases: 8
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 2
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
   percent: 12
 ---
 
@@ -25,16 +26,16 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 17 of 23 (Home Feed + Artist Profiles + Collection)
-Plan: 1 of 3 complete in current phase
+Plan: 2 of 3 complete in current phase
 Status: Executing Phase 17
-Last activity: 2026-03-08 -- Completed 17-01 Home Feed (types, hooks, UI components)
+Last activity: 2026-03-08 -- Completed 17-02 Artist Profile (hooks, route, 7 UI components)
 
 Progress: [##________] 12% (1/8 v3.0 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 2)
+- Total plans completed: 25 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 3)
 - Average duration: --
 - Total execution time: --
 
@@ -43,7 +44,7 @@ Progress: [##________] 12% (1/8 v3.0 phases complete)
 | Phase | Plans | Status |
 |-------|-------|--------|
 | 16. Setup + Nav + Auth | 1/1 | Complete |
-| 17. Home + Profiles + Collection | 1/3 | In progress |
+| 17. Home + Profiles + Collection | 2/3 | In progress |
 | 18. Passport + Badges + Sharing | TBD | Not started |
 | 19. Search + Add + Share Ext | TBD | Not started |
 | 20. Location-Based Collection | TBD | Not started |
@@ -63,6 +64,9 @@ Progress: [##________] 12% (1/8 v3.0 phases complete)
 - [17-01] Pink accent title instead of gradient text (avoids MaskedView dep, defer to Polish phase)
 - [17-01] Weekend range logic ported from web for consistent event date calculations
 - [17-01] TanStack Query staleTime: 5min events/recent, 10min residents
+- [17-02] Direct Supabase queries for artist data (not web API routes)
+- [17-02] Linking.openURL for all external links (no WebView embeds)
+- [17-02] Deterministic gradient pairs from name hash for fallback avatars
 
 ### Pending Todos
 
@@ -77,5 +81,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Completed 17-01-PLAN.md (Home Feed)
+Stopped at: Completed 17-02-PLAN.md (Artist Profile)
 Resume file: None

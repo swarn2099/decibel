@@ -27,11 +27,11 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 
 ### Artist Profiles
 
-- [ ] **PROF-01**: Fan can view artist profile with full-width hero photo, name, genres, city, fan count
-- [ ] **PROF-02**: Fan can tap social links (Spotify, SoundCloud, Instagram, RA) to open in respective app or browser
-- [ ] **PROF-03**: Fan can view top tracks/mixes section on artist profile
-- [ ] **PROF-04**: Fan can view upcoming shows on artist profile
-- [ ] **PROF-05**: Fan can see founder badge and similar artists on artist profile
+- [x] **PROF-01**: Fan can view artist profile with full-width hero photo, name, genres, city, fan count
+- [x] **PROF-02**: Fan can tap social links (Spotify, SoundCloud, Instagram, RA) to open in respective app or browser
+- [x] **PROF-03**: Fan can view top tracks/mixes section on artist profile
+- [x] **PROF-04**: Fan can view upcoming shows on artist profile
+- [x] **PROF-05**: Fan can see founder badge and similar artists on artist profile
 
 ### Collection Flow
 
