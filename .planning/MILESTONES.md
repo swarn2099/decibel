@@ -1,5 +1,21 @@
 # Milestones
 
+## v2.0 The Passport (Shipped: 2026-03-07)
+
+**Phases:** 11-15 (5 phases, 13 plans)
+**Timeline:** 2026-03-07
+
+**Key accomplishments:**
+- Passport visual overhaul with timeline, stats dashboard, and public passport URL
+- Online discovery: add artists from Spotify/SoundCloud links, Spotify OAuth import, recommendations
+- Badge system: 17 badge types across 5 categories with evaluation engine and retroactive backfill
+- Enhanced artist profiles: Spotify embed, fan stats, similar artists, Collect vs Discover CTAs, claim flow
+- Passport sharing: shareable cards (5 variants), follow system, activity feed, contact discovery
+
+**Archive:** `milestones/v1.1-phases/11-* through 15-*`
+
+---
+
 ## v1.2 Polish, Map, and Pipeline Fixes (Shipped: 2026-03-07)
 
 **Phases:** 8-10 (3 phases, 5 plans)

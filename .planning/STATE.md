@@ -1,35 +1,35 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: The Passport
-status: completed
-last_updated: "2026-03-07T06:30:46.091Z"
-last_activity: 2026-03-07 — Completed 15-03-PLAN.md
+milestone: v3.0
+milestone_name: Decibel Mobile
+status: in_progress
+last_updated: "2026-03-08"
+last_activity: 2026-03-08 — Milestone v3.0 started
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-07)
+See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v2.0 — The Passport (Phase 15: Passport Sharing & Social)
+**Current focus:** v3.0 — Decibel Mobile
 
 ## Current Position
 
-Phase: 15 of 15 (Passport Sharing & Social)
-Plan: 3 of 3 complete
-Status: Complete
-Last activity: 2026-03-07 — Completed 15-03-PLAN.md
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-08 — Milestone v3.0 started
 
-Progress: [██████████] 100% (v2.0 phases) | Plan 3/3 in Phase 15 -- PHASE COMPLETE
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -42,45 +42,8 @@ Progress: [██████████] 100% (v2.0 phases) | Plan 3/3 in Phas
 
 ### Decisions
 
-- [11-01] Fan slug computed at query time (no DB migration) — slugify name or first 8 chars of ID
-- [11-01] Stats fetched client-side via /api/passport/stats to keep page SSR fast
-- [11-01] /profile redirects to /passport for backward compatibility
-- [11-02] OG and story card use query params for data (edge runtime can't use Supabase Node client)
-- [11-02] Stats section hidden on public passport since stats API requires auth
-- [11-02] Web Share API used on mobile with download fallback on desktop
-- [12-01] SoundCloud widget API for rich metadata; other platforms extract from URL slug
-- [12-01] Auto-create fan record via upsert if missing during discovery flow
-- [12-01] Timeline lifted to React state for instant discovery prepend
-- [12-03] Genre overlap via Supabase .overlaps() filter for recommendation matching
-- [12-03] Performers with upcoming events prioritized in recommendations
-- [12-03] Fallback to popular performers when no genre overlap exists
-
-Decisions are logged in PROJECT.md Key Decisions table.
-- [Phase 12-02]: Spotify token stored in httpOnly cookie and deleted after import (one-time-use pattern)
-- [Phase 12-02]: Artist matching uses case-insensitive ILIKE on performer name
-- [Phase 12-02]: Auto-create performer from Spotify data if not in DB
-- [Phase 13-01]: Badge evaluation is a pure function (evaluateBadges) with no DB calls for testability
-- [Phase 13-01]: fan_badges table SQL documented as manual prerequisite (Supabase JS client can't run DDL)
-- [Phase 13-01]: Connector badge uses 10+ collections as proxy until share tracking exists
-- [Phase 13-02]: Badge showcase placed between stats and recommendations; public passport fetches badges server-side
-- [Phase 14-01]: Spotify embed uses dark theme (theme=0) at 352px height for top tracks view
-- [Phase 14-01]: Fan stats and similar artists fetched server-side via Promise.all for SSR performance
-- [Phase 14-01]: Similar artists limited to 8, ordered by follower_count desc, using .overlaps() genre matching
-- [Phase 14]: Journey state derived from collections + fan_tiers tables (no new DB migration needed)
-- [Phase 14]: ArtistActions fetches journey on mount via client-side fetch for SSR compatibility
-- [Phase 14]: Gradient props passed from server to client component for visual consistency
-- [Phase 14-03]: Used signInWithOtp with emailRedirectTo claim param for magic link claim flow
-- [Phase 14-03]: Auth callback handles claim query param to auto-claim performer post-verification
-- [Phase 14-03]: Default auth callback redirect changed from /profile to /passport
-- [Phase 15-02]: Follow status checked via followers list scan (not dedicated check endpoint)
-- [Phase 15-02]: Privacy enforcement server-side in public passport page
-- [Phase 15-02]: fan_follows uses DB-level no_self_follow constraint for defense in depth
-- [Phase 15-02]: countOnly query param on followers/following endpoints for efficient count fetching
-- [Phase 15]: All share card endpoints use edge runtime with query params (consistent with Phase 11 decision)
-- [Phase 15-03]: Feed merges collections + badges from followed fans, sorted by timestamp
-- [Phase 15-03]: Privacy enforcement server-side: private excluded, mutual requires bidirectional follow
-- [Phase 15-03]: Contact tracking uses localStorage for web notification without push infrastructure
-- [Phase 15-03]: ContactCheck UI embedded inline in ActivityFeed section
+- [v2.0] All decisions from v2.0 preserved in PROJECT.md Key Decisions table
+- [v3.0] Mobile project initialized at /home/swarn/decibel/mobile/ (Phase 1 complete pre-GSD)
 
 ### Pending Todos
 
@@ -89,3 +52,4 @@ None.
 ### Blockers/Concerns
 
 - [Phase 1]: RLS policies written but not yet applied -- need DB password or Supabase CLI login to deploy
+- Spotify app in Development Mode -- search/import may fail for non-registered users

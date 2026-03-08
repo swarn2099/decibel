@@ -32,59 +32,42 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 
 ### Active
 
-#### Passport Visual Overhaul
-- [ ] Rich passport layout with timeline, stats dashboard, tier badges
-- [ ] "Your Year in Sound" stats section (dancefloors, cities, artists, streaks)
-- [ ] Shareable 1080x1920 story-ready passport card generation
-- [ ] Public passport page at /passport/[fan-slug] with OG meta tags
+#### React Native Mobile App
+- [ ] Expo project with tab navigation, auth, design system, Supabase connection
+- [ ] Home feed with upcoming events, featured artists, pull-to-refresh
+- [ ] Artist profile screens with Collect/Discover flows
+- [ ] Rich passport with stamps, badges, stats, shareable cards
+- [ ] Search + add artist with Spotify search and founder badge
+- [ ] Location-based venue detection and collection prompting
+- [ ] Native map with dark theme, venue markers, genre filters
+- [ ] Push notifications (nearby events, badges, tier-ups, friend activity)
+- [ ] Polish, animations, offline support, App Store submission
 
-#### Online Discovery
-- [ ] Add artist from link (Spotify, SoundCloud, RA, Instagram, TikTok)
-- [ ] Auto-scraping pipeline for artists not yet in database
-- [ ] Spotify OAuth integration importing top artists as discoveries
-- [ ] Smart recommendations based on collection + listening data
+## Current Milestone: v3.0 — Decibel Mobile
 
-#### Badges and Gamification
-- [ ] Discovery badges (Trailblazer, First 100, First 10 Verified)
-- [ ] Attendance badges (Regular, Devotee, Inner Circle, Venue Local/Legend)
-- [ ] Exploration badges (Genre Explorer, City Hopper, Night Owl, Scene Veteran, Centurion)
-- [ ] Streak badges (On Fire, Unstoppable, Year-Round)
-- [ ] Social badges (Tastemaker, Connector)
-- [ ] Badge display with rarity tiers, unlock animations
-
-#### Enhanced Artist Profiles
-- [ ] Profile enrichment (top tracks, fan stats, similar artists, past shows)
-- [ ] Spotify/SoundCloud embeds on profiles
-- [ ] Distinct "Collect" vs "Discover" CTAs
-- [ ] Artist claim flow (magic link + SoundCloud/Spotify verification)
-
-#### Passport Sharing and Social
-- [ ] Shareable cards (single-artist, milestone, badge, discovery, stats)
-- [ ] Activity feed showing friend collections, discoveries, badges
-- [ ] Follow system (follow/unfollow, mutual followers)
-- [ ] Contact-based "someone you know joined" notifications
-
-## Current Milestone: v2.0 — The Passport
-
-**Goal:** Transform the fan passport into a rich, visual, shareable experience that fans screenshot and post — the hero screen of the entire product.
+**Goal:** Build the React Native (Expo) mobile app that mirrors the web experience and adds native capabilities: location-based collection, push notifications, and share extension.
 
 **Target features:**
-- Passport visual overhaul with timeline, stats, and public shareable URL
-- Online discovery + add artists from any link + Spotify integration
-- Badge system rewarding attendance, discovery, streaks, and social activity
-- Enhanced artist profiles with distinct Collect vs Discover flows
-- Passport sharing with story-ready cards, activity feed, and follow system
+- Home feed with upcoming events and artist discovery
+- Artist profiles with Collect/Discover CTAs
+- Rich passport with stamp-style collections, badges, stats, and shareable cards
+- Search + add artist from Spotify with founder badge
+- Location-based venue detection and auto-collection prompting
+- Native dark-themed scene map with venue markers
+- Push notifications for nearby events, badge unlocks, friend activity
+- App Store-ready polish with animations, offline support, and TestFlight
 
 ### Out of Scope
 
-- React Native mobile app — not in current scope, future milestone
 - SMS OTP auth — future milestone
-- Location-based passive detection — future milestone (requires mobile app)
 - Email receipt parsing (AXS, DICE, Eventbrite) — future milestone
 - Real-time fan count via Supabase Realtime — nice-to-have
 - SendGrid email delivery for messages — stubbed for now, real delivery later
 - Payments/credits — explicitly off per product rules
 - Song requests / tipping — anti-features for underground scene
+- Background location tracking — foreground only, "While Using" permission
+- Apple Music integration — stub UI only ("Coming soon in mobile app")
+- Performer dashboard in mobile — web only for now
 
 ## Context
 
@@ -98,11 +81,14 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 - **Scrapers**: `scripts/scrapers/` — EDMTrain, RA GraphQL, DICE API, SoundCloud enrichment
 - **Design tokens**: bg=#0B0B0F, pink=#FF4D6A, purple=#9B6DFF, blue=#4D9AFF, teal=#00D4AA, yellow=#FFD700
 - **Font**: Poppins via next/font/google
-- **Milestones shipped**: v1.0 MVP (Phases 1-4), v1.1 Growth Mechanics (Phases 5-7), v1.2 Polish/Map/Pipeline (Phases 8-10)
+- **Milestones shipped**: v1.0 MVP (Phases 1-4), v1.1 Growth Mechanics (Phases 5-7), v1.2 Polish/Map/Pipeline (Phases 8-10), v2.0 The Passport (Phases 11-15)
+- **Mobile app**: `/home/swarn/decibel/mobile/` — Expo project initialized with tab nav, auth, design system (Phase 1 complete)
+- **Mobile stack**: React Native + Expo SDK 52+, Expo Router, NativeWind, TanStack Query, Zustand, Supabase (shared DB)
 
 ## Constraints
 
-- **Tech stack**: Next.js 15, TypeScript, Tailwind, Supabase — established
+- **Tech stack (web)**: Next.js 15, TypeScript, Tailwind, Supabase — established
+- **Tech stack (mobile)**: React Native, Expo SDK 52+, Expo Router, NativeWind, TanStack Query, Zustand — established in Phase 1
 - **Design**: Dark underground aesthetic — no generic AI/corporate looks
 - **Fan cost**: Always free. Never charge fans.
 - **Capture speed**: QR scan -> collection must complete in under 5 seconds, no app install
@@ -123,6 +109,10 @@ Fans can scan a QR code at a live show and instantly collect that performer — 
 | Pre-fetch all leaderboard time periods server-side | Instant client-side toggle, no loading states | ✓ Good |
 | Optional outputDir param on content generators | Keeps standalone usage unchanged while enabling batch orchestration | ✓ Good |
 | RA GraphQL + DICE API for event scraping | 5x more events than EDMTrain alone, no Playwright needed | ✓ Good |
+| React Native + Expo for mobile | Shared TypeScript codebase, Expo Router mirrors Next.js patterns, EAS for builds | ✓ Good |
+| Shared Supabase backend | Same DB, same auth, same APIs — no backend duplication | ✓ Good |
+| NativeWind for mobile styling | Tailwind patterns carry over from web, same design tokens | ✓ Good |
+| Foreground-only location | "While Using" permission only, no background tracking — privacy-first | ✓ Good |
 
 ---
-*Last updated: 2026-03-07 after v2.0 milestone start*
+*Last updated: 2026-03-08 after v3.0 milestone start*
