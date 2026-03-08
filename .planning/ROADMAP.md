@@ -88,7 +88,12 @@ Plans:
   3. Fan can tap "Collect" on an artist profile (with location check) and see a confirmation animation with artist name, date, and tier badge
   4. Fan can tap "Discover" on an artist profile to add an online discovery to their passport
   5. After collecting or discovering, fan is prompted to share a generated card
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 17-01-PLAN.md -- Home feed with events, resident artists, recently added, pull-to-refresh
+- [ ] 17-02-PLAN.md -- Artist profile screen with hero, stats, social links, shows, similar artists
+- [ ] 17-03-PLAN.md -- Collect/discover flow with confirmation animation and share prompt
 
 ### Phase 18: Passport + Badges + Sharing
 **Goal**: Fan has a rich, visual passport showing their collection history, badges, and stats -- and can share any of it as branded cards
@@ -183,7 +188,7 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 14. Enhanced Artist Profiles | v2.0 | 3/3 | Complete | 2026-03-07 |
 | 15. Passport Sharing and Social | v2.0 | 3/3 | Complete | 2026-03-07 |
 | 16. Setup + Navigation + Auth | v3.0 | 1/1 | Complete | 2026-03-08 |
-| 17. Home Feed + Artist Profiles + Collection | v3.0 | 0/? | Not started | - |
+| 17. Home Feed + Artist Profiles + Collection | v3.0 | 0/3 | Not started | - |
 | 18. Passport + Badges + Sharing | v3.0 | 0/? | Not started | - |
 | 19. Search + Add Artist + Share Extension | v3.0 | 0/? | Not started | - |
 | 20. Location-Based Collection | v3.0 | 0/? | Not started | - |
