@@ -54,7 +54,7 @@
 **Milestone Goal:** Build the React Native (Expo) mobile app that mirrors the web experience and adds native capabilities: location-based collection, push notifications, and share extension.
 
 - [x] **Phase 16: Setup + Navigation + Auth** - Expo project, tab nav, auth, design system, Supabase connection
-- [ ] **Phase 17: Home Feed + Artist Profiles + Collection** - Browsable home feed, rich artist profiles, and collect/discover flows
+- [x] **Phase 17: Home Feed + Artist Profiles + Collection** - Browsable home feed, rich artist profiles, and collect/discover flows (completed 2026-03-08)
 - [ ] **Phase 18: Passport + Badges + Sharing** - Rich passport with stamps, badges, stats, and shareable cards
 - [ ] **Phase 19: Search + Add Artist + Share Extension** - Search, Spotify-powered add flow, and OS-level share target
 - [ ] **Phase 20: Location-Based Collection** - Venue geofence detection and auto-collection prompting
@@ -188,7 +188,7 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 14. Enhanced Artist Profiles | v2.0 | 3/3 | Complete | 2026-03-07 |
 | 15. Passport Sharing and Social | v2.0 | 3/3 | Complete | 2026-03-07 |
 | 16. Setup + Navigation + Auth | v3.0 | 1/1 | Complete | 2026-03-08 |
-| 17. Home Feed + Artist Profiles + Collection | 2/3 | In Progress|  | - |
+| 17. Home Feed + Artist Profiles + Collection | 3/3 | Complete   | 2026-03-08 | - |
 | 18. Passport + Badges + Sharing | v3.0 | 0/? | Not started | - |
 | 19. Search + Add Artist + Share Extension | v3.0 | 0/? | Not started | - |
 | 20. Location-Based Collection | v3.0 | 0/? | Not started | - |

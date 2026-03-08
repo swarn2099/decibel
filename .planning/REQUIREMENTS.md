@@ -35,10 +35,10 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 
 ### Collection Flow
 
-- [ ] **COLL-01**: Fan can tap "Collect" on artist profile to create a verified collection (with location check)
-- [ ] **COLL-02**: Fan can tap "Discover" on artist profile to add online discovery to passport
-- [ ] **COLL-03**: Fan sees confirmation animation (card slide-up with artist name, date, tier badge) after collecting
-- [ ] **COLL-04**: Fan is prompted to share after collecting (generates shareable card via API)
+- [x] **COLL-01**: Fan can tap "Collect" on artist profile to create a verified collection (with location check)
+- [x] **COLL-02**: Fan can tap "Discover" on artist profile to add online discovery to passport
+- [x] **COLL-03**: Fan sees confirmation animation (card slide-up with artist name, date, tier badge) after collecting
+- [x] **COLL-04**: Fan is prompted to share after collecting (generates shareable card via API)
 
 ### Passport
 

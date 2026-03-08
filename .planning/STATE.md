@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
 status: executing
-stopped_at: Completed 17-02-PLAN.md (Artist Profile)
-last_updated: "2026-03-08T23:42:23Z"
-last_activity: 2026-03-08 -- Completed 17-02 Artist Profile (hooks, route, 7 UI components)
+stopped_at: Completed 17-03-PLAN.md (Collection Flow)
+last_updated: "2026-03-08T23:48:05Z"
+last_activity: 2026-03-08 -- Completed 17-03 Collection Flow (collect/discover hooks, confirmation modal, share)
 progress:
   total_phases: 8
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 0
   completed_plans: 0
-  percent: 12
+  percent: 25
 ---
 
 # Project State
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v3.0 -- Phase 17 (Home Feed + Artist Profiles + Collection)
+**Current focus:** v3.0 -- Phase 17 COMPLETE, ready for Phase 18
 
 ## Current Position
 
-Phase: 17 of 23 (Home Feed + Artist Profiles + Collection)
-Plan: 2 of 3 complete in current phase
-Status: Executing Phase 17
-Last activity: 2026-03-08 -- Completed 17-02 Artist Profile (hooks, route, 7 UI components)
+Phase: 17 of 23 (Home Feed + Artist Profiles + Collection) -- COMPLETE
+Plan: 3 of 3 complete in current phase
+Status: Phase 17 Complete
+Last activity: 2026-03-08 -- Completed 17-03 Collection Flow (collect/discover hooks, confirmation modal, share)
 
-Progress: [##________] 12% (1/8 v3.0 phases complete)
+Progress: [###_______] 25% (2/8 v3.0 phases complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 3)
+- Total plans completed: 26 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 4)
 - Average duration: --
 - Total execution time: --
 
@@ -44,7 +44,7 @@ Progress: [##________] 12% (1/8 v3.0 phases complete)
 | Phase | Plans | Status |
 |-------|-------|--------|
 | 16. Setup + Nav + Auth | 1/1 | Complete |
-| 17. Home + Profiles + Collection | 2/3 | In progress |
+| 17. Home + Profiles + Collection | 3/3 | Complete |
 | 18. Passport + Badges + Sharing | TBD | Not started |
 | 19. Search + Add + Share Ext | TBD | Not started |
 | 20. Location-Based Collection | TBD | Not started |
@@ -67,6 +67,9 @@ Progress: [##________] 12% (1/8 v3.0 phases complete)
 - [17-02] Direct Supabase queries for artist data (not web API routes)
 - [17-02] Linking.openURL for all external links (no WebView embeds)
 - [17-02] Deterministic gradient pairs from name hash for fallback avatars
+- [17-03] Direct Supabase insert for discover (web API uses cookie auth, incompatible with mobile)
+- [17-03] Web API call for collect (handles tier calc server-side)
+- [17-03] Reanimated spring physics for stamp animation (damping:12, stiffness:180)
 
 ### Pending Todos
 
@@ -81,5 +84,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-08
-Stopped at: Completed 17-02-PLAN.md (Artist Profile)
+Stopped at: Completed 17-03-PLAN.md (Collection Flow) -- Phase 17 COMPLETE
 Resume file: None
