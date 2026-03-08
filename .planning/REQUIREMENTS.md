@@ -19,11 +19,11 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 
 ### Home Feed
 
-- [ ] **HOME-01**: Fan can view "Next Weekend" section showing upcoming events with venue, date, and artist photos
-- [ ] **HOME-02**: Fan can scroll "Chicago Residents" horizontal list of local artists
-- [ ] **HOME-03**: Fan can view "Recently Added" section showing newest artists in database
-- [ ] **HOME-04**: Fan can pull-to-refresh to reload home feed data
-- [ ] **HOME-05**: Fan sees "Add an Artist" CTA banner linking to add flow
+- [x] **HOME-01**: Fan can view "Next Weekend" section showing upcoming events with venue, date, and artist photos
+- [x] **HOME-02**: Fan can scroll "Chicago Residents" horizontal list of local artists
+- [x] **HOME-03**: Fan can view "Recently Added" section showing newest artists in database
+- [x] **HOME-04**: Fan can pull-to-refresh to reload home feed data
+- [x] **HOME-05**: Fan sees "Add an Artist" CTA banner linking to add flow
 
 ### Artist Profiles
 
