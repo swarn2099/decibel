@@ -5,7 +5,8 @@
 - v1.0 MVP - Phases 1-4 (shipped 2026-03-06)
 - v1.1 Growth Mechanics + Content Engine - Phases 5-7 (shipped 2026-03-06)
 - v1.2 Polish, Map, and Pipeline Fixes - Phases 8-10 (shipped 2026-03-07)
-- v2.0 The Passport - Phases 11-15 (in progress)
+- v2.0 The Passport - Phases 11-15 (shipped 2026-03-07)
+- v3.0 Decibel Mobile - Phases 16-23 (in progress)
 
 ## Phases
 
@@ -37,101 +38,132 @@
 
 </details>
 
-### v2.0 The Passport (In Progress)
+<details>
+<summary>v2.0 The Passport (Phases 11-15) - SHIPPED 2026-03-07</summary>
 
-**Milestone Goal:** Transform the fan passport into a rich, visual, shareable experience that fans screenshot and post -- the hero screen of the entire product.
+- [x] Phase 11: Passport Visual Overhaul (2/2 plans) -- completed 2026-03-07
+- [x] Phase 12: Online Discovery + Add From Anywhere (3/3 plans) -- completed 2026-03-07
+- [x] Phase 13: Badges and Gamification (2/2 plans) -- completed 2026-03-07
+- [x] Phase 14: Enhanced Artist Profiles (3/3 plans) -- completed 2026-03-07
+- [x] Phase 15: Passport Sharing and Social (3/3 plans) -- completed 2026-03-07
 
-- [x] **Phase 11: Passport Visual Overhaul** - Rich passport layout with timeline, stats dashboard, story-ready sharing, and public passport URL
-- [x] **Phase 12: Online Discovery + Add From Anywhere** - Fan-driven artist discovery via links, Spotify import, and smart recommendations (completed 2026-03-07)
-- [x] **Phase 13: Badges and Gamification** - Badge system rewarding attendance, discovery, streaks, exploration, and social activity (completed 2026-03-07)
-- [x] **Phase 14: Enhanced Artist Profiles** - Rich artist pages with tracks, fan stats, similar artists, and distinct Collect vs Discover flows (completed 2026-03-07)
-- [x] **Phase 15: Passport Sharing and Social** - Shareable cards, activity feed, follow system, and social notifications (completed 2026-03-07)
+</details>
+
+### v3.0 Decibel Mobile (In Progress)
+
+**Milestone Goal:** Build the React Native (Expo) mobile app that mirrors the web experience and adds native capabilities: location-based collection, push notifications, and share extension.
+
+- [x] **Phase 16: Setup + Navigation + Auth** - Expo project, tab nav, auth, design system, Supabase connection
+- [ ] **Phase 17: Home Feed + Artist Profiles + Collection** - Browsable home feed, rich artist profiles, and collect/discover flows
+- [ ] **Phase 18: Passport + Badges + Sharing** - Rich passport with stamps, badges, stats, and shareable cards
+- [ ] **Phase 19: Search + Add Artist + Share Extension** - Search, Spotify-powered add flow, and OS-level share target
+- [ ] **Phase 20: Location-Based Collection** - Venue geofence detection and auto-collection prompting
+- [ ] **Phase 21: Map + Leaderboard** - Dark-themed scene map and competitive leaderboard
+- [ ] **Phase 22: Push Notifications** - Event alerts, badge unlocks, tier-ups, and deep-linked notifications
+- [ ] **Phase 23: Polish + App Store Prep** - Animations, offline support, error states, TestFlight submission
 
 ## Phase Details
 
-### Phase 11: Passport Visual Overhaul
-**Goal**: Fans have a beautiful, data-rich passport that they want to screenshot and share
-**Depends on**: Nothing (first phase of v2.0; builds on existing /profile)
-**Requirements**: PASS-01, PASS-02, PASS-03, PASS-04, PASS-05, PASS-06, PASS-07
+### Phase 16: Setup + Navigation + Auth
+**Goal**: Fan can install the app, onboard, sign in, and navigate between all five tabs
+**Depends on**: Nothing (first phase of v3.0)
+**Requirements**: SETUP-01, SETUP-02, SETUP-03, SETUP-04, SETUP-05, SETUP-06
 **Success Criteria** (what must be TRUE):
-  1. Fan can view their passport with a chronological timeline showing both verified and discovered collections, visually distinct from each other (verified = full color + solid badge + tier indicator; discovered = muted + outline badge + "discovered" tag)
-  2. Fan can view a "Your Year in Sound" stats section showing dancefloors visited, cities, total artists, venues, attendance streaks, and favorite genre
-  3. Fan can generate a 1080x1920 story-ready image of their passport and download or share it
-  4. Anyone can visit /passport/[fan-slug] without logging in and see that fan's passport with proper OG meta preview card
-**Plans**: 2 plans
+  1. Fan can install dev build and see onboarding slides on first launch
+  2. Fan can sign in via magic link email and session persists across app restarts
+  3. Fan can navigate between Home, Search, Collect, Map, and Passport tabs with correct icons and dark theme
+  4. App connects to the same Supabase backend as the web app (shared data)
+**Plans**: Complete
 
 Plans:
-- [x] 11-01-PLAN.md -- Core passport page with timeline (verified vs discovered) and stats dashboard
-- [x] 11-02-PLAN.md -- Public passport URL with OG meta + story-ready shareable card
+- [x] 16-01-PLAN.md -- Expo project setup, navigation, auth, design system (complete)
 
-### Phase 12: Online Discovery + Add From Anywhere
-**Goal**: Fans can build their passport without waiting for live shows -- discover artists online from any music platform
-**Depends on**: Phase 11 (passport must display discoveries)
-**Requirements**: DISC-01, DISC-02, DISC-03, DISC-04, DISC-05, DISC-06
+### Phase 17: Home Feed + Artist Profiles + Collection
+**Goal**: Fan can browse the home feed, view rich artist profiles, and collect or discover artists from their phone
+**Depends on**: Phase 16
+**Requirements**: HOME-01, HOME-02, HOME-03, HOME-04, HOME-05, PROF-01, PROF-02, PROF-03, PROF-04, PROF-05, COLL-01, COLL-02, COLL-03, COLL-04
 **Success Criteria** (what must be TRUE):
-  1. Fan can paste a Spotify/SoundCloud/RA/Instagram/TikTok/YouTube link and add that artist as a discovery to their passport
-  2. If an artist doesn't exist in the database, the system auto-creates their profile from the submitted link
-  3. Fan can connect Spotify via OAuth and see their top artists imported as discoveries, with "collect in person" prompts for those with upcoming local shows
-  4. Fan sees personalized "Artists you might like" recommendations on their passport based on collection and listening data
-  5. Apple Music shows a "Coming soon -- connect Apple Music in the mobile app" stub UI
-**Plans**: 3 plans
+  1. Fan can scroll a home feed showing upcoming events, local resident artists, and recently added artists with pull-to-refresh
+  2. Fan can tap an artist to view a full profile screen with hero photo, genres, social links, tracks/mixes, upcoming shows, founder badge, and similar artists
+  3. Fan can tap "Collect" on an artist profile (with location check) and see a confirmation animation with artist name, date, and tier badge
+  4. Fan can tap "Discover" on an artist profile to add an online discovery to their passport
+  5. After collecting or discovering, fan is prompted to share a generated card
+**Plans**: TBD
 
-Plans:
-- [ ] 12-01-PLAN.md -- Link-based artist discovery with auto-creation pipeline (paste any music link to discover)
-- [ ] 12-02-PLAN.md -- Spotify OAuth import + Apple Music stub
-- [ ] 12-03-PLAN.md -- Personalized artist recommendations engine
-
-### Phase 13: Badges and Gamification
-**Goal**: Fans earn and display badges that reward showing up, exploring, and being early -- making the passport feel alive and collectible
-**Depends on**: Phase 11, Phase 12 (badges reference both verified collections and discoveries)
-**Requirements**: BADGE-01, BADGE-02, BADGE-03, BADGE-04, BADGE-05, BADGE-06, BADGE-07, BADGE-08
+### Phase 18: Passport + Badges + Sharing
+**Goal**: Fan has a rich, visual passport showing their collection history, badges, and stats -- and can share any of it as branded cards
+**Depends on**: Phase 16
+**Requirements**: PASS-01, PASS-02, PASS-03, PASS-04, PASS-05, PASS-06, PASS-07, PASS-08, PASS-09, PASS-10
 **Success Criteria** (what must be TRUE):
-  1. Fan earns badges across five categories (discovery, attendance, exploration, streak, social) based on their real collection and activity data
-  2. Badges display on the passport with icon, name, description, date earned, and rarity tier
-  3. When a badge is unlocked, the fan sees a visual animation or toast notification
-  4. Existing fans receive retroactive badges based on their current collection data when the feature launches
-**Plans**: 2 plans
+  1. Fan can view their passport with header (name, city, avatar), stats bar, and collection timeline where verified stamps are full-color and discovered stamps are muted
+  2. Fan can tap a collected artist to see tier progress (e.g., "3/5 scans to Secret tier")
+  3. Fan can view earned badges in a grid and tap locked badges to see unlock requirements
+  4. Fan can generate and share passport summary, single-artist, and badge achievement cards via Instagram Stories, iMessage, copy link, or save to camera roll
+  5. Fan can copy their public passport URL
+**Plans**: TBD
 
-Plans:
-- [ ] 13-01-PLAN.md -- Badge types, definitions, evaluation engine, API endpoints, and retroactive backfill script
-- [ ] 13-02-PLAN.md -- Badge showcase on passport with rarity styling and unlock animation
-
-### Phase 14: Enhanced Artist Profiles
-**Goal**: Artist profiles become rich destination pages that fans browse, discover from, and use to plan their next show
-**Depends on**: Phase 12 (needs discover CTA and auto-scraping pipeline for new artists)
-**Requirements**: PROF-01, PROF-02, PROF-03, PROF-04, PROF-05, PROF-06, PROF-07, PROF-08, PROF-09
+### Phase 19: Search + Add Artist + Share Extension
+**Goal**: Fan can find any artist in Decibel, add missing artists via Spotify search with founder badge, and share links TO Decibel from other apps
+**Depends on**: Phase 16
+**Requirements**: SRCH-01, SRCH-02, SRCH-03, SRCH-04, SRCH-05, SRCH-06, SRCH-07, SHARE-01, SHARE-02
 **Success Criteria** (what must be TRUE):
-  1. Artist profile shows top tracks/mixes, genres, bio, social links, photo, and a Spotify embed alongside the existing SoundCloud embed
-  2. Artist profile shows upcoming and past shows with venue history, plus fan stats (total collectors, discoverers, tier breakdown) and similar artists based on genre overlap
-  3. Fan can click "Discover" to add the artist to their passport or "Collect" to see next show info / QR context, with their tier progress and journey state visible (discovered -> collecting -> inner circle)
-  4. Unclaimed profiles show a "Claim this profile" CTA with magic link verification flow
-**Plans**: 3 plans
+  1. Fan can search existing Decibel artists with autocomplete results
+  2. Fan can search Spotify for artists not in Decibel and add them (under 1M listeners = founder badge, over 1M = regular add)
+  3. Fan sees loading animation during profile scraping and celebration screen when earning founder badge
+  4. Fan can share a Spotify/SoundCloud/Instagram link TO Decibel from another app, which opens the artist profile or triggers the add flow
+**Plans**: TBD
 
-Plans:
-- [ ] 14-01-PLAN.md -- Rich profile sections: Spotify embed, past shows, fan stats, similar artists
-- [ ] 14-02-PLAN.md -- Discover/Collect CTAs with fan journey state and tier progress
-- [ ] 14-03-PLAN.md -- Claim profile flow with magic link verification
-
-### Phase 15: Passport Sharing and Social
-**Goal**: Fans can share any moment from their passport and see what their friends are collecting -- the viral loop
-**Depends on**: Phase 11, Phase 13 (shares badges and passport visuals)
-**Requirements**: SOCL-01, SOCL-02, SOCL-03, SOCL-04, SOCL-05, SOCL-06
+### Phase 20: Location-Based Collection
+**Goal**: Fan gets prompted to collect artists when they are physically at a venue with an active event -- the core differentiator
+**Depends on**: Phase 17 (needs artist profiles and collection flow)
+**Requirements**: LOC-01, LOC-02, LOC-03, LOC-04, LOC-05, LOC-06, LOC-07
 **Success Criteria** (what must be TRUE):
-  1. Fan can generate shareable cards for single-artist, milestone, badge, discovery, and stats variants
-  2. Fan can follow/unfollow other fans and see follower/following counts on their passport
-  3. Fan sees an activity feed showing friend collections, discoveries, and badge unlocks
-  4. Fan can control privacy (mutual followers / public / private) and receives a notification when a phone contact joins Decibel
-**Plans**: 3 plans
+  1. Fan sees a clear explanation before location permission is requested, and the app only asks for "While Using" (foreground) permission
+  2. When at a venue with an active event, a non-intrusive banner appears showing the artist and venue with a "Collect?" prompt
+  3. Multi-artist lineups show all performing artists with individual collect buttons
+  4. Fan can manually trigger "I'm at a show" from the home screen as a fallback
+  5. App functions fully without location permission granted (graceful degradation)
+**Plans**: TBD
 
-Plans:
-- [x] 15-01-PLAN.md -- Shareable card variants (artist, badge, milestone, discovery, stats)
-- [x] 15-02-PLAN.md -- Follow system, follower/following counts, privacy settings
-- [ ] 15-03-PLAN.md -- Activity feed and contact-check for friend discovery
+### Phase 21: Map + Leaderboard
+**Goal**: Fan can explore the local scene on a dark-themed map and compete on leaderboards
+**Depends on**: Phase 16
+**Requirements**: MAP-01, MAP-02, MAP-03, MAP-04, MAP-05, MAP-06, LEAD-01, LEAD-02, LEAD-03, LEAD-04, LEAD-05
+**Success Criteria** (what must be TRUE):
+  1. Fan can view a full-screen dark-themed map with venue markers sized by activity and colored by genre
+  2. Fan can tap a venue marker to see a bottom sheet with venue name, upcoming events, and top artists
+  3. Fan can filter the map by genre and toggle "Tonight" mode showing only active venues with pulsing markers
+  4. Fan can view fan and performer leaderboards with weekly/monthly/all-time filters, seeing their own position highlighted
+  5. Fan can generate and share a "rank" image from the leaderboard
+**Plans**: TBD
+
+### Phase 22: Push Notifications
+**Goal**: Fan stays engaged through timely, relevant push notifications that deep-link to the right screen
+**Depends on**: Phase 16
+**Requirements**: NOTIF-01, NOTIF-02, NOTIF-03, NOTIF-04, NOTIF-05, NOTIF-06, NOTIF-07, NOTIF-08, NOTIF-09
+**Success Criteria** (what must be TRUE):
+  1. Push notification registration works on both iOS and Android
+  2. Fan receives contextual notifications: nearby events, badge unlocks, tier-ups, artist messages, friend joins, and weekly recaps
+  3. Tapping any notification deep-links to the correct screen (artist profile, passport, badge detail, etc.)
+  4. Fan can toggle each notification type on/off individually in settings
+**Plans**: TBD
+
+### Phase 23: Polish + App Store Prep
+**Goal**: App feels polished, handles edge cases gracefully, and is ready for TestFlight distribution
+**Depends on**: Phase 17, Phase 18, Phase 19, Phase 20, Phase 21, Phase 22
+**Requirements**: POLISH-01, POLISH-02, POLISH-03, POLISH-04, POLISH-05, POLISH-06, POLISH-07, POLISH-08, POLISH-09, POLISH-10
+**Success Criteria** (what must be TRUE):
+  1. All data-dependent screens show skeleton loading states and network error states with retry buttons
+  2. Passport and artist data are cached for offline viewing
+  3. Collection confirmation, badge unlock, pull-to-refresh, and passport scroll all have custom animations with haptic feedback
+  4. Empty states show illustrations (no collections yet, no badges yet, etc.)
+  5. TestFlight build is distributable and App Store screenshots are generated for required device sizes
+**Plans**: TBD
 
 ## Progress
 
-**Execution Order:** 11 -> 12 -> 13 -> 14 -> 15
-(Note: Phase 14 depends on 12 only; Phase 15 depends on 11+13. Phases 13 and 14 could theoretically run in parallel after 12 completes.)
+**Execution Order:**
+Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20 (after 17) -> Phase 23 (after all)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -145,8 +177,16 @@ Plans:
 | 8. Bug Fixes | v1.2 | 1/1 | Complete | 2026-03-06 |
 | 9. Scene Map | v1.2 | 2/2 | Complete | 2026-03-06 |
 | 10. Scraper Pipeline | v1.2 | 2/2 | Complete | 2026-03-07 |
-| 11. Passport Visual Overhaul | v2.0 | Complete    | 2026-03-07 | 2026-03-07 |
-| 12. Online Discovery | 3/3 | Complete    | 2026-03-07 | - |
-| 13. Badges and Gamification | 2/2 | Complete    | 2026-03-07 | - |
-| 14. Enhanced Artist Profiles | 3/3 | Complete    | 2026-03-07 | - |
-| 15. Passport Sharing and Social | 3/3 | Complete    | 2026-03-07 | - |
+| 11. Passport Visual Overhaul | v2.0 | 2/2 | Complete | 2026-03-07 |
+| 12. Online Discovery | v2.0 | 3/3 | Complete | 2026-03-07 |
+| 13. Badges and Gamification | v2.0 | 2/2 | Complete | 2026-03-07 |
+| 14. Enhanced Artist Profiles | v2.0 | 3/3 | Complete | 2026-03-07 |
+| 15. Passport Sharing and Social | v2.0 | 3/3 | Complete | 2026-03-07 |
+| 16. Setup + Navigation + Auth | v3.0 | 1/1 | Complete | 2026-03-08 |
+| 17. Home Feed + Artist Profiles + Collection | v3.0 | 0/? | Not started | - |
+| 18. Passport + Badges + Sharing | v3.0 | 0/? | Not started | - |
+| 19. Search + Add Artist + Share Extension | v3.0 | 0/? | Not started | - |
+| 20. Location-Based Collection | v3.0 | 0/? | Not started | - |
+| 21. Map + Leaderboard | v3.0 | 0/? | Not started | - |
+| 22. Push Notifications | v3.0 | 0/? | Not started | - |
+| 23. Polish + App Store Prep | v3.0 | 0/? | Not started | - |
