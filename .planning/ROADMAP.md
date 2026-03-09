@@ -185,7 +185,12 @@ Plans:
   3. Collection confirmation, badge unlock, pull-to-refresh, and passport scroll all have custom animations with haptic feedback
   4. Empty states show illustrations (no collections yet, no badges yet, etc.)
   5. TestFlight build is distributable and App Store screenshots are generated for required device sizes
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 23-01-PLAN.md -- Skeleton loaders, error states with retry, empty states with illustrations
+- [ ] 23-02-PLAN.md -- Offline caching, enhanced animations with haptics, passport parallax, custom pull-to-refresh
+- [ ] 23-03-PLAN.md -- TestFlight build config and App Store screenshot prep
 
 ## Progress
 
@@ -216,4 +221,4 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 20. Location-Based Collection | 3/3 | Complete    | 2026-03-09 | - |
 | 21. Map + Leaderboard | 2/2 | Complete    | 2026-03-09 | - |
 | 22. Push Notifications | 2/2 | Complete    | 2026-03-09 | - |
-| 23. Polish + App Store Prep | v3.0 | 0/? | Not started | - |
+| 23. Polish + App Store Prep | v3.0 | 0/3 | Not started | - |
