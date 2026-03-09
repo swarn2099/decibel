@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v3.0 -- Phase 21 COMPLETE (Map + Leaderboard)
+**Current focus:** v3.0 -- Phase 22 IN PROGRESS (Push Notifications)
 
 ## Current Position
 
-Phase: 21 of 23 (Map + Leaderboard) -- COMPLETE
-Plan: 2 of 2 complete in current phase
-Status: Phase 21 COMPLETE
-Last activity: 2026-03-09 -- Completed 21-02 Leaderboard (fan/performer tabs, time filters, podium, share rank)
+Phase: 22 of 23 (Push Notifications) -- IN PROGRESS
+Plan: 1 of 1 complete in current phase
+Status: Phase 22 Plan 01 COMPLETE
+Last activity: 2026-03-09 -- Completed 22-01 Push notification foundation (token registration, deep-linking, settings screen)
 
-Progress: [██████████] 100% (29/29 v3.0 plans complete)
+Progress: [██████████] 100% (30/30 v3.0 plans complete)
 
 ## Performance Metrics
 
@@ -48,12 +48,13 @@ Progress: [██████████] 100% (29/29 v3.0 plans complete)
 | 18. Passport + Badges + Sharing | 3/3 | Complete |
 | 19. Search + Add + Share Ext | 3/3 | Complete |
 | 20. Location-Based Collection | 3/3 | Complete |
-| 21. Map + Leaderboard | TBD | Not started |
-| 22. Push Notifications | TBD | Not started |
+| 21. Map + Leaderboard | 2/2 | Complete |
+| 22. Push Notifications | 1/1 | Complete |
 | 23. Polish + App Store | TBD | Not started |
 | Phase 20 P03 | 2min | 2 tasks | 5 files |
 | Phase 21 P02 | 4min | 2 tasks | 7 files |
 | Phase 21 P01 | 5min | 3 tasks | 7 files |
+| Phase 22 P01 | 7min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,10 @@ Progress: [██████████] 100% (29/29 v3.0 plans complete)
 - [Phase 21-02]: Trophy icon in collection header with yellow tint for discoverability
 - [Phase 21]: Genre color mapping: house=pink, techno=blue, bass/dnb=teal, disco=yellow, default=purple
 - [Phase 21]: BottomSheet pattern via @gorhom/bottom-sheet for map venue details
+- [Phase 22-01]: shouldShowBanner/shouldShowList API for expo-notifications v55+ (not shouldShowAlert)
+- [Phase 22-01]: Notification preferences in Supabase (not MMKV) so Edge Functions can check before sending
+- [Phase 22-01]: Settings gear icon in Collection header row alongside leaderboard trophy
+- [Phase 22-01]: subscription.remove() pattern for expo-notifications v55+
 
 ### Pending Todos
 
@@ -118,6 +123,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T02:52:54.469Z
-Stopped at: Completed 21-01-PLAN.md
+Last session: 2026-03-09T03:30:40Z
+Stopped at: Completed 22-01-PLAN.md
 Resume file: None

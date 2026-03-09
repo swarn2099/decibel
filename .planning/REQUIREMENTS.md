@@ -97,15 +97,15 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 
 ### Push Notifications
 
-- [ ] **NOTIF-01**: Push notification registration works on iOS and Android
+- [x] **NOTIF-01**: Push notification registration works on iOS and Android
 - [ ] **NOTIF-02**: Fan receives "nearby event" notification when artist they've collected is playing nearby
 - [ ] **NOTIF-03**: Fan receives "badge earned" notification on badge unlock
 - [ ] **NOTIF-04**: Fan receives "tier up" notification on tier progression
 - [ ] **NOTIF-05**: Fan receives "artist message" notification when a DJ messages fans
 - [ ] **NOTIF-06**: Fan receives "friend joined" notification when a phone contact joins Decibel
 - [ ] **NOTIF-07**: Fan receives weekly recap notification summarizing shows, collections, badges
-- [ ] **NOTIF-08**: Tapping notification deep-links to correct screen
-- [ ] **NOTIF-09**: Fan can toggle each notification type on/off in settings
+- [x] **NOTIF-08**: Tapping notification deep-links to correct screen
+- [x] **NOTIF-09**: Fan can toggle each notification type on/off in settings
 
 ### Polish & App Store
 
