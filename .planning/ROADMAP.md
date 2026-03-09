@@ -215,5 +215,5 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 19. Search + Add Artist + Share Extension | 3/3 | Complete    | 2026-03-09 | - |
 | 20. Location-Based Collection | 3/3 | Complete    | 2026-03-09 | - |
 | 21. Map + Leaderboard | 2/2 | Complete    | 2026-03-09 | - |
-| 22. Push Notifications | 2/2 | Complete   | 2026-03-09 | - |
+| 22. Push Notifications | 2/2 | Complete    | 2026-03-09 | - |
 | 23. Polish + App Store Prep | v3.0 | 0/? | Not started | - |
