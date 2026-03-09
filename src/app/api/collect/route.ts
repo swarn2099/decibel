@@ -10,7 +10,7 @@ function calculateTier(scanCount: number): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { performer_id, email } = await req.json();
+    const { performer_id, email, capture_method } = await req.json();
 
     if (!performer_id || !email) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         fan_id: fan.id,
         performer_id,
         event_date: today,
-        capture_method: "qr",
+        capture_method: capture_method || "qr",
       });
 
     const alreadyCollected = collectionError?.code === "23505"; // unique violation
