@@ -4,8 +4,8 @@ milestone: v3.0
 milestone_name: Decibel Mobile
 status: completed
 stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-03-09T02:52:54.482Z"
-last_activity: 2026-03-09 -- Completed 20-03 Gap Closure (capture_method passthrough for location collections)
+last_updated: "2026-03-09T02:56:11.885Z"
+last_activity: 2026-03-09 -- Completed 21-02 Leaderboard (fan/performer tabs, time filters, podium, share rank)
 progress:
   total_phases: 8
   completed_phases: 4
