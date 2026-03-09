@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "**.cdninstagram.com" },
       { protocol: "https", hostname: "**.fbcdn.net" },
       { protocol: "https", hostname: "a1.sndcdn.com" },
+      { protocol: "https", hostname: "cdn-images.dzcdn.net" },
     ],
   },
 };
