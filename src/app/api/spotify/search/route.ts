@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { searchDeezerArtists } from "@/lib/deezer";
 import { createSupabaseAdmin } from "@/lib/supabase-admin";
 
-const MAX_FANS = 1_000_000;
+const MAX_FANS = 13_000;
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim();
