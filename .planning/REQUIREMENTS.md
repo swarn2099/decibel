@@ -59,9 +59,9 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 - [x] **SRCH-02**: Fan sees "Not here? Add them to Decibel" link when artist not found
 - [x] **SRCH-03**: Fan can search Spotify API for artists not in database
 - [x] **SRCH-04**: Artists under 1M monthly listeners show "Founder badge" CTA; over 1M show regular add
-- [ ] **SRCH-05**: Fan sees loading animation during scraping pipeline ("Building profile...")
-- [ ] **SRCH-06**: Fan sees celebration screen with founder badge animation when earning founder badge
-- [ ] **SRCH-07**: Artist auto-added to fan's passport as discovered after adding
+- [x] **SRCH-05**: Fan sees loading animation during scraping pipeline ("Building profile...")
+- [x] **SRCH-06**: Fan sees celebration screen with founder badge animation when earning founder badge
+- [x] **SRCH-07**: Artist auto-added to fan's passport as discovered after adding
 
 ### Share Extension
 
