@@ -121,7 +121,12 @@ Plans:
   2. Fan can search Spotify for artists not in Decibel and add them (under 1M listeners = founder badge, over 1M = regular add)
   3. Fan sees loading animation during profile scraping and celebration screen when earning founder badge
   4. Fan can share a Spotify/SoundCloud/Instagram link TO Decibel from another app, which opens the artist profile or triggers the add flow
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 19-01-PLAN.md -- Search screen with Decibel autocomplete and Spotify search integration
+- [ ] 19-02-PLAN.md -- Add artist flow with loading animation, founder celebration, auto-discover
+- [ ] 19-03-PLAN.md -- Share extension: URL parser, Android intent filter, paste-a-link fallback
 
 ### Phase 20: Location-Based Collection
 **Goal**: Fan gets prompted to collect artists when they are physically at a venue with an active event -- the core differentiator
@@ -195,7 +200,7 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 16. Setup + Navigation + Auth | v3.0 | 1/1 | Complete | 2026-03-08 |
 | 17. Home Feed + Artist Profiles + Collection | 3/3 | Complete    | 2026-03-08 | - |
 | 18. Passport + Badges + Sharing | 3/3 | Complete    | 2026-03-09 | - |
-| 19. Search + Add Artist + Share Extension | v3.0 | 0/? | Not started | - |
+| 19. Search + Add Artist + Share Extension | v3.0 | 0/3 | Not started | - |
 | 20. Location-Based Collection | v3.0 | 0/? | Not started | - |
 | 21. Map + Leaderboard | v3.0 | 0/? | Not started | - |
 | 22. Push Notifications | v3.0 | 0/? | Not started | - |
