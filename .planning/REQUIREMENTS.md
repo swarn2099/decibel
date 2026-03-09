@@ -80,20 +80,20 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 
 ### Scene Map
 
-- [ ] **MAP-01**: Full-screen dark-themed map with custom dark style and venue markers
-- [ ] **MAP-02**: Venue markers sized by activity level, colored by genre
-- [ ] **MAP-03**: Fan can tap venue marker to see bottom sheet with venue name, upcoming events, top artists
-- [ ] **MAP-04**: Fan can filter map by genre via chips at top
-- [ ] **MAP-05**: "Tonight" toggle shows only active venues with pulsing markers
-- [ ] **MAP-06**: "Near Me" button centers map on fan's location
+- [x] **MAP-01**: Full-screen dark-themed map with custom dark style and venue markers
+- [x] **MAP-02**: Venue markers sized by activity level, colored by genre
+- [x] **MAP-03**: Fan can tap venue marker to see bottom sheet with venue name, upcoming events, top artists
+- [x] **MAP-04**: Fan can filter map by genre via chips at top
+- [x] **MAP-05**: "Tonight" toggle shows only active venues with pulsing markers
+- [x] **MAP-06**: "Near Me" button centers map on fan's location
 
 ### Leaderboard
 
-- [ ] **LEAD-01**: Fan/Performer tabs with Weekly/Monthly/All-Time filters
-- [ ] **LEAD-02**: Fan leaderboard shows rank, name, collection count, tier badge
-- [ ] **LEAD-03**: Performer leaderboard shows rank, photo, name, fan count, genres
-- [ ] **LEAD-04**: Fan's own position highlighted in teal
-- [ ] **LEAD-05**: "Share Rank" button generates shareable image
+- [x] **LEAD-01**: Fan/Performer tabs with Weekly/Monthly/All-Time filters
+- [x] **LEAD-02**: Fan leaderboard shows rank, name, collection count, tier badge
+- [x] **LEAD-03**: Performer leaderboard shows rank, photo, name, fan count, genres
+- [x] **LEAD-04**: Fan's own position highlighted in teal
+- [x] **LEAD-05**: "Share Rank" button generates shareable image
 
 ### Push Notifications
 

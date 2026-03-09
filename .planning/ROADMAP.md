@@ -58,7 +58,7 @@
 - [x] **Phase 18: Passport + Badges + Sharing** - Rich passport with stamps, badges, stats, and shareable cards (completed 2026-03-09)
 - [x] **Phase 19: Search + Add Artist + Share Extension** - Search, Spotify-powered add flow, and OS-level share target (completed 2026-03-09)
 - [x] **Phase 20: Location-Based Collection** - Venue geofence detection and auto-collection prompting (completed 2026-03-09)
-- [ ] **Phase 21: Map + Leaderboard** - Dark-themed scene map and competitive leaderboard
+- [x] **Phase 21: Map + Leaderboard** - Dark-themed scene map and competitive leaderboard (completed 2026-03-09)
 - [ ] **Phase 22: Push Notifications** - Event alerts, badge unlocks, tier-ups, and deep-linked notifications
 - [ ] **Phase 23: Polish + App Store Prep** - Animations, offline support, error states, TestFlight submission
 
@@ -210,6 +210,6 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 18. Passport + Badges + Sharing | 3/3 | Complete    | 2026-03-09 | - |
 | 19. Search + Add Artist + Share Extension | 3/3 | Complete    | 2026-03-09 | - |
 | 20. Location-Based Collection | 3/3 | Complete    | 2026-03-09 | - |
-| 21. Map + Leaderboard | v3.0 | 0/2 | Not started | - |
+| 21. Map + Leaderboard | 2/2 | Complete   | 2026-03-09 | - |
 | 22. Push Notifications | v3.0 | 0/? | Not started | - |
 | 23. Polish + App Store Prep | v3.0 | 0/? | Not started | - |

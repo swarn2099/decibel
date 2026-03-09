@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
 status: completed
-stopped_at: Completed 20-03-PLAN.md
-last_updated: "2026-03-09T02:10:05.335Z"
+stopped_at: Completed 21-01-PLAN.md
+last_updated: "2026-03-09T02:52:54.482Z"
 last_activity: 2026-03-09 -- Completed 20-03 Gap Closure (capture_method passthrough for location collections)
 progress:
   total_phases: 8
-  completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  completed_phases: 4
+  total_plans: 11
+  completed_plans: 11
   percent: 100
 ---
 
@@ -52,6 +52,8 @@ Progress: [██████████] 100% (27/27 v3.0 plans complete)
 | 22. Push Notifications | TBD | Not started |
 | 23. Polish + App Store | TBD | Not started |
 | Phase 20 P03 | 2min | 2 tasks | 5 files |
+| Phase 21 P02 | 4min | 2 tasks | 7 files |
+| Phase 21 P01 | 5min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -98,6 +100,11 @@ Progress: [██████████] 100% (27/27 v3.0 plans complete)
 - [20-02] "I'm at a show" button always visible regardless of permission state
 - [20-03] capture_method defaults to 'qr' when not provided -- backward compatible with web QR scans
 - [Phase 20]: capture_method defaults to 'qr' when not provided -- backward compatible with web QR scans
+- [Phase 21-02]: Client-side grouping for leaderboard (mirrors web, no custom Supabase functions)
+- [Phase 21-02]: Text-based share for rank (no web API endpoint for rank cards yet)
+- [Phase 21-02]: Trophy icon in collection header with yellow tint for discoverability
+- [Phase 21]: Genre color mapping: house=pink, techno=blue, bass/dnb=teal, disco=yellow, default=purple
+- [Phase 21]: BottomSheet pattern via @gorhom/bottom-sheet for map venue details
 
 ### Pending Todos
 
@@ -111,6 +118,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T02:06:42.427Z
-Stopped at: Completed 20-03-PLAN.md
+Last session: 2026-03-09T02:52:54.469Z
+Stopped at: Completed 21-01-PLAN.md
 Resume file: None
