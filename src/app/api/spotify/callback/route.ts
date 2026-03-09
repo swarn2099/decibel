@@ -4,7 +4,7 @@ import { createSupabaseAdmin } from "@/lib/supabase-admin";
 export async function GET(req: NextRequest) {
   const siteUrl =
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://decibel-three.vercel.app";
+    "https://decible.live";
 
   const code = req.nextUrl.searchParams.get("code");
   const error = req.nextUrl.searchParams.get("error");

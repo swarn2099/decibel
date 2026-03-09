@@ -9,7 +9,7 @@ export async function GET() {
 
   if (!user) {
     return NextResponse.redirect(
-      new URL("/auth/login", process.env.NEXT_PUBLIC_SITE_URL || "https://decibel-three.vercel.app")
+      new URL("/auth/login", process.env.NEXT_PUBLIC_SITE_URL || "https://decible.live")
     );
   }
 
@@ -18,7 +18,7 @@ export async function GET() {
     return NextResponse.json({ error: "Spotify not configured" }, { status: 500 });
   }
 
-  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://decibel-three.vercel.app"}/api/spotify/callback`;
+  const redirectUri = `${process.env.NEXT_PUBLIC_SITE_URL || "https://decible.live"}/api/spotify/callback`;
 
   const params = new URLSearchParams({
     client_id: clientId,
