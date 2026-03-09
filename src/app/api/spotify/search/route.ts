@@ -3,16 +3,34 @@ import { searchSpotifyArtists } from "@/lib/spotify";
 import { createSupabaseAdmin } from "@/lib/supabase-admin";
 import { createSupabaseServer } from "@/lib/supabase-server";
 
-async function getUserSpotifyToken(admin: ReturnType<typeof createSupabaseAdmin>): Promise<string | null> {
+async function getUserEmail(req: NextRequest, admin: ReturnType<typeof createSupabaseAdmin>): Promise<string | null> {
+  // Try Bearer token first (mobile)
+  const auth = req.headers.get("authorization");
+  if (auth?.startsWith("Bearer ")) {
+    const token = auth.slice(7);
+    const { data, error } = await admin.auth.getUser(token);
+    if (!error && data.user?.email) return data.user.email;
+  }
+
+  // Fall back to cookie auth (web)
   try {
     const supabase = await createSupabaseServer();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.email) return null;
+    if (user?.email) return user.email;
+  } catch {}
+
+  return null;
+}
+
+async function getUserSpotifyToken(req: NextRequest, admin: ReturnType<typeof createSupabaseAdmin>): Promise<string | null> {
+  try {
+    const email = await getUserEmail(req, admin);
+    if (!email) return null;
 
     const { data: fan } = await admin
       .from("fans")
       .select("spotify_refresh_token")
-      .eq("email", user.email)
+      .eq("email", email)
       .maybeSingle();
 
     if (!fan?.spotify_refresh_token) return null;
@@ -43,7 +61,7 @@ async function getUserSpotifyToken(admin: ReturnType<typeof createSupabaseAdmin>
       await admin
         .from("fans")
         .update({ spotify_refresh_token: data.refresh_token })
-        .eq("email", user.email);
+        .eq("email", email);
     }
 
     return data.access_token;
@@ -75,7 +93,7 @@ export async function GET(req: NextRequest) {
   const existing = existingRaw || [];
 
   // Try user's own Spotify token first, then fall back to server token
-  const userToken = await getUserSpotifyToken(admin);
+  const userToken = await getUserSpotifyToken(req, admin);
 
   // Search Spotify
   let spotifyResults: Awaited<ReturnType<typeof searchSpotifyArtists>> = [];

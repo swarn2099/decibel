@@ -101,16 +101,14 @@ export async function POST(req: NextRequest) {
       fan = newFan;
     }
 
-    // Store Spotify refresh token
+    // Always mark Spotify as connected; store refresh token if available
+    const spotifyUpdate: Record<string, string> = {
+      spotify_connected_at: new Date().toISOString(),
+    };
     if (spotifyRefreshToken) {
-      await admin
-        .from("fans")
-        .update({
-          spotify_refresh_token: spotifyRefreshToken,
-          spotify_connected_at: new Date().toISOString(),
-        })
-        .eq("id", fan.id);
+      spotifyUpdate.spotify_refresh_token = spotifyRefreshToken;
     }
+    await admin.from("fans").update(spotifyUpdate).eq("id", fan.id);
 
     const today = new Date().toISOString().split("T")[0];
     const importedArtists: {
