@@ -82,11 +82,21 @@ export async function GET(req: NextRequest) {
     .order("created_at", { ascending: false })
     .range(from, to);
 
-  // Get fan_tiers for this fan
-  const { data: tiers } = await admin
-    .from("fan_tiers")
-    .select("performer_id, scan_count, current_tier")
-    .eq("fan_id", fan.id);
+  // Get fan_tiers and founder_badges for this fan
+  const [{ data: tiers }, { data: founderBadges }] = await Promise.all([
+    admin
+      .from("fan_tiers")
+      .select("performer_id, scan_count, current_tier")
+      .eq("fan_id", fan.id),
+    admin
+      .from("founder_badges")
+      .select("performer_id")
+      .eq("fan_id", fan.id),
+  ]);
+
+  const foundedPerformerIds = new Set(
+    (founderBadges ?? []).map((f: { performer_id: string }) => f.performer_id)
+  );
 
   const tierMap = new Map(
     (tiers ?? []).map((t: Record<string, unknown>) => [
@@ -131,6 +141,7 @@ export async function GET(req: NextRequest) {
       created_at: c.created_at,
       scan_count: tier?.scan_count ?? null,
       current_tier: tier?.current_tier ?? null,
+      is_founder: foundedPerformerIds.has(performerId),
       rotation: getSeededRotation(c.id as string),
     };
   });
