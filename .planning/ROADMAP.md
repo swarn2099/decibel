@@ -55,7 +55,7 @@
 
 - [x] **Phase 16: Setup + Navigation + Auth** - Expo project, tab nav, auth, design system, Supabase connection
 - [x] **Phase 17: Home Feed + Artist Profiles + Collection** - Browsable home feed, rich artist profiles, and collect/discover flows (completed 2026-03-08)
-- [ ] **Phase 18: Passport + Badges + Sharing** - Rich passport with stamps, badges, stats, and shareable cards
+- [x] **Phase 18: Passport + Badges + Sharing** - Rich passport with stamps, badges, stats, and shareable cards (completed 2026-03-09)
 - [ ] **Phase 19: Search + Add Artist + Share Extension** - Search, Spotify-powered add flow, and OS-level share target
 - [ ] **Phase 20: Location-Based Collection** - Venue geofence detection and auto-collection prompting
 - [ ] **Phase 21: Map + Leaderboard** - Dark-themed scene map and competitive leaderboard
@@ -194,7 +194,7 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 15. Passport Sharing and Social | v2.0 | 3/3 | Complete | 2026-03-07 |
 | 16. Setup + Navigation + Auth | v3.0 | 1/1 | Complete | 2026-03-08 |
 | 17. Home Feed + Artist Profiles + Collection | 3/3 | Complete    | 2026-03-08 | - |
-| 18. Passport + Badges + Sharing | 2/3 | In Progress|  | - |
+| 18. Passport + Badges + Sharing | 3/3 | Complete   | 2026-03-09 | - |
 | 19. Search + Add Artist + Share Extension | v3.0 | 0/? | Not started | - |
 | 20. Location-Based Collection | v3.0 | 0/? | Not started | - |
 | 21. Map + Leaderboard | v3.0 | 0/? | Not started | - |
