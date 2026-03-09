@@ -109,14 +109,14 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 
 ### Polish & App Store
 
-- [ ] **POLISH-01**: Skeleton loading screens on all data-dependent screens
+- [x] **POLISH-01**: Skeleton loading screens on all data-dependent screens
 - [ ] **POLISH-02**: Offline support with cached passport and artist data
 - [ ] **POLISH-03**: Collection confirmation stamp animation with haptic feedback
 - [ ] **POLISH-04**: Badge unlock starburst animation with haptic feedback
 - [ ] **POLISH-05**: Passport parallax header scroll effect
 - [ ] **POLISH-06**: Custom pull-to-refresh animation (Decibel logo pulse or sound wave)
-- [ ] **POLISH-07**: Network error states with retry buttons on all screens
-- [ ] **POLISH-08**: Empty states with illustrations (no collections yet, no badges yet)
+- [x] **POLISH-07**: Network error states with retry buttons on all screens
+- [x] **POLISH-08**: Empty states with illustrations (no collections yet, no badges yet)
 - [ ] **POLISH-09**: TestFlight build distributable to beta testers
 - [ ] **POLISH-10**: App Store screenshots (6.7" and 5.5") for passport, map, collection, leaderboard
 
