@@ -45,8 +45,8 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 - [ ] **PASS-01**: Fan can view passport with header (name, city, member since, avatar), stats bar, and collection timeline
 - [ ] **PASS-02**: Collections display as stamps — verified are full-color with tier badge, discovered are muted with outline
 - [ ] **PASS-03**: Fan can tap an artist in collection to see tier progress ("3/5 scans to Secret tier")
-- [ ] **PASS-04**: Fan can view earned badges in a grid with icons, names, and earned dates
-- [ ] **PASS-05**: Fan can tap a locked/grayed badge to see what's needed to earn it
+- [x] **PASS-04**: Fan can view earned badges in a grid with icons, names, and earned dates
+- [x] **PASS-05**: Fan can tap a locked/grayed badge to see what's needed to earn it
 - [ ] **PASS-06**: Fan can generate and share passport summary card (1080x1920, server-side rendered)
 - [ ] **PASS-07**: Fan can generate and share single-artist collection card
 - [ ] **PASS-08**: Fan can generate and share badge achievement card
