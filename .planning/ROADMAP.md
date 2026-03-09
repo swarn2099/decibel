@@ -138,7 +138,11 @@ Plans:
   3. Multi-artist lineups show all performing artists with individual collect buttons
   4. Fan can manually trigger "I'm at a show" from the home screen as a fallback
   5. App functions fully without location permission granted (graceful degradation)
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 20-01-PLAN.md -- Location permission flow, venue geofence detection hooks, dismissed event store
+- [ ] 20-02-PLAN.md -- Collection banner overlay, multi-artist lineup, Collect tab with manual trigger
 
 ### Phase 21: Map + Leaderboard
 **Goal**: Fan can explore the local scene on a dark-themed map and compete on leaderboards
@@ -201,7 +205,7 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 17. Home Feed + Artist Profiles + Collection | 3/3 | Complete    | 2026-03-08 | - |
 | 18. Passport + Badges + Sharing | 3/3 | Complete    | 2026-03-09 | - |
 | 19. Search + Add Artist + Share Extension | 3/3 | Complete    | 2026-03-09 | - |
-| 20. Location-Based Collection | v3.0 | 0/? | Not started | - |
+| 20. Location-Based Collection | v3.0 | 0/2 | Not started | - |
 | 21. Map + Leaderboard | v3.0 | 0/? | Not started | - |
 | 22. Push Notifications | v3.0 | 0/? | Not started | - |
 | 23. Polish + App Store Prep | v3.0 | 0/? | Not started | - |
