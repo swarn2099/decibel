@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 
 ## Current Position
 
-Phase: 22 of 23 (Push Notifications) -- IN PROGRESS
-Plan: 1 of 1 complete in current phase
-Status: Phase 22 Plan 01 COMPLETE
-Last activity: 2026-03-09 -- Completed 22-01 Push notification foundation (token registration, deep-linking, settings screen)
+Phase: 22 of 23 (Push Notifications) -- COMPLETE
+Plan: 2 of 2 complete in current phase
+Status: Phase 22 COMPLETE
+Last activity: 2026-03-09 -- Completed 22-02 Server-side notification dispatch (Expo Push API, triggers, weekly recap)
 
-Progress: [██████████] 100% (30/30 v3.0 plans complete)
+Progress: [██████████] 100% (31/31 v3.0 plans complete)
 
 ## Performance Metrics
 
@@ -49,7 +49,7 @@ Progress: [██████████] 100% (30/30 v3.0 plans complete)
 | 19. Search + Add + Share Ext | 3/3 | Complete |
 | 20. Location-Based Collection | 3/3 | Complete |
 | 21. Map + Leaderboard | 2/2 | Complete |
-| 22. Push Notifications | 1/1 | Complete |
+| 22. Push Notifications | 2/2 | Complete |
 | 23. Polish + App Store | TBD | Not started |
 | Phase 20 P03 | 2min | 2 tasks | 5 files |
 | Phase 21 P02 | 4min | 2 tasks | 7 files |
@@ -110,6 +110,9 @@ Progress: [██████████] 100% (30/30 v3.0 plans complete)
 - [Phase 22-01]: Notification preferences in Supabase (not MMKV) so Edge Functions can check before sending
 - [Phase 22-01]: Settings gear icon in Collection header row alongside leaderboard trophy
 - [Phase 22-01]: subscription.remove() pattern for expo-notifications v55+
+- [Phase 22-02]: Fire-and-forget pattern for notification sends (Promise.resolve().then) to not block API responses
+- [Phase 22-02]: Native fetch for Expo Push API (no axios, Next.js 15 built-in)
+- [Phase 22-02]: Friend join notification stubbed (contact import deferred to v4.0)
 
 ### Pending Todos
 
@@ -123,6 +126,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T03:30:40Z
-Stopped at: Completed 22-01-PLAN.md
+Last session: 2026-03-09T03:36:24Z
+Stopped at: Completed 22-02-PLAN.md
 Resume file: None
