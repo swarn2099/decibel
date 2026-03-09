@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
-status: completed
-stopped_at: Completed 23-01-PLAN.md
-last_updated: "2026-03-09T04:26:11Z"
-last_activity: 2026-03-09 -- Completed 23-01 Loading, error, and empty states across all screens
+status: executing
+stopped_at: Completed 23-02-PLAN.md
+last_updated: "2026-03-09T04:32:52.260Z"
+last_activity: 2026-03-09 -- Completed 23-02 Offline cache, animations, parallax, pull-to-refresh
 progress:
   total_phases: 8
   completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
-  percent: 100
+  total_plans: 16
+  completed_plans: 15
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 23 of 23 (Polish + App Store Prep) -- IN PROGRESS
-Plan: 1 of 3 complete in current phase
+Plan: 2 of 3 complete in current phase
 Status: Phase 23 IN PROGRESS
-Last activity: 2026-03-09 -- Completed 23-01 Loading, error, and empty states across all screens
+Last activity: 2026-03-09 -- Completed 23-02 Offline cache, animations, parallax, pull-to-refresh
 
-Progress: [██████████] 100% (32/34 v3.0 plans complete)
+Progress: [██████████] 97% (33/34 v3.0 plans complete)
 
 ## Performance Metrics
 
@@ -116,6 +116,9 @@ Progress: [██████████] 100% (32/34 v3.0 plans complete)
 - [Phase 23-01]: Reanimated opacity pulse (0.3-0.7) for skeleton shimmer -- no gradient sweep
 - [Phase 23-01]: Error checked before loading in all screens (isError priority over isLoading)
 - [Phase 23-01]: Inline ActivityIndicator kept for sub-component states (collect button, infinite scroll)
+- [Phase 23]: [23-02] MMKV-backed TanStack Query persistence via createSyncStoragePersister (separate instance from auth)
+- [Phase 23]: [23-02] PassportHeader owns parallax via scrollY SharedValue prop (not outer Animated.View wrapper)
+- [Phase 23]: [23-02] DecibelRefreshControl uses native RefreshControl with transparent tint + custom sound-wave overlay
 
 ### Pending Todos
 
@@ -129,6 +132,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T04:20:05Z
-Stopped at: Completed 23-01-PLAN.md
+Last session: 2026-03-09T04:32:52.254Z
+Stopped at: Completed 23-02-PLAN.md
 Resume file: None

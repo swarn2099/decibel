@@ -221,4 +221,4 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 20. Location-Based Collection | 3/3 | Complete    | 2026-03-09 | - |
 | 21. Map + Leaderboard | 2/2 | Complete    | 2026-03-09 | - |
 | 22. Push Notifications | 2/2 | Complete    | 2026-03-09 | - |
-| 23. Polish + App Store Prep | 1/3 | In Progress|  | - |
+| 23. Polish + App Store Prep | 2/3 | In Progress|  | - |
