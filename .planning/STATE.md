@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
-status: completed
-stopped_at: Completed 19-02-PLAN.md (Add Artist Flow)
-last_updated: "2026-03-09T01:21:00.940Z"
-last_activity: 2026-03-09 -- Completed 19-03 Share Extension (URL parser + Android intents + paste-a-link)
+status: in-progress
+stopped_at: Completed 20-01-PLAN.md (Location Infrastructure)
+last_updated: "2026-03-09T01:50:03Z"
+last_activity: 2026-03-09 -- Completed 20-01 Location Infrastructure (expo-location, venue detection, location store)
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
   percent: 100
 ---
 
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v3.0 -- Phase 19 in progress (Search + Add Artist + Share Extension)
+**Current focus:** v3.0 -- Phase 20 in progress (Location-Based Collection)
 
 ## Current Position
 
-Phase: 19 of 23 (Search + Add Artist + Share Extension) -- IN PROGRESS
-Plan: 3 of 3 complete in current phase
-Status: Phase 19 COMPLETE
-Last activity: 2026-03-09 -- Completed 19-03 Share Extension (URL parser + Android intents + paste-a-link)
+Phase: 20 of 23 (Location-Based Collection) -- IN PROGRESS
+Plan: 1 of 2 complete in current phase
+Status: Phase 20 IN PROGRESS
+Last activity: 2026-03-09 -- Completed 20-01 Location Infrastructure (expo-location, venue detection, location store)
 
-Progress: [██████████] 100% (24/24 v3.0 plans complete)
+Progress: [██████████] 96% (25/26 v3.0 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 8)
+- Total plans completed: 31 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 9)
 - Average duration: --
 - Total execution time: --
 
@@ -47,7 +47,7 @@ Progress: [██████████] 100% (24/24 v3.0 plans complete)
 | 17. Home + Profiles + Collection | 3/3 | Complete |
 | 18. Passport + Badges + Sharing | 3/3 | Complete |
 | 19. Search + Add + Share Ext | 3/3 | Complete |
-| 20. Location-Based Collection | TBD | Not started |
+| 20. Location-Based Collection | 1/2 | In progress |
 | 21. Map + Leaderboard | TBD | Not started |
 | 22. Push Notifications | TBD | Not started |
 | 23. Polish + App Store | TBD | Not started |
@@ -86,6 +86,11 @@ Progress: [██████████] 100% (24/24 v3.0 plans complete)
 - [19-02] Reanimated particle system for confetti (no Lottie dependency)
 - [19-02] generateSlug with random 4-char suffix to avoid collisions
 - [Phase 19-03]: Android intent filter for text/plain; iOS uses paste-a-link fallback (native share sheet deferred to Phase 23)
+- [20-01] Foreground-only location: requestForegroundPermissionsAsync only, never background
+- [20-01] Haversine distance for geofence matching (accurate, no library needed)
+- [20-01] 2-minute staleTime on venue detection to avoid constant location polling
+- [20-01] Default 200m geofence radius when venue has null geofence_radius
+- [20-01] MMKV persistence for dismissed events and permission state
 
 ### Pending Todos
 
@@ -99,6 +104,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T01:16:51Z
-Stopped at: Completed 19-02-PLAN.md (Add Artist Flow)
+Last session: 2026-03-09T01:50:03Z
+Stopped at: Completed 20-01-PLAN.md (Location Infrastructure)
 Resume file: None
