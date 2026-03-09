@@ -1,4 +1,5 @@
 import { createSupabaseAdmin } from "@/lib/supabase";
+import { sendPushNotification } from "@/lib/pushNotifications";
 import { NextRequest, NextResponse } from "next/server";
 
 function calculateTier(scanCount: number): string {
@@ -46,6 +47,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to record collection" }, { status: 500 });
     }
 
+    // Get previous scan count to detect tier changes
+    const { data: prevTier } = await supabase
+      .from("fan_tiers")
+      .select("scan_count, current_tier")
+      .eq("fan_id", fan.id)
+      .eq("performer_id", performer_id)
+      .single();
+
+    const previousTierName = prevTier?.current_tier || null;
+
     // Get current scan count
     const { count } = await supabase
       .from("collections")
@@ -69,6 +80,56 @@ export async function POST(req: NextRequest) {
         },
         { onConflict: "fan_id,performer_id" }
       );
+
+    // Fire-and-forget: send push notifications for tier-up and badge events
+    if (!alreadyCollected) {
+      // Get performer info for notification text
+      const { data: performer } = await supabase
+        .from("performers")
+        .select("name, slug")
+        .eq("id", performer_id)
+        .single();
+
+      const performerName = performer?.name || "an artist";
+      const performerSlug = performer?.slug || "";
+
+      // Check for tier change
+      if (previousTierName && currentTier !== previousTierName) {
+        const tierDisplayName = currentTier.replace("_", " ");
+        Promise.resolve().then(() =>
+          sendPushNotification({
+            userId: fan.id,
+            title: "Tier Up! 🎧",
+            body: `You're now ${tierDisplayName} tier with ${performerName}!`,
+            data: { type: "artist", slug: performerSlug },
+            preferenceKey: "tier_ups",
+          })
+        );
+      }
+
+      // Check for new badges (created in last 5 seconds for this user)
+      Promise.resolve().then(async () => {
+        const fiveSecondsAgo = new Date(Date.now() - 5000).toISOString();
+        const { data: newBadges } = await supabase
+          .from("fan_badges")
+          .select("badge_type")
+          .eq("fan_id", fan.id)
+          .gte("earned_at", fiveSecondsAgo);
+
+        if (newBadges && newBadges.length > 0) {
+          for (const badge of newBadges) {
+            const badgeName = badge.badge_type.replace(/_/g, " ");
+            sendPushNotification({
+              userId: fan.id,
+              title: "Badge Earned! 🏆",
+              body: `You unlocked the ${badgeName} badge!`,
+              data: { type: "badge" },
+              preferenceKey: "badge_unlocks",
+            });
+          }
+        }
+      });
+    }
 
     return NextResponse.json({
       scan_count: scanCount,
