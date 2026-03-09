@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
 status: executing
-stopped_at: Completed 18-02-PLAN.md (Badge System)
-last_updated: "2026-03-09T00:30:19Z"
+stopped_at: Completed 18-01-PLAN.md (Passport Screen)
+last_updated: "2026-03-09T00:33:32.471Z"
 last_activity: 2026-03-09 -- Completed 18-02 Badge System (types, definitions, hook, grid, modal)
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 0
   total_plans: 3
   completed_plans: 2
   percent: 37
@@ -73,6 +73,9 @@ Progress: [####______] 37% (2/8 v3.0 phases complete, 18 in progress)
 - [18-02] Badge types/definitions ported exactly from web for cross-platform consistency
 - [18-02] StyleSheet over NativeWind for badge visuals (glow rings, embossed effects)
 - [18-02] useFanBadges computes rarity % inline with 10min cache
+- [Phase 18-01]: Fan profile query includes city field for passport header
+- [Phase 18-01]: Client-side stats from Supabase collections (mirrors web pattern)
+- [Phase 18-01]: Grid overlay rgba(255,255,255,0.02) for paper texture (no image asset)
 
 ### Pending Todos
 
@@ -86,6 +89,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09
-Stopped at: Completed 18-02-PLAN.md (Badge System)
+Last session: 2026-03-09T00:33:32.464Z
+Stopped at: Completed 18-01-PLAN.md (Passport Screen)
 Resume file: None
