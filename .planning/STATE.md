@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
 status: executing
-stopped_at: Completed 23-02-PLAN.md
-last_updated: "2026-03-09T04:32:52.260Z"
+stopped_at: Completed 23-03-PLAN.md
+last_updated: "2026-03-09T04:35:56.971Z"
 last_activity: 2026-03-09 -- Completed 23-02 Offline cache, animations, parallax, pull-to-refresh
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 16
-  completed_plans: 15
-  percent: 97
+  completed_plans: 16
+  percent: 100
 ---
 
 # Project State
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v3.0 -- Phase 23 IN PROGRESS (Polish + App Store Prep)
+**Current focus:** v3.0 COMPLETE -- All 34 plans across 8 phases shipped
 
 ## Current Position
 
-Phase: 23 of 23 (Polish + App Store Prep) -- IN PROGRESS
-Plan: 2 of 3 complete in current phase
-Status: Phase 23 IN PROGRESS
-Last activity: 2026-03-09 -- Completed 23-02 Offline cache, animations, parallax, pull-to-refresh
+Phase: 23 of 23 (Polish + App Store Prep) -- COMPLETE
+Plan: 3 of 3 complete in current phase
+Status: v3.0 COMPLETE
+Last activity: 2026-03-09 -- Completed 23-03 TestFlight prep, production app.json, EAS config
 
-Progress: [██████████] 97% (33/34 v3.0 plans complete)
+Progress: [██████████] 100% (34/34 v3.0 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 33 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 11)
+- Total plans completed: 34 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 12)
 - Average duration: --
 - Total execution time: --
 
@@ -50,11 +50,12 @@ Progress: [██████████] 97% (33/34 v3.0 plans complete)
 | 20. Location-Based Collection | 3/3 | Complete |
 | 21. Map + Leaderboard | 2/2 | Complete |
 | 22. Push Notifications | 2/2 | Complete |
-| 23. Polish + App Store | 1/3 | In Progress |
+| 23. Polish + App Store | 3/3 | Complete |
 | Phase 20 P03 | 2min | 2 tasks | 5 files |
 | Phase 21 P02 | 4min | 2 tasks | 7 files |
 | Phase 21 P01 | 5min | 3 tasks | 7 files |
 | Phase 22 P01 | 7min | 2 tasks | 9 files |
+| Phase 23 P03 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -119,6 +120,9 @@ Progress: [██████████] 97% (33/34 v3.0 plans complete)
 - [Phase 23]: [23-02] MMKV-backed TanStack Query persistence via createSyncStoragePersister (separate instance from auth)
 - [Phase 23]: [23-02] PassportHeader owns parallax via scrollY SharedValue prop (not outer Animated.View wrapper)
 - [Phase 23]: [23-02] DecibelRefreshControl uses native RefreshControl with transparent tint + custom sound-wave overlay
+- [Phase 23-03]: bundleIdentifier set to com.decibel.app (iOS and Android)
+- [Phase 23-03]: Dark-only userInterfaceStyle with #0B0B0F splash -- no light mode
+- [Phase 23-03]: EAS build deferred -- CLI not installed, Swarn needs local Apple signing
 
 ### Pending Todos
 
@@ -132,6 +136,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T04:32:52.254Z
-Stopped at: Completed 23-02-PLAN.md
+Last session: 2026-03-09T04:35:56.964Z
+Stopped at: Completed 23-03-PLAN.md
 Resume file: None

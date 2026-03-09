@@ -117,8 +117,8 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 - [x] **POLISH-06**: Custom pull-to-refresh animation (Decibel logo pulse or sound wave)
 - [x] **POLISH-07**: Network error states with retry buttons on all screens
 - [x] **POLISH-08**: Empty states with illustrations (no collections yet, no badges yet)
-- [ ] **POLISH-09**: TestFlight build distributable to beta testers
-- [ ] **POLISH-10**: App Store screenshots (6.7" and 5.5") for passport, map, collection, leaderboard
+- [x] **POLISH-09**: TestFlight build distributable to beta testers
+- [x] **POLISH-10**: App Store screenshots (6.7" and 5.5") for passport, map, collection, leaderboard
 
 ## v4.0 Requirements (Deferred)
 
