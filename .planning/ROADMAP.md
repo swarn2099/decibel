@@ -154,7 +154,11 @@ Plans:
   3. Fan can filter the map by genre and toggle "Tonight" mode showing only active venues with pulsing markers
   4. Fan can view fan and performer leaderboards with weekly/monthly/all-time filters, seeing their own position highlighted
   5. Fan can generate and share a "rank" image from the leaderboard
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 21-01-PLAN.md -- Scene map with dark style, venue markers, genre filter, tonight mode, venue bottom sheet
+- [ ] 21-02-PLAN.md -- Leaderboard with fan/performer tabs, time filters, podium, share rank
 
 ### Phase 22: Push Notifications
 **Goal**: Fan stays engaged through timely, relevant push notifications that deep-link to the right screen
@@ -206,6 +210,6 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 18. Passport + Badges + Sharing | 3/3 | Complete    | 2026-03-09 | - |
 | 19. Search + Add Artist + Share Extension | 3/3 | Complete    | 2026-03-09 | - |
 | 20. Location-Based Collection | 3/3 | Complete    | 2026-03-09 | - |
-| 21. Map + Leaderboard | v3.0 | 0/? | Not started | - |
+| 21. Map + Leaderboard | v3.0 | 0/2 | Not started | - |
 | 22. Push Notifications | v3.0 | 0/? | Not started | - |
 | 23. Polish + App Store Prep | v3.0 | 0/? | Not started | - |
