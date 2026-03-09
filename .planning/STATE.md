@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
-status: in-progress
-stopped_at: Completed 20-02-PLAN.md (Location Collection UI)
-last_updated: "2026-03-09T01:56:31Z"
-last_activity: 2026-03-09 -- Completed 20-02 Location Collection UI (banner, permission modal, collect tab, venue sheet)
+status: completed
+stopped_at: Completed 20-03-PLAN.md
+last_updated: "2026-03-09T02:06:42.435Z"
+last_activity: 2026-03-09 -- Completed 20-03 Gap Closure (capture_method passthrough for location collections)
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 9
+  completed_plans: 9
   percent: 100
 ---
 
@@ -26,16 +26,16 @@ See: .planning/PROJECT.md (updated 2026-03-08)
 ## Current Position
 
 Phase: 20 of 23 (Location-Based Collection) -- COMPLETE
-Plan: 2 of 2 complete in current phase
+Plan: 3 of 3 complete in current phase
 Status: Phase 20 COMPLETE
-Last activity: 2026-03-09 -- Completed 20-02 Location Collection UI (banner, permission modal, collect tab, venue sheet)
+Last activity: 2026-03-09 -- Completed 20-03 Gap Closure (capture_method passthrough for location collections)
 
-Progress: [██████████] 100% (26/26 v3.0 plans complete)
+Progress: [██████████] 100% (27/27 v3.0 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 10)
+- Total plans completed: 33 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 11)
 - Average duration: --
 - Total execution time: --
 
@@ -47,10 +47,11 @@ Progress: [██████████] 100% (26/26 v3.0 plans complete)
 | 17. Home + Profiles + Collection | 3/3 | Complete |
 | 18. Passport + Badges + Sharing | 3/3 | Complete |
 | 19. Search + Add + Share Ext | 3/3 | Complete |
-| 20. Location-Based Collection | 2/2 | Complete |
+| 20. Location-Based Collection | 3/3 | Complete |
 | 21. Map + Leaderboard | TBD | Not started |
 | 22. Push Notifications | TBD | Not started |
 | 23. Polish + App Store | TBD | Not started |
+| Phase 20 P03 | 2min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,8 @@ Progress: [██████████] 100% (26/26 v3.0 plans complete)
 - [20-02] Multi-artist banner starts collapsed with Show/Hide toggle
 - [20-02] Permission modal 2s delay post-auth to not interrupt initial load
 - [20-02] "I'm at a show" button always visible regardless of permission state
+- [20-03] capture_method defaults to 'qr' when not provided -- backward compatible with web QR scans
+- [Phase 20]: capture_method defaults to 'qr' when not provided -- backward compatible with web QR scans
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T01:56:31Z
-Stopped at: Completed 20-02-PLAN.md (Location Collection UI)
+Last session: 2026-03-09T02:06:42.427Z
+Stopped at: Completed 20-03-PLAN.md
 Resume file: None
