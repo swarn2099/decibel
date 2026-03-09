@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Decibel Mobile
 status: in-progress
-stopped_at: Completed 20-01-PLAN.md (Location Infrastructure)
-last_updated: "2026-03-09T01:50:03Z"
-last_activity: 2026-03-09 -- Completed 20-01 Location Infrastructure (expo-location, venue detection, location store)
+stopped_at: Completed 20-02-PLAN.md (Location Collection UI)
+last_updated: "2026-03-09T01:56:31Z"
+last_activity: 2026-03-09 -- Completed 20-02 Location Collection UI (banner, permission modal, collect tab, venue sheet)
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
   percent: 100
 ---
 
@@ -21,21 +21,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v3.0 -- Phase 20 in progress (Location-Based Collection)
+**Current focus:** v3.0 -- Phase 20 COMPLETE (Location-Based Collection)
 
 ## Current Position
 
-Phase: 20 of 23 (Location-Based Collection) -- IN PROGRESS
-Plan: 1 of 2 complete in current phase
-Status: Phase 20 IN PROGRESS
-Last activity: 2026-03-09 -- Completed 20-01 Location Infrastructure (expo-location, venue detection, location store)
+Phase: 20 of 23 (Location-Based Collection) -- COMPLETE
+Plan: 2 of 2 complete in current phase
+Status: Phase 20 COMPLETE
+Last activity: 2026-03-09 -- Completed 20-02 Location Collection UI (banner, permission modal, collect tab, venue sheet)
 
-Progress: [██████████] 96% (25/26 v3.0 plans complete)
+Progress: [██████████] 100% (26/26 v3.0 plans complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 9)
+- Total plans completed: 32 (v1.0: 8, v1.1: 5, v1.2: 4, v2.0: 5, v3.0: 10)
 - Average duration: --
 - Total execution time: --
 
@@ -47,7 +47,7 @@ Progress: [██████████] 96% (25/26 v3.0 plans complete)
 | 17. Home + Profiles + Collection | 3/3 | Complete |
 | 18. Passport + Badges + Sharing | 3/3 | Complete |
 | 19. Search + Add + Share Ext | 3/3 | Complete |
-| 20. Location-Based Collection | 1/2 | In progress |
+| 20. Location-Based Collection | 2/2 | Complete |
 | 21. Map + Leaderboard | TBD | Not started |
 | 22. Push Notifications | TBD | Not started |
 | 23. Polish + App Store | TBD | Not started |
@@ -91,6 +91,10 @@ Progress: [██████████] 96% (25/26 v3.0 plans complete)
 - [20-01] 2-minute staleTime on venue detection to avoid constant location polling
 - [20-01] Default 200m geofence radius when venue has null geofence_radius
 - [20-01] MMKV persistence for dismissed events and permission state
+- [20-02] Reanimated entering/exiting props for banner animation (SlideInUp/SlideOutUp)
+- [20-02] Multi-artist banner starts collapsed with Show/Hide toggle
+- [20-02] Permission modal 2s delay post-auth to not interrupt initial load
+- [20-02] "I'm at a show" button always visible regardless of permission state
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-09T01:50:03Z
-Stopped at: Completed 20-01-PLAN.md (Location Infrastructure)
+Last session: 2026-03-09T01:56:31Z
+Stopped at: Completed 20-02-PLAN.md (Location Collection UI)
 Resume file: None

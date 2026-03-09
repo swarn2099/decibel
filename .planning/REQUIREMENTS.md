@@ -73,9 +73,9 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 - [x] **LOC-01**: Fan sees clear explanation of why location permission is needed before request
 - [x] **LOC-02**: App requests "While Using" location permission (NOT "Always")
 - [x] **LOC-03**: When app is in foreground, checks current location against venue geofences
-- [ ] **LOC-04**: If fan is at a venue with an active event, non-intrusive banner appears: "[Artist] is playing at [Venue]. Collect?"
-- [ ] **LOC-05**: Multiple-artist lineups show all artists with individual collect buttons
-- [ ] **LOC-06**: "I'm at a show" manual trigger on Home screen as fallback for auto-detection
+- [x] **LOC-04**: If fan is at a venue with an active event, non-intrusive banner appears: "[Artist] is playing at [Venue]. Collect?"
+- [x] **LOC-05**: Multiple-artist lineups show all artists with individual collect buttons
+- [x] **LOC-06**: "I'm at a show" manual trigger on Home screen as fallback for auto-detection
 - [x] **LOC-07**: App functions fully without location permission (graceful degradation)
 
 ### Scene Map
