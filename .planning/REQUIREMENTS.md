@@ -65,8 +65,8 @@ Requirements for the React Native mobile app. Each maps to roadmap phases.
 
 ### Share Extension
 
-- [ ] **SHARE-01**: Decibel registered as share target for URLs on iOS and Android
-- [ ] **SHARE-02**: Sharing a Spotify/SoundCloud/Instagram link TO Decibel opens artist profile (if exists) or add flow (if new)
+- [x] **SHARE-01**: Decibel registered as share target for URLs on iOS and Android
+- [x] **SHARE-02**: Sharing a Spotify/SoundCloud/Instagram link TO Decibel opens artist profile (if exists) or add flow (if new)
 
 ### Location-Based Collection
 
