@@ -169,7 +169,11 @@ Plans:
   2. Fan receives contextual notifications: nearby events, badge unlocks, tier-ups, artist messages, friend joins, and weekly recaps
   3. Tapping any notification deep-links to the correct screen (artist profile, passport, badge detail, etc.)
   4. Fan can toggle each notification type on/off individually in settings
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 22-01-PLAN.md -- Push token registration, deep-link handler, notification preferences settings screen
+- [ ] 22-02-PLAN.md -- Server-side notification dispatch via Expo Push API for all notification types
 
 ### Phase 23: Polish + App Store Prep
 **Goal**: App feels polished, handles edge cases gracefully, and is ready for TestFlight distribution
@@ -211,5 +215,5 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 19. Search + Add Artist + Share Extension | 3/3 | Complete    | 2026-03-09 | - |
 | 20. Location-Based Collection | 3/3 | Complete    | 2026-03-09 | - |
 | 21. Map + Leaderboard | 2/2 | Complete    | 2026-03-09 | - |
-| 22. Push Notifications | v3.0 | 0/? | Not started | - |
+| 22. Push Notifications | v3.0 | 0/2 | Not started | - |
 | 23. Polish + App Store Prep | v3.0 | 0/? | Not started | - |
