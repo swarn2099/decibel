@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
   // Get fan record (auto-create if missing)
   let { data: fan } = await admin
     .from("fans")
-    .select("id, name, avatar_url, city, created_at")
+    .select("id, name, avatar_url, city, created_at, spotify_connected_at")
     .eq("email", email)
     .single();
 
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
     const { data: newFan, error: createError } = await admin
       .from("fans")
       .insert({ email, name: null, city: null })
-      .select("id, name, avatar_url, city, created_at")
+      .select("id, name, avatar_url, city, created_at, spotify_connected_at")
       .single();
 
     if (createError) {
@@ -248,6 +248,48 @@ export async function GET(req: NextRequest) {
     };
   }
 
+  // Badges + social counts (only on page 0)
+  let badges = null;
+  let social = null;
+  if (page === 0) {
+    // Get earned badges
+    const { data: earnedBadges } = await admin
+      .from("fan_badges")
+      .select("badge_id, earned_at")
+      .eq("fan_id", fan.id);
+
+    // Get badge holder counts for rarity
+    const [{ count: totalFans }, { data: allBadgeCounts }] = await Promise.all([
+      admin.from("fans").select("id", { count: "exact", head: true }),
+      admin.from("fan_badges").select("badge_id"),
+    ]);
+
+    const badgeHolderCounts = new Map<string, number>();
+    for (const row of allBadgeCounts ?? []) {
+      badgeHolderCounts.set(row.badge_id, (badgeHolderCounts.get(row.badge_id) ?? 0) + 1);
+    }
+
+    badges = {
+      earned: (earnedBadges ?? []).map((b: { badge_id: string; earned_at: string }) => ({
+        badge_id: b.badge_id,
+        earned_at: b.earned_at,
+      })),
+      totalFans: totalFans ?? 0,
+      holderCounts: Object.fromEntries(badgeHolderCounts),
+    };
+
+    // Social counts
+    const [{ count: followerCount }, { count: followingCount }] = await Promise.all([
+      admin.from("fan_follows").select("id", { count: "exact", head: true }).eq("following_id", fan.id),
+      admin.from("fan_follows").select("id", { count: "exact", head: true }).eq("follower_id", fan.id),
+    ]);
+
+    social = {
+      followers: followerCount ?? 0,
+      following: followingCount ?? 0,
+    };
+  }
+
   return NextResponse.json({
     fan: {
       id: fan.id,
@@ -255,9 +297,12 @@ export async function GET(req: NextRequest) {
       avatar_url: fan.avatar_url,
       city: fan.city,
       created_at: fan.created_at,
+      spotify_connected_at: fan.spotify_connected_at ?? null,
     },
     collections: stamps,
     stats,
+    badges,
+    social,
     hasMore: stamps.length === pageSize,
   });
 }
