@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-08)
 
 **Core value:** Fans scan a QR code at a live show and instantly collect that performer -- no app install, no friction -- building a verified attendance record with tiered access rewards.
-**Current focus:** v3.0 -- Phase 20 COMPLETE (Location-Based Collection)
+**Current focus:** v3.0 -- Phase 21 COMPLETE (Map + Leaderboard)
 
 ## Current Position
 
-Phase: 20 of 23 (Location-Based Collection) -- COMPLETE
-Plan: 3 of 3 complete in current phase
-Status: Phase 20 COMPLETE
-Last activity: 2026-03-09 -- Completed 20-03 Gap Closure (capture_method passthrough for location collections)
+Phase: 21 of 23 (Map + Leaderboard) -- COMPLETE
+Plan: 2 of 2 complete in current phase
+Status: Phase 21 COMPLETE
+Last activity: 2026-03-09 -- Completed 21-02 Leaderboard (fan/performer tabs, time filters, podium, share rank)
 
-Progress: [██████████] 100% (27/27 v3.0 plans complete)
+Progress: [██████████] 100% (29/29 v3.0 plans complete)
 
 ## Performance Metrics
 
