@@ -105,7 +105,12 @@ Plans:
   3. Fan can view earned badges in a grid and tap locked badges to see unlock requirements
   4. Fan can generate and share passport summary, single-artist, and badge achievement cards via Instagram Stories, iMessage, copy link, or save to camera roll
   5. Fan can copy their public passport URL
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 18-01-PLAN.md -- Passport screen with stamps, stats bar, header, tier progress modal
+- [ ] 18-02-PLAN.md -- Badge system with grid, earned/locked visuals, detail modals
+- [ ] 18-03-PLAN.md -- Share card generation, share sheet, public passport URL copy
 
 ### Phase 19: Search + Add Artist + Share Extension
 **Goal**: Fan can find any artist in Decibel, add missing artists via Spotify search with founder badge, and share links TO Decibel from other apps
@@ -189,7 +194,7 @@ Phase 16 (complete) -> Phases 17, 18, 19, 21, 22 (parallel after 16) -> Phase 20
 | 15. Passport Sharing and Social | v2.0 | 3/3 | Complete | 2026-03-07 |
 | 16. Setup + Navigation + Auth | v3.0 | 1/1 | Complete | 2026-03-08 |
 | 17. Home Feed + Artist Profiles + Collection | 3/3 | Complete    | 2026-03-08 | - |
-| 18. Passport + Badges + Sharing | v3.0 | 0/? | Not started | - |
+| 18. Passport + Badges + Sharing | v3.0 | 0/3 | Planned | - |
 | 19. Search + Add Artist + Share Extension | v3.0 | 0/? | Not started | - |
 | 20. Location-Based Collection | v3.0 | 0/? | Not started | - |
 | 21. Map + Leaderboard | v3.0 | 0/? | Not started | - |
