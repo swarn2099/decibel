@@ -7,7 +7,7 @@ import { User, LogIn, MapPin, Trophy, Plus, Menu, X } from "lucide-react";
 import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { SearchBar } from "./search-bar";
 
-const HIDDEN_ROUTES = ["/auth", "/artist"];
+const HIDDEN_ROUTES = ["/auth", "/artist", "/passport"];
 const HIDDEN_EXACT = ["/"];
 
 export function Navbar() {

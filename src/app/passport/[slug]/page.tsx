@@ -1,21 +1,44 @@
-import { createSupabaseAdmin, createSupabaseServer } from "@/lib/supabase";
+import { createSupabaseAdmin } from "@/lib/supabase";
 import { notFound } from "next/navigation";
-import { PassportClient } from "../passport-client";
+import Link from "next/link";
+import Image from "next/image";
 import { generateFanSlug } from "@/lib/fan-slug";
 import { BADGE_DEFINITIONS } from "@/lib/badges/definitions";
-import type {
-  PassportFan,
-  PassportTimelineEntry,
-} from "@/lib/types/passport";
+import { AppStoreCTA } from "@/components/app-store-badge";
+import { Footer } from "@/components/footer";
+import { SITE_URL } from "@/lib/config";
+import { PerformerImage } from "@/components/performer-image";
 import type { BadgeWithDefinition } from "@/lib/types/badges";
-import type { PrivacySetting } from "@/lib/types/social";
 import type { Metadata } from "next";
+
+export const revalidate = 3600;
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-async function findFanBySlug(slug: string) {
+interface Fan {
+  id: string;
+  email: string;
+  name: string | null;
+  city: string | null;
+  created_at: string;
+  avatar_url: string | null;
+}
+
+interface CollectionEntry {
+  id: string;
+  verified: boolean;
+  created_at: string;
+  performer: {
+    id: string;
+    name: string;
+    slug: string;
+    photo_url: string | null;
+  };
+}
+
+async function findFanBySlug(slug: string): Promise<Fan | null> {
   const admin = createSupabaseAdmin();
   const { data: fans } = await admin
     .from("fans")
@@ -23,65 +46,38 @@ async function findFanBySlug(slug: string) {
     .limit(500);
 
   if (!fans) return null;
-
   return fans.find((fan) => generateFanSlug(fan) === slug) || null;
 }
 
-async function getPassportData(fanId: string) {
+async function getCollections(fanId: string): Promise<CollectionEntry[]> {
   const admin = createSupabaseAdmin();
-
-  const { data: collections } = await admin
+  const { data } = await admin
     .from("collections")
     .select(
-      `id, event_date, capture_method, verified, created_at,
-       performers!inner (id, name, slug, photo_url, genres, city),
-       venues (name)`
+      "id, verified, created_at, performers!inner(id, name, slug, photo_url)"
     )
     .eq("fan_id", fanId)
     .order("created_at", { ascending: false });
 
-  const { data: tiers } = await admin
-    .from("fan_tiers")
-    .select("performer_id, scan_count, current_tier")
-    .eq("fan_id", fanId);
+  if (!data) return [];
 
-  const tierMap = new Map(
-    (tiers || []).map((t) => [t.performer_id, t])
-  );
-
-  const timeline: PassportTimelineEntry[] = (collections || []).map((c) => {
-    const performer = c.performers as unknown as {
-      id: string;
-      name: string;
-      slug: string;
-      photo_url: string | null;
-      genres: string[];
-      city: string;
-    };
-    const venue = c.venues as unknown as { name: string } | null;
-    const tier = tierMap.get(performer.id);
-
-    return {
+  // Deduplicate by performer
+  const seen = new Set<string>();
+  const entries: CollectionEntry[] = [];
+  for (const c of data) {
+    const performer = (
+      Array.isArray(c.performers) ? c.performers[0] : c.performers
+    ) as CollectionEntry["performer"];
+    if (!performer || seen.has(performer.id)) continue;
+    seen.add(performer.id);
+    entries.push({
       id: c.id,
-      performer: {
-        id: performer.id,
-        name: performer.name,
-        slug: performer.slug,
-        photo_url: performer.photo_url,
-        genres: performer.genres || [],
-        city: performer.city || "",
-      },
-      venue,
-      event_date: c.event_date,
-      capture_method: c.capture_method as PassportTimelineEntry["capture_method"],
       verified: c.verified,
       created_at: c.created_at,
-      scan_count: tier?.scan_count ?? null,
-      current_tier: tier?.current_tier ?? null,
-    };
-  });
-
-  return timeline;
+      performer,
+    });
+  }
+  return entries;
 }
 
 async function getFanBadges(fanId: string): Promise<BadgeWithDefinition[]> {
@@ -96,178 +92,231 @@ async function getFanBadges(fanId: string): Promise<BadgeWithDefinition[]> {
 
   return earnedBadges
     .map((eb) => {
-      const definition = BADGE_DEFINITIONS[eb.badge_id as keyof typeof BADGE_DEFINITIONS];
+      const definition =
+        BADGE_DEFINITIONS[eb.badge_id as keyof typeof BADGE_DEFINITIONS];
       if (!definition) return null;
-      return {
-        badge_id: eb.badge_id,
-        fan_id: eb.fan_id,
-        earned_at: eb.earned_at,
-        definition,
-      } as BadgeWithDefinition;
+      return { ...eb, definition } as BadgeWithDefinition;
     })
     .filter(Boolean) as BadgeWithDefinition[];
+}
+
+async function getFounderBadges(
+  fanId: string
+): Promise<{ performer_name: string; performer_slug: string }[]> {
+  const admin = createSupabaseAdmin();
+  const { data } = await admin
+    .from("founder_badges")
+    .select("performers(name, slug)")
+    .eq("fan_id", fanId);
+
+  if (!data) return [];
+  return data
+    .map((fb) => {
+      const p = (Array.isArray(fb.performers)
+        ? fb.performers[0]
+        : fb.performers) as { name: string; slug: string } | null;
+      return p ? { performer_name: p.name, performer_slug: p.slug } : null;
+    })
+    .filter(Boolean) as { performer_name: string; performer_slug: string }[];
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const fan = await findFanBySlug(slug);
+  if (!fan) return { title: "Passport Not Found | DECIBEL" };
 
-  if (!fan) {
-    return { title: "Passport Not Found | DECIBEL" };
-  }
-
-  const timeline = await getPassportData(fan.id);
-  const uniqueArtists = new Set(timeline.map((t) => t.performer.id)).size;
-  const uniqueVenues = new Set(
-    timeline.filter((t) => t.venue).map((t) => t.venue!.name)
-  ).size;
+  const collections = await getCollections(fan.id);
+  const badges = await getFanBadges(fan.id);
   const name = fan.name || "Anonymous Fan";
 
-  const ogImageUrl = `/api/og/passport?slug=${encodeURIComponent(slug)}&name=${encodeURIComponent(name)}&artists=${uniqueArtists}&shows=${timeline.length}&venues=${uniqueVenues}`;
+  const ogImageUrl = `/api/og/passport?slug=${encodeURIComponent(slug)}&name=${encodeURIComponent(name)}&artists=${collections.length}&shows=${collections.length}&venues=0`;
 
   return {
-    title: `${name}'s Passport | DECIBEL`,
-    description: `${name} has collected ${uniqueArtists} artists across ${uniqueVenues} venues. View their live music passport.`,
+    title: `${name}'s Decibel Passport`,
+    description: `${collections.length} artists collected. ${badges.length} badges earned.`,
     openGraph: {
-      title: `${name}'s Passport | DECIBEL`,
-      description: `${name} has collected ${uniqueArtists} artists across ${uniqueVenues} venues. View their live music passport.`,
+      title: `${name}'s Decibel Passport`,
+      description: `${collections.length} artists collected. ${badges.length} badges earned.`,
       images: [{ url: ogImageUrl, width: 1200, height: 630 }],
+      url: `${SITE_URL}/passport/${slug}`,
       type: "profile",
     },
     twitter: {
       card: "summary_large_image",
-      title: `${name}'s Passport | DECIBEL`,
-      description: `${name} has collected ${uniqueArtists} artists across ${uniqueVenues} venues.`,
+      title: `${name}'s Decibel Passport`,
+      description: `${collections.length} artists collected. ${badges.length} badges earned.`,
       images: [ogImageUrl],
     },
   };
 }
 
-async function getPrivacySetting(fanId: string): Promise<PrivacySetting> {
-  const admin = createSupabaseAdmin();
-  const { data } = await admin
-    .from("fan_privacy")
-    .select("visibility")
-    .eq("fan_id", fanId)
-    .maybeSingle();
-  return (data?.visibility as PrivacySetting) || "public";
+function formatMemberSince(dateStr: string): string {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 }
 
-async function checkIsFollowing(followerId: string, followingId: string): Promise<boolean> {
-  const admin = createSupabaseAdmin();
-  const { data } = await admin
-    .from("fan_follows")
-    .select("id")
-    .eq("follower_id", followerId)
-    .eq("following_id", followingId)
-    .maybeSingle();
-  return !!data;
+// Border color based on collection type
+function getCollectionBorder(verified: boolean, isFounder: boolean): string {
+  if (isFounder) return "ring-yellow";
+  if (verified) return "ring-pink";
+  return "ring-purple";
 }
 
 export default async function PublicPassportPage({ params }: Props) {
   const { slug } = await params;
   const fan = await findFanBySlug(slug);
-
   if (!fan) notFound();
 
-  const passportFan: PassportFan = {
-    id: fan.id,
-    email: fan.email,
-    name: fan.name,
-    city: fan.city,
-    created_at: fan.created_at,
-    avatar_url: fan.avatar_url ?? null,
-    spotify_connected_at: null,
-  };
-
-  // Check viewer identity
-  let viewerFanId: string | undefined;
-  try {
-    const supabase = await createSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user?.email) {
-      const admin = createSupabaseAdmin();
-      const { data: viewerFan } = await admin
-        .from("fans")
-        .select("id")
-        .eq("email", user.email)
-        .single();
-      viewerFanId = viewerFan?.id;
-    }
-  } catch {
-    // Not logged in -- continue as anonymous
-  }
-
-  // Check privacy setting
-  const privacy = await getPrivacySetting(fan.id);
-  let canViewFull = true;
-
-  if (privacy === "private" && viewerFanId !== fan.id) {
-    // Private: only the fan themselves can see full passport
-    if (viewerFanId) {
-      canViewFull = await checkIsFollowing(viewerFanId, fan.id);
-    } else {
-      canViewFull = false;
-    }
-  } else if (privacy === "mutual" && viewerFanId !== fan.id) {
-    // Mutual: both must follow each other
-    if (viewerFanId) {
-      const [viewerFollows, fanFollows] = await Promise.all([
-        checkIsFollowing(viewerFanId, fan.id),
-        checkIsFollowing(fan.id, viewerFanId),
-      ]);
-      canViewFull = viewerFollows && fanFollows;
-    } else {
-      canViewFull = false;
-    }
-  }
-
-  const [timeline, badges] = await Promise.all([
-    canViewFull ? getPassportData(fan.id) : Promise.resolve([]),
-    canViewFull ? getFanBadges(fan.id) : Promise.resolve([]),
+  const [collections, badges, founderBadges] = await Promise.all([
+    getCollections(fan.id),
+    getFanBadges(fan.id),
+    getFounderBadges(fan.id),
   ]);
 
+  const founderPerformerIds = new Set(
+    founderBadges.map((fb) => fb.performer_slug)
+  );
+  const name = fan.name || "Anonymous Fan";
+  const totalBadges = badges.length;
+
   return (
-    <>
-      <PassportClient
-        fan={passportFan}
-        fanSlug={slug}
-        timeline={timeline}
-        isPublic
-        badges={badges}
-        viewerFanId={viewerFanId}
-      />
-      {!canViewFull && (
-        <div className="mx-auto max-w-2xl px-4 -mt-16 pb-12">
-          <div className="rounded-xl border border-light-gray/20 bg-bg-card p-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-light-gray/10">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-gray"
-              >
-                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-              </svg>
-            </div>
-            <h3 className="mb-2 text-lg font-bold text-[var(--text)]">
-              Private Passport
-            </h3>
-            <p className="text-sm text-gray">
-              {privacy === "private"
-                ? "This passport is private. Follow this fan to see their activity."
-                : "This passport is visible to mutual followers only."}
+    <main className="min-h-dvh bg-bg">
+      {/* ───── Header ───── */}
+      <div className="flex flex-col items-center px-6 pt-16 pb-8 text-center sm:pt-20">
+        {/* Back to home */}
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-1 text-xs"
+        >
+          <span className="bg-gradient-to-r from-pink via-purple to-blue bg-clip-text font-bold text-transparent">
+            DECIBEL
+          </span>
+        </Link>
+
+        {/* Avatar */}
+        {fan.avatar_url ? (
+          <Image
+            src={fan.avatar_url}
+            alt={name}
+            width={80}
+            height={80}
+            className="mb-3 h-20 w-20 rounded-full object-cover ring-2 ring-pink/30"
+          />
+        ) : (
+          <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-pink/30 to-purple/30 text-2xl font-bold text-[var(--text-muted)] ring-2 ring-pink/30">
+            {name.charAt(0).toUpperCase()}
+          </div>
+        )}
+
+        <h1 className="mb-1 text-2xl font-bold">{name}</h1>
+        <p className="text-sm text-gray">
+          Member since {formatMemberSince(fan.created_at)}
+        </p>
+
+        {/* Stats row */}
+        <div className="mt-4 flex items-center gap-6 text-center">
+          <div>
+            <p className="text-xl font-bold text-pink">{collections.length}</p>
+            <p className="text-xs text-gray">stamps</p>
+          </div>
+          <div>
+            <p className="text-xl font-bold text-pink">{totalBadges}</p>
+            <p className="text-xs text-gray">badges</p>
+          </div>
+          <div>
+            <p className="text-xl font-bold text-pink">
+              {collections.filter((c) => c.verified).length}
             </p>
+            <p className="text-xs text-gray">shows</p>
           </div>
         </div>
+      </div>
+
+      {/* ───── Collection Grid ───── */}
+      {collections.length > 0 && (
+        <section className="mx-auto max-w-3xl px-6 pb-8">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
+            Collection
+          </h2>
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5">
+            {collections.map((entry) => {
+              const isFounder = founderPerformerIds.has(
+                entry.performer.slug
+              );
+              const borderColor = getCollectionBorder(
+                entry.verified,
+                isFounder
+              );
+              return (
+                <Link
+                  key={entry.id}
+                  href={`/artist/${entry.performer.slug}`}
+                  className="group flex flex-col items-center gap-2"
+                >
+                  <div
+                    className={`h-20 w-20 overflow-hidden rounded-full ring-2 ${borderColor} transition-transform group-hover:scale-105`}
+                  >
+                    {entry.performer.photo_url ? (
+                      <PerformerImage
+                        src={entry.performer.photo_url}
+                        alt={entry.performer.name}
+                        className="h-full w-full object-cover"
+                        fallbackClassName="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple/30 to-pink/30 text-lg font-bold text-[var(--text-muted)]"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-purple/30 to-pink/30 text-lg font-bold text-[var(--text-muted)]">
+                        {entry.performer.name
+                          .split(" ")
+                          .map((w) => w[0])
+                          .join("")
+                          .slice(0, 2)
+                          .toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <p className="w-20 truncate text-center text-xs font-medium">
+                    {entry.performer.name}
+                  </p>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
       )}
-    </>
+
+      {/* ───── Badges Earned ───── */}
+      {badges.length > 0 && (
+        <section className="mx-auto max-w-3xl px-6 pb-8">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-gray">
+            Badges ({badges.length}/18)
+          </h2>
+          <div className="grid grid-cols-4 gap-3 sm:grid-cols-6">
+            {badges.map((badge) => (
+              <div
+                key={badge.badge_id}
+                className="flex flex-col items-center gap-1 rounded-xl border border-[rgba(255,255,255,0.06)] bg-bg-card p-3"
+                title={badge.definition.description}
+              >
+                <span className="text-2xl">{badge.definition.icon}</span>
+                <span className="w-full truncate text-center text-[10px] font-medium text-[var(--text-muted)]">
+                  {badge.definition.name}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ───── Download CTA ───── */}
+      <div className="mx-auto max-w-2xl px-6 pb-12">
+        <AppStoreCTA
+          title="Get your own passport"
+          subtitle="Track the artists you see live. Earn badges. Compete with friends."
+          variant="pink"
+        />
+      </div>
+
+      <Footer />
+    </main>
   );
 }
