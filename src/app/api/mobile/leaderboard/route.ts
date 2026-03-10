@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
       .select("fan_id, fans!inner(id, name, email)");
 
     if (dateFilter) {
-      query = query.gte("collected_at", dateFilter);
+      query = query.gte("created_at", dateFilter);
     }
 
     const { data, error } = await query;
@@ -92,7 +92,7 @@ export async function GET(req: NextRequest) {
     );
 
   if (dateFilter) {
-    query = query.gte("collected_at", dateFilter);
+    query = query.gte("created_at", dateFilter);
   }
 
   const { data, error } = await query;
