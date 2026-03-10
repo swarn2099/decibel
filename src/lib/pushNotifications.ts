@@ -276,11 +276,48 @@ export async function sendBulkPushNotifications(
 }
 
 /**
- * Placeholder for friend join notification check.
- * Contact import is deferred to v4.0 -- this function is a stub.
+ * Call this after a new user's first collection to notify existing fans who share that artist.
+ * Queries all fans who also collected firstPerformerId (excluding newUserId),
+ * then sends a friend-joined notification to overlapping fans.
+ * Errors are logged but not thrown — this is a non-critical notification path.
  */
-export async function checkFriendJoined(newUserId: string): Promise<void> {
-  console.log(
-    `friend join check: not yet implemented (user: ${newUserId}). Contact import deferred to v4.0.`
-  );
+export async function checkFriendJoined(
+  newUserId: string,
+  firstPerformerId: string
+): Promise<void> {
+  try {
+    const supabase = createSupabaseAdmin();
+
+    // Get all fans who collected the same performer (excluding the new user)
+    const { data: overlappingCollections } = await supabase
+      .from("collections")
+      .select("fan_id")
+      .eq("performer_id", firstPerformerId)
+      .neq("fan_id", newUserId);
+
+    if (!overlappingCollections || overlappingCollections.length === 0) {
+      return;
+    }
+
+    const overlappingFanIds = [...new Set(overlappingCollections.map((c) => c.fan_id))];
+
+    // Get performer name for notification body
+    const { data: performer } = await supabase
+      .from("performers")
+      .select("name")
+      .eq("id", firstPerformerId)
+      .single();
+
+    const performerName = performer?.name || "this artist";
+
+    await sendBulkPushNotifications({
+      userIds: overlappingFanIds,
+      title: "A new fan joined Decibel 🎧",
+      body: `Someone who also loves ${performerName} just joined the scene`,
+      data: { type: "friend" },
+      preferenceKey: "friend_joins",
+    });
+  } catch (error) {
+    console.error("checkFriendJoined failed:", error);
+  }
 }
