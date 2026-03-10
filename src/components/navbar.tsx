@@ -8,6 +8,7 @@ import { createSupabaseBrowser } from "@/lib/supabase-browser";
 import { SearchBar } from "./search-bar";
 
 const HIDDEN_ROUTES = ["/auth", "/artist"];
+const HIDDEN_EXACT = ["/"];
 
 export function Navbar() {
   const pathname = usePathname();
@@ -29,6 +30,7 @@ export function Navbar() {
   }, [pathname]);
 
   if (HIDDEN_ROUTES.some((r) => pathname.startsWith(r))) return null;
+  if (HIDDEN_EXACT.includes(pathname)) return null;
   if (!loaded) return null;
 
   const isLanding = pathname === "/";
