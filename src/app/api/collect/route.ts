@@ -1,5 +1,6 @@
+// PUSH-06 (artist message notifications) handled by /api/messages route
 import { createSupabaseAdmin } from "@/lib/supabase";
-import { sendPushNotification } from "@/lib/pushNotifications";
+import { sendPushNotification, checkFriendJoined } from "@/lib/pushNotifications";
 import { NextRequest, NextResponse } from "next/server";
 
 function calculateTier(scanCount: number): string {
@@ -95,7 +96,9 @@ export async function POST(req: NextRequest) {
 
       // Check for tier change
       if (previousTierName && currentTier !== previousTierName) {
-        const tierDisplayName = currentTier.replace("_", " ");
+        const tierDisplayName = currentTier
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase());
         Promise.resolve().then(() =>
           sendPushNotification({
             userId: fan.id,
@@ -108,27 +111,42 @@ export async function POST(req: NextRequest) {
       }
 
       // Check for new badges (created in last 5 seconds for this user)
+      // PUSH-04: include badge name and description in notification body
       Promise.resolve().then(async () => {
         const fiveSecondsAgo = new Date(Date.now() - 5000).toISOString();
         const { data: newBadges } = await supabase
           .from("fan_badges")
-          .select("badge_type")
+          .select("badge_type, badges(name, description)")
           .eq("fan_id", fan.id)
           .gte("earned_at", fiveSecondsAgo);
 
         if (newBadges && newBadges.length > 0) {
           for (const badge of newBadges) {
-            const badgeName = badge.badge_type.replace(/_/g, " ");
+            const badgeInfo = badge.badges as
+              | { name: string; description: string }
+              | { name: string; description: string }[]
+              | null;
+            const resolved = Array.isArray(badgeInfo) ? badgeInfo[0] : badgeInfo;
+            const badgeName = resolved?.name ?? badge.badge_type.replace(/_/g, " ");
+            const badgeDescription = resolved?.description;
+            const body = badgeDescription
+              ? `You unlocked ${badgeName}! ${badgeDescription}`
+              : `You unlocked the ${badgeName} badge!`;
             sendPushNotification({
               userId: fan.id,
               title: "Badge Earned! 🏆",
-              body: `You unlocked the ${badgeName} badge!`,
+              body,
               data: { type: "badge" },
               preferenceKey: "badge_unlocks",
             });
           }
         }
       });
+    }
+
+    // PUSH-07: fire friend-joined notification on user's first collection of an artist
+    if (!alreadyCollected && scanCount === 1) {
+      Promise.resolve().then(() => checkFriendJoined(fan.id, performer_id));
     }
 
     return NextResponse.json({
