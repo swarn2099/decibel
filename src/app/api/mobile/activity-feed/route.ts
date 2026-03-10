@@ -76,7 +76,16 @@ export async function GET(req: NextRequest) {
     )
   );
 
-  const items = (collections ?? []).map((c: Record<string, unknown>) => {
+  // Helper: detect garbled names (DB IDs or slugs leaking as display names)
+  const isGarbledName = (name: string | null | undefined): boolean => {
+    if (!name) return true;
+    // Matches UUIDs, base64-like strings, or strings with no spaces that are too long
+    if (/^[a-zA-Z0-9_-]{15,}$/.test(name)) return true;
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}/.test(name)) return true;
+    return false;
+  };
+
+  const allItems = (collections ?? []).map((c: Record<string, unknown>) => {
     const fan = Array.isArray(c.fans) ? c.fans[0] : c.fans;
     const performer = Array.isArray(c.performers)
       ? c.performers[0]
@@ -93,6 +102,8 @@ export async function GET(req: NextRequest) {
     if (isFounder) action = "founded";
     else if (isVerified) action = "collected";
 
+    const performerName = (performer as Record<string, unknown>)?.name as string;
+
     return {
       id: c.id as string,
       fan_id: fanId,
@@ -102,8 +113,7 @@ export async function GET(req: NextRequest) {
         ((fan as Record<string, unknown>)?.avatar_url as string) || null,
       action,
       performer_id: performerId,
-      performer_name:
-        ((performer as Record<string, unknown>)?.name as string) || "Unknown",
+      performer_name: performerName || "Unknown",
       performer_slug:
         ((performer as Record<string, unknown>)?.slug as string) || "",
       performer_image:
@@ -111,8 +121,23 @@ export async function GET(req: NextRequest) {
       venue_name:
         ((venue as Record<string, unknown>)?.name as string) || null,
       timestamp: c.created_at as string,
+      _garbled: isGarbledName(performerName),
     };
   });
+
+  // Filter out entries with garbled performer names
+  const filtered = allItems.filter((item) => !item._garbled);
+
+  // Dedup by fan_id + performer_id + action — keep most recent (first, since ordered desc)
+  const seen = new Set<string>();
+  const items = filtered
+    .filter((item) => {
+      const key = `${item.fan_id}:${item.performer_id}:${item.action}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map(({ _garbled, ...rest }) => rest);
 
   return NextResponse.json({
     items,
