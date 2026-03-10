@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/notifications/nearby-scan",
+      "schedule": "0 21 * * *"
+    },
+    {
+      "path": "/api/notifications/weekly-recap",
+      "schedule": "0 23 * * 0"
+    }
+  ]
+}
