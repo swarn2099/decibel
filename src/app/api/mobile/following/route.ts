@@ -42,5 +42,24 @@ export async function GET(req: NextRequest) {
     };
   });
 
+  // Fetch real stamp counts for all followed users
+  if (users.length > 0) {
+    const userIds = users.map((u) => u.id);
+    const { data: counts } = await admin
+      .from("collections")
+      .select("fan_id")
+      .in("fan_id", userIds);
+
+    if (counts) {
+      const countMap: Record<string, number> = {};
+      for (const row of counts) {
+        countMap[row.fan_id] = (countMap[row.fan_id] ?? 0) + 1;
+      }
+      for (const user of users) {
+        user.stamp_count = countMap[user.id] ?? 0;
+      }
+    }
+  }
+
   return NextResponse.json({ users });
 }
