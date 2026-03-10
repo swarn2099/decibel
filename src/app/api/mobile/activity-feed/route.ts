@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     .select(
       `id, fan_id, verified, capture_method, created_at,
        fans!inner (id, name, avatar_url),
-       performers!inner (id, name, slug, photo_url),
+       performers!inner (id, name, slug, photo_url, genres),
        venues (name)`
     )
     .order("created_at", { ascending: false })
@@ -118,6 +118,8 @@ export async function GET(req: NextRequest) {
         ((performer as Record<string, unknown>)?.slug as string) || "",
       performer_image:
         ((performer as Record<string, unknown>)?.photo_url as string) || null,
+      performer_genres:
+        ((performer as Record<string, unknown>)?.genres as string[]) || null,
       venue_name:
         ((venue as Record<string, unknown>)?.name as string) || null,
       timestamp: c.created_at as string,
