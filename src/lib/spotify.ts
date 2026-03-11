@@ -110,22 +110,23 @@ export interface SpotifyArtistResult {
 
 /**
  * Scrape monthly listener count from public Spotify artist page.
- * Returns 0 if the scrape fails (treated as unknown/underground).
+ * Returns null if the scrape fails — null means "unverified", NOT "eligible".
+ * Callers must treat null as unverified, never as 0/underground.
  */
-async function scrapeMonthlyListeners(artistId: string): Promise<number> {
+export async function scrapeMonthlyListeners(artistId: string): Promise<number | null> {
   try {
     const res = await fetch(`https://open.spotify.com/artist/${artistId}`, {
       headers: { "User-Agent": "Mozilla/5.0" },
       cache: "no-store",
       signal: AbortSignal.timeout(3000),
     });
-    if (!res.ok) return 0;
+    if (!res.ok) return null;
     const html = await res.text();
     const match = html.match(/([\d,]+)\s*monthly listeners/);
-    if (!match) return 0;
-    return parseInt(match[1].replace(/,/g, ""), 10) || 0;
+    if (!match) return null;
+    return parseInt(match[1].replace(/,/g, ""), 10) || null;
   } catch {
-    return 0;
+    return null;
   }
 }
 
@@ -184,17 +185,17 @@ export async function searchSpotifyArtists(
       followers?: { total?: number };
     },
     i: number) => {
-      const scraped = listenerResults[i].status === "fulfilled" ? listenerResults[i].value : 0;
+      const scraped = listenerResults[i].status === "fulfilled" ? listenerResults[i].value : null;
       // Use API followers if available, otherwise use scraped monthly listeners
       const apiFollowers = a.followers?.total ?? 0;
       return {
         id: a.id,
         name: a.name,
         photo_url: a.images?.[0]?.url || null,
-        monthly_listeners: scraped || null,
+        monthly_listeners: scraped,
         genres: a.genres || [],
         spotify_url: a.external_urls?.spotify || `https://open.spotify.com/artist/${a.id}`,
-        followers: apiFollowers > 0 ? apiFollowers : scraped,
+        followers: apiFollowers > 0 ? apiFollowers : (scraped ?? 0),
       };
     }
   );
