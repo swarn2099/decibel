@@ -331,14 +331,41 @@ export async function POST(req: NextRequest) {
   // ── Spotify resolution ────────────────────────────────────────────────────
 
   if (platform === "spotify") {
-    let spotifyArtist;
+    // Use oEmbed (public, no API key needed — avoids Spotify dev mode 5-user limit)
+    let oembedData: { title?: string; thumbnail_url?: string } | null = null;
     try {
-      spotifyArtist = await getSpotifyArtist(identifier);
+      const oembedUrl = `https://open.spotify.com/oembed?url=https://open.spotify.com/artist/${identifier}`;
+      const oembedRes = await fetch(oembedUrl, { signal: AbortSignal.timeout(5000) });
+      if (oembedRes.ok) {
+        oembedData = await oembedRes.json();
+      }
     } catch {
-      return NextResponse.json(
-        { error: "Failed to fetch artist data from Spotify" },
-        { status: 502 }
-      );
+      // oEmbed failed — will fall back to Spotify Web API below
+    }
+
+    // Fall back to Spotify Web API if oEmbed failed
+    let spotifyArtist: { id: string; name: string; photo_url: string | null; genres: string[] } | null = null;
+    if (oembedData?.title) {
+      spotifyArtist = {
+        id: identifier,
+        name: oembedData.title,
+        photo_url: oembedData.thumbnail_url ?? null,
+        genres: [],
+      };
+    } else {
+      try {
+        const apiArtist = await getSpotifyArtist(identifier);
+        if (apiArtist) {
+          spotifyArtist = {
+            id: apiArtist.id,
+            name: apiArtist.name,
+            photo_url: apiArtist.photo_url,
+            genres: apiArtist.genres,
+          };
+        }
+      } catch {
+        // Both oEmbed and Web API failed
+      }
     }
 
     if (!spotifyArtist) {
@@ -346,6 +373,18 @@ export async function POST(req: NextRequest) {
         { error: "Artist not found on Spotify" },
         { status: 404 }
       );
+    }
+
+    // Try to get genres from Spotify Web API if oEmbed was used (oEmbed doesn't return genres)
+    if (oembedData?.title && spotifyArtist.genres.length === 0) {
+      try {
+        const apiArtist = await getSpotifyArtist(identifier);
+        if (apiArtist?.genres?.length) {
+          spotifyArtist.genres = apiArtist.genres;
+        }
+      } catch {
+        // Genres are nice-to-have, not critical
+      }
     }
 
     let monthlyListeners: number | null = null;
