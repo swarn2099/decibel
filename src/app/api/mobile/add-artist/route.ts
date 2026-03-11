@@ -29,12 +29,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { spotifyId, name, photoUrl, genres, followers, monthlyListeners } =
+  const { spotifyId, soundcloudUsername, appleMusicUrl, platform, name, photoUrl, genres, followers, monthlyListeners } =
     await req.json();
 
-  if (!spotifyId || !name) {
+  if (!name) {
     return NextResponse.json(
-      { error: "spotifyId and name are required" },
+      { error: "name is required" },
+      { status: 400 }
+    );
+  }
+
+  // Require at least one platform identifier
+  const hasSpotify = platform === "spotify" && spotifyId && spotifyId !== "";
+  const hasSoundcloud = platform === "soundcloud" && soundcloudUsername && soundcloudUsername !== "";
+  const hasAppleMusic = platform === "apple_music" && appleMusicUrl && appleMusicUrl !== "";
+
+  if (!hasSpotify && !hasSoundcloud && !hasAppleMusic) {
+    return NextResponse.json(
+      { error: "A platform identifier (spotifyId, soundcloudUsername, or appleMusicUrl) is required" },
       { status: 400 }
     );
   }
@@ -58,12 +70,17 @@ export async function POST(req: NextRequest) {
     fan = newFan;
   }
 
-  // Check if performer already exists
-  const { data: existing } = await admin
-    .from("performers")
-    .select("id, name, slug")
-    .eq("spotify_id", spotifyId)
-    .maybeSingle();
+  // Check if performer already exists — check by platform-specific identifier
+  let existingQuery = admin.from("performers").select("id, name, slug");
+  if (hasSpotify) {
+    existingQuery = existingQuery.eq("spotify_id", spotifyId);
+  } else if (hasSoundcloud) {
+    existingQuery = existingQuery.eq("soundcloud_url", `https://soundcloud.com/${soundcloudUsername}`);
+  } else if (hasAppleMusic) {
+    existingQuery = existingQuery.eq("apple_music_url", appleMusicUrl);
+  }
+
+  const { data: existing } = await existingQuery.maybeSingle();
 
   if (existing) {
     // Check founder
@@ -94,21 +111,30 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // Create performer
+  // Create performer — build insert payload based on platform
   const slug = generateSlug(name);
+  const performerInsert: Record<string, unknown> = {
+    name,
+    slug,
+    photo_url: photoUrl ?? null,
+    genres: genres ?? [],
+    follower_count: followers ?? null,
+    monthly_listeners: monthlyListeners ?? null,
+    claimed: false,
+  };
+
+  if (hasSpotify) {
+    performerInsert.spotify_id = spotifyId;
+    performerInsert.spotify_url = `https://open.spotify.com/artist/${spotifyId}`;
+  } else if (hasSoundcloud) {
+    performerInsert.soundcloud_url = `https://soundcloud.com/${soundcloudUsername}`;
+  } else if (hasAppleMusic) {
+    performerInsert.apple_music_url = appleMusicUrl;
+  }
+
   const { data: performer, error: insertError } = await admin
     .from("performers")
-    .insert({
-      name,
-      slug,
-      photo_url: photoUrl ?? null,
-      genres: genres ?? [],
-      follower_count: followers ?? null,
-      spotify_id: spotifyId,
-      spotify_url: `https://open.spotify.com/artist/${spotifyId}`,
-      monthly_listeners: monthlyListeners ?? null,
-      claimed: false,
-    })
+    .insert(performerInsert)
     .select("id, name, slug")
     .single();
 
