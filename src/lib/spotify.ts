@@ -206,10 +206,21 @@ export async function getSpotifyArtist(
 ): Promise<SpotifyArtistResult | null> {
   const token = await getAccessToken();
 
-  const res = await fetch(
+  let res = await fetch(
     `https://api.spotify.com/v1/artists/${artistId}`,
     { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" }
   );
+
+  // If cached token failed, clear cache and retry with a fresh one
+  if (!res.ok && cachedToken) {
+    console.warn(`[spotify] getSpotifyArtist failed with cached ${cachedToken.type} token (${res.status}), retrying with fresh token`);
+    cachedToken = null;
+    const freshToken = await getAccessToken();
+    res = await fetch(
+      `https://api.spotify.com/v1/artists/${artistId}`,
+      { headers: { Authorization: `Bearer ${freshToken}` }, cache: "no-store" }
+    );
+  }
 
   if (!res.ok) return null;
 

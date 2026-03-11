@@ -30,29 +30,38 @@ interface ParsedUrl {
 }
 
 /**
- * Attempts to resolve a spotify.link short URL by following the redirect
- * server-side and returning the canonical open.spotify.com URL.
+ * Attempts to resolve a short URL by following the redirect
+ * server-side and returning the canonical URL.
  */
-async function resolveSpotifyShortLink(url: string): Promise<string | null> {
+async function resolveShortLink(url: string, expectedHost: string): Promise<string | null> {
   try {
+    const fullUrl = url.startsWith("http") ? url : `https://${url}`;
     // Try redirect: "manual" first to capture Location header
-    const res = await fetch(url, {
+    const res = await fetch(fullUrl, {
       redirect: "manual",
       signal: AbortSignal.timeout(5000),
     });
     const location = res.headers.get("location");
-    if (location && location.includes("open.spotify.com")) return location;
+    if (location && location.includes(expectedHost)) return location;
 
     // Fall back to following the redirect and reading the final URL
-    const followed = await fetch(url, {
+    const followed = await fetch(fullUrl, {
       redirect: "follow",
       signal: AbortSignal.timeout(5000),
     });
-    if (followed.url.includes("open.spotify.com")) return followed.url;
+    if (followed.url.includes(expectedHost)) return followed.url;
     return null;
   } catch {
     return null;
   }
+}
+
+async function resolveSpotifyShortLink(url: string): Promise<string | null> {
+  return resolveShortLink(url, "open.spotify.com");
+}
+
+async function resolveSoundCloudShortLink(url: string): Promise<string | null> {
+  return resolveShortLink(url, "soundcloud.com");
 }
 
 async function parseUrl(rawUrl: string): Promise<ParsedUrl | null> {
@@ -91,6 +100,21 @@ async function parseUrl(rawUrl: string): Promise<ParsedUrl | null> {
       identifier: spotifyMatch[1],
       resolvedUrl: `https://open.spotify.com/artist/${spotifyMatch[1]}`,
     };
+  }
+
+  // SoundCloud short link: on.soundcloud.com/...
+  if (/on\.soundcloud\.com\//i.test(url)) {
+    const resolved = await resolveSoundCloudShortLink(url);
+    if (!resolved) return null;
+    const scResolvedMatch = resolved.match(/(?:https?:\/\/)?(?:www\.|m\.)?soundcloud\.com\/([a-zA-Z0-9_-]+)\/?/i);
+    if (scResolvedMatch && scResolvedMatch[1] !== "search" && scResolvedMatch[1] !== "discover") {
+      return {
+        platform: "soundcloud",
+        identifier: scResolvedMatch[1],
+        resolvedUrl: `https://soundcloud.com/${scResolvedMatch[1]}`,
+      };
+    }
+    return null;
   }
 
   // SoundCloud: soundcloud.com/username (support www/m subdomains, no https required)
