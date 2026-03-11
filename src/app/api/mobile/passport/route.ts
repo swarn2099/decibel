@@ -75,12 +75,28 @@ export async function GET(req: NextRequest) {
     .from("collections")
     .select(
       `id, verified, capture_method, event_date, created_at,
-       performers!inner (id, name, slug, photo_url, genres, city),
+       performers!inner (id, name, slug, photo_url, genres, city, spotify_url, soundcloud_url, apple_music_url),
        venues (name)`
     )
     .eq("fan_id", fan.id)
     .order("created_at", { ascending: false })
     .range(from, to);
+
+  // Build fan_count map for all performers on this page
+  const performerIds = (collections ?? []).map((c: Record<string, unknown>) => {
+    const p = Array.isArray(c.performers) ? c.performers[0] : c.performers;
+    return (p as Record<string, unknown>)?.id as string;
+  }).filter(Boolean);
+
+  const { data: fanCountRows } = await admin
+    .from("collections")
+    .select("performer_id")
+    .in("performer_id", performerIds);
+
+  const fanCountMap = new Map<string, number>();
+  for (const row of fanCountRows ?? []) {
+    fanCountMap.set(row.performer_id, (fanCountMap.get(row.performer_id) ?? 0) + 1);
+  }
 
   // Get fan_tiers and founder_badges for this fan
   const [{ data: tiers }, { data: founderBadges }] = await Promise.all([
@@ -117,20 +133,23 @@ export async function GET(req: NextRequest) {
     const performerId = (performer as Record<string, unknown>)?.id as string;
     const tier = tierMap.get(performerId);
 
+    const p = performer as Record<string, unknown>;
+    const platformUrl =
+      (p.spotify_url as string | null) ??
+      (p.soundcloud_url as string | null) ??
+      (p.apple_music_url as string | null) ??
+      null;
+
     return {
       id: c.id,
       performer: {
         id: performerId,
-        name:
-          ((performer as Record<string, unknown>)?.name as string) ?? "Unknown",
-        slug:
-          ((performer as Record<string, unknown>)?.slug as string) ?? "",
-        photo_url:
-          ((performer as Record<string, unknown>)?.photo_url as string) ?? null,
-        genres:
-          ((performer as Record<string, unknown>)?.genres as string[]) ?? [],
-        city:
-          ((performer as Record<string, unknown>)?.city as string) ?? "",
+        name: (p?.name as string) ?? "Unknown",
+        slug: (p?.slug as string) ?? "",
+        photo_url: (p?.photo_url as string) ?? null,
+        genres: (p?.genres as string[]) ?? [],
+        city: (p?.city as string) ?? "",
+        platform_url: platformUrl,
       },
       venue: venue
         ? { name: (venue as Record<string, unknown>).name as string }
@@ -143,6 +162,7 @@ export async function GET(req: NextRequest) {
       current_tier: tier?.current_tier ?? null,
       is_founder: foundedPerformerIds.has(performerId),
       rotation: getSeededRotation(c.id as string),
+      fan_count: fanCountMap.get(performerId) ?? 0,
     };
   });
 
