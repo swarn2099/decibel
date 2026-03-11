@@ -28,6 +28,15 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // Get current user's fan_id
+  const { data: currentFan } = await admin
+    .from("fans")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
+  const fanId = currentFan?.id;
+
   // Fan count from collections
   const { count } = await admin
     .from("collections")
@@ -37,7 +46,7 @@ export async function GET(req: NextRequest) {
   // Founder info
   const { data: founder } = await admin
     .from("founder_badges")
-    .select("awarded_at, fan:fans(name, avatar_url)")
+    .select("awarded_at, fan_id, fan:fans(name, avatar_url)")
     .eq("performer_id", performerId)
     .maybeSingle();
 
@@ -53,8 +62,44 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Compute current user's relationship status (server-side, no RLS issues)
+  let userStatus: "founded" | "collected" | "discovered" | "none" = "none";
+  if (fanId) {
+    // Check if current user is the founder
+    if (founder && founder.fan_id === fanId) {
+      userStatus = "founded";
+    } else {
+      // Check founder_badges for this user (in case they're a founder but not THE founder returned above)
+      const { data: userFounder } = await admin
+        .from("founder_badges")
+        .select("id")
+        .eq("fan_id", fanId)
+        .eq("performer_id", performerId)
+        .maybeSingle();
+
+      if (userFounder) {
+        userStatus = "founded";
+      } else {
+        // Check collection
+        const { data: collection } = await admin
+          .from("collections")
+          .select("verified")
+          .eq("fan_id", fanId)
+          .eq("performer_id", performerId)
+          .maybeSingle();
+
+        if (collection?.verified) {
+          userStatus = "collected";
+        } else if (collection) {
+          userStatus = "discovered";
+        }
+      }
+    }
+  }
+
   return NextResponse.json({
     fanCount: count ?? 0,
     founder: founderInfo,
+    userStatus,
   });
 }
