@@ -43,14 +43,17 @@ export async function GET(req: NextRequest) {
   const page = parseInt(req.nextUrl.searchParams.get("page") ?? "0");
   const pageSize = 20;
 
-  // Get fan record (auto-create if missing)
-  let { data: fan } = await admin
+  // Support viewing another user's passport via fan_id param
+  const targetFanId = req.nextUrl.searchParams.get("fan_id");
+
+  // Get the authenticated user's fan record
+  let { data: authFan } = await admin
     .from("fans")
     .select("id, name, avatar_url, city, created_at, spotify_connected_at")
     .eq("email", email)
     .single();
 
-  if (!fan) {
+  if (!authFan) {
     // Auto-create fan record on first mobile login
     const { data: newFan, error: createError } = await admin
       .from("fans")
@@ -64,23 +67,56 @@ export async function GET(req: NextRequest) {
         { status: 500 }
       );
     }
-    fan = newFan;
+    authFan = newFan;
+  }
+
+  // If viewing another user's passport, load their fan record
+  let fan = authFan;
+  let isOwnPassport = true;
+  if (targetFanId && targetFanId !== authFan.id) {
+    const { data: targetFan } = await admin
+      .from("fans")
+      .select("id, name, avatar_url, city, created_at, spotify_connected_at")
+      .eq("id", targetFanId)
+      .single();
+
+    if (!targetFan) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+    fan = targetFan;
+    isOwnPassport = false;
+  }
+
+  // Check if current user follows the target (for profile pages)
+  let isFollowing = false;
+  if (!isOwnPassport) {
+    const { data: followRow } = await admin
+      .from("fan_follows")
+      .select("id")
+      .eq("follower_id", authFan.id)
+      .eq("following_id", fan.id)
+      .maybeSingle();
+    isFollowing = !!followRow;
   }
 
   // Get collections (paginated)
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const { data: collections } = await admin
+  const { data: collections, error: collectionsError } = await admin
     .from("collections")
     .select(
       `id, verified, capture_method, event_date, created_at,
-       performers!inner (id, name, slug, photo_url, genres, city, spotify_url, soundcloud_url, apple_music_url),
+       performers!inner (id, name, slug, photo_url, genres, city, spotify_url, soundcloud_url, mixcloud_url),
        venues (name)`
     )
     .eq("fan_id", fan.id)
     .order("created_at", { ascending: false })
     .range(from, to);
+
+  if (collectionsError) {
+    console.error("[passport] Collections query error:", collectionsError.message, collectionsError.details);
+  }
 
   // Build fan_count map for all performers on this page
   const performerIds = (collections ?? []).map((c: Record<string, unknown>) => {
@@ -106,7 +142,7 @@ export async function GET(req: NextRequest) {
       .eq("fan_id", fan.id),
     admin
       .from("founder_badges")
-      .select("performer_id")
+      .select("performer_id, created_at")
       .eq("fan_id", fan.id),
   ]);
 
@@ -137,7 +173,7 @@ export async function GET(req: NextRequest) {
     const platformUrl =
       (p.spotify_url as string | null) ??
       (p.soundcloud_url as string | null) ??
-      (p.apple_music_url as string | null) ??
+      (p.mixcloud_url as string | null) ??
       null;
 
     return {
@@ -165,6 +201,48 @@ export async function GET(req: NextRequest) {
       fan_count: fanCountMap.get(performerId) ?? 0,
     };
   });
+
+  // Add founder-only artists that have no collection entry (page 0 only)
+  if (page === 0) {
+    const collectionPerformerIds = new Set(stamps.map((s: { performer: { id: string } }) => s.performer.id));
+    const founderOnlyIds = (founderBadges ?? [])
+      .filter((f: { performer_id: string }) => !collectionPerformerIds.has(f.performer_id))
+      .map((f: { performer_id: string; created_at: string }) => f);
+
+    if (founderOnlyIds.length > 0) {
+      const { data: founderPerformers } = await admin
+        .from("performers")
+        .select("id, name, slug, photo_url, genres, city, spotify_url, soundcloud_url, mixcloud_url")
+        .in("id", founderOnlyIds.map((f: { performer_id: string }) => f.performer_id));
+
+      for (const fp of founderPerformers ?? []) {
+        const founderBadge = founderOnlyIds.find((f: { performer_id: string }) => f.performer_id === fp.id);
+        const platformUrl = fp.spotify_url ?? fp.soundcloud_url ?? fp.mixcloud_url ?? null;
+        stamps.push({
+          id: `founder-${fp.id}`,
+          performer: {
+            id: fp.id,
+            name: fp.name ?? "Unknown",
+            slug: fp.slug ?? "",
+            photo_url: fp.photo_url ?? null,
+            genres: fp.genres ?? [],
+            city: fp.city ?? "",
+            platform_url: platformUrl,
+          },
+          venue: null,
+          event_date: null,
+          capture_method: "online",
+          verified: false,
+          created_at: founderBadge?.created_at ?? new Date().toISOString(),
+          scan_count: null,
+          current_tier: null,
+          is_founder: true,
+          rotation: getSeededRotation(fp.id),
+          fan_count: fanCountMap.get(fp.id) ?? 0,
+        });
+      }
+    }
+  }
 
   // Compute stats (only on page 0 to avoid redundant work)
   let stats = null;
@@ -265,9 +343,14 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Include founder-only artists in stats
+    const founderOnlyCount = (founderBadges ?? []).filter(
+      (f: { performer_id: string }) => !rows.some((r) => (r.performer as Record<string, unknown>)?.id === f.performer_id)
+    ).length;
+
     stats = {
       totalArtists: verifiedPerformerIds.size,
-      totalDiscovered: discovered.length,
+      totalDiscovered: discovered.length + founderOnlyCount,
       totalShows: verified.length,
       uniqueVenues: venueIds.size,
       uniqueCities: cities.size,
@@ -332,6 +415,7 @@ export async function GET(req: NextRequest) {
     },
     collections: stamps,
     stats,
+    is_following: isFollowing,
     badges,
     social,
     hasMore: stamps.length === pageSize,
