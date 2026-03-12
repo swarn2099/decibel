@@ -42,6 +42,8 @@ export async function GET(req: NextRequest) {
 
   const page = parseInt(req.nextUrl.searchParams.get("page") ?? "0");
   const pageSize = 20;
+  // Optional filter: ?collection_type=stamp|find|discovery (for View More pages)
+  const collectionTypeFilter = req.nextUrl.searchParams.get("collection_type") as "stamp" | "find" | "discovery" | null;
 
   // Support viewing another user's passport via fan_id param
   const targetFanId = req.nextUrl.searchParams.get("fan_id");
@@ -103,16 +105,23 @@ export async function GET(req: NextRequest) {
   const from = page * pageSize;
   const to = from + pageSize - 1;
 
-  const { data: collections, error: collectionsError } = await admin
+  let collectionsQuery = admin
     .from("collections")
     .select(
-      `id, verified, capture_method, event_date, created_at,
+      `id, verified, capture_method, event_date, created_at, collection_type,
        performers!inner (id, name, slug, photo_url, genres, city, spotify_url, soundcloud_url, mixcloud_url),
-       venues (name)`
+       venues (name),
+       fans!collections_fan_id_fkey (id, name)`
     )
     .eq("fan_id", fan.id)
     .order("created_at", { ascending: false })
     .range(from, to);
+
+  if (collectionTypeFilter) {
+    collectionsQuery = collectionsQuery.eq("collection_type", collectionTypeFilter);
+  }
+
+  const { data: collections, error: collectionsError } = await collectionsQuery;
 
   if (collectionsError) {
     console.error("[passport] Collections query error:", collectionsError.message, collectionsError.details);
@@ -166,8 +175,10 @@ export async function GET(req: NextRequest) {
       ? c.performers[0]
       : c.performers;
     const venue = Array.isArray(c.venues) ? c.venues[0] : c.venues;
+    const fanRecord = Array.isArray(c.fans) ? c.fans[0] : c.fans;
     const performerId = (performer as Record<string, unknown>)?.id as string;
     const tier = tierMap.get(performerId);
+    const isFounder = foundedPerformerIds.has(performerId);
 
     const p = performer as Record<string, unknown>;
     const platformUrl =
@@ -175,6 +186,14 @@ export async function GET(req: NextRequest) {
       (p.soundcloud_url as string | null) ??
       (p.mixcloud_url as string | null) ??
       null;
+
+    // Derive collection_type from DB value, falling back to legacy inference
+    let collectionType = (c.collection_type as string | null);
+    if (!collectionType) {
+      if (c.verified === true) collectionType = "stamp";
+      else if (isFounder) collectionType = "find";
+      else collectionType = "discovery";
+    }
 
     return {
       id: c.id,
@@ -196,9 +215,12 @@ export async function GET(req: NextRequest) {
       created_at: c.created_at,
       scan_count: tier?.scan_count ?? null,
       current_tier: tier?.current_tier ?? null,
-      is_founder: foundedPerformerIds.has(performerId),
+      is_founder: isFounder,
       rotation: getSeededRotation(c.id as string),
       fan_count: fanCountMap.get(performerId) ?? 0,
+      collection_type: collectionType,
+      finder_username: (fanRecord as Record<string, unknown> | null)?.name as string | null ?? null,
+      finder_fan_id: (fanRecord as Record<string, unknown> | null)?.id as string | null ?? null,
     };
   });
 
@@ -239,6 +261,9 @@ export async function GET(req: NextRequest) {
           is_founder: true,
           rotation: getSeededRotation(fp.id),
           fan_count: fanCountMap.get(fp.id) ?? 0,
+          collection_type: "find",
+          finder_username: fan.name ?? null,
+          finder_fan_id: fan.id,
         });
       }
     }
