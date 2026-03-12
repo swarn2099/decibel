@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { getSpotifyArtist, scrapeMonthlyListeners } from "@/lib/spotify";
+import { getSpotifyArtist, scrapeMonthlyListeners, searchSpotifyArtists } from "@/lib/spotify";
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -219,6 +219,43 @@ async function getUserRelationship(
   return "none";
 }
 
+// ── Hardcoded block list of known major artists ──────────────────────────────
+// Stopgap: immediately reject these while scraper reliability improves.
+// Names are lowercased, alphanumeric-only for fuzzy matching.
+const BLOCKED_MAJOR_ARTISTS = new Set([
+  "drake", "taylorswift", "theweeknd", "badbunny", "edsheeran",
+  "arianagrande", "billyjoelarmstrong", "billieeilish", "brunomars",
+  "dojcat", "duaLipa", "postmalone", "travisscott", "sza",
+  "beyonce", "kendricklamar", "justinbieber", "rihanna", "eminem",
+  "karolg", "harrystyles", "oliviarodrigo", "mileycyrus", "adele",
+  "imaginedragons", "coldplay", "maroon5", "bts", "blackpink",
+  "ladygaga", "kanyewest", "ye", "lizzo", "shakira",
+  "johnsummit", "fishermusic", "fisher", "marshmello", "skrillex",
+  "zedd", "calvinharris", "martingarrix", "davidguetta", "tiesto",
+  "diplo", "kygo", "illenium", "excision", "deadmau5",
+  "charliexcx", "sabrinacarpenter", "chappellroan",
+].map(n => n.toLowerCase().replace(/[^a-z0-9]/g, "")));
+
+function isBlockedMajorArtist(name: string): boolean {
+  const normalized = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return BLOCKED_MAJOR_ARTISTS.has(normalized);
+}
+
+// ── Spotify popularity fallback ──────────────────────────────────────────────
+// When scraping monthly listeners fails (returns null), check the Spotify Web
+// API popularity field. Popularity > 75 roughly correlates to 1M+ listeners.
+async function checkPopularityFallback(spotifyId: string): Promise<boolean> {
+  try {
+    const artist = await getSpotifyArtist(spotifyId);
+    if (!artist) return false;
+    // getSpotifyArtist returns followers; if followers > 1M, block
+    if (artist.followers >= 1_000_000) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 // ── Spotify cross-reference for Apple Music ───────────────────────────────────
 
 async function probeSpotifyByName(name: string): Promise<{
@@ -226,6 +263,7 @@ async function probeSpotifyByName(name: string): Promise<{
   monthly_listeners?: number | null;
   photo_url?: string | null;
   genres?: string[];
+  over_threshold?: boolean;
 } | null> {
   try {
     const { searchSpotifyArtists } = await import("@/lib/spotify");
@@ -240,11 +278,26 @@ async function probeSpotifyByName(name: string): Promise<{
 
     // Scrape monthly listeners for the matched artist
     const listeners = await scrapeMonthlyListeners(match.id);
+
+    // If scraper succeeded, use that
+    if (listeners !== null) {
+      return {
+        spotify_id: match.id,
+        monthly_listeners: listeners,
+        photo_url: match.photo_url,
+        genres: match.genres,
+        over_threshold: listeners >= 1_000_000,
+      };
+    }
+
+    // Scraper failed — fallback to Spotify followers via Web API
+    const overByFollowers = await checkPopularityFallback(match.id);
     return {
       spotify_id: match.id,
-      monthly_listeners: listeners,
+      monthly_listeners: null,
       photo_url: match.photo_url,
       genres: match.genres,
+      over_threshold: overByFollowers,
     };
   } catch {
     return null;
@@ -394,7 +447,24 @@ export async function POST(req: NextRequest) {
       monthlyListeners = null;
     }
 
-    // Gate: reject if listeners confirmed >= 1M (null = unverified = pass through)
+    // Block list check
+    if (isBlockedMajorArtist(spotifyArtist.name)) {
+      const response: ValidateResponse = {
+        eligible: false,
+        rejection_reason: "over_threshold",
+        artist: {
+          name: spotifyArtist.name,
+          photo_url: spotifyArtist.photo_url,
+          platform: "spotify",
+          spotify_id: spotifyArtist.id,
+          monthly_listeners: monthlyListeners,
+          genres: spotifyArtist.genres,
+        },
+      };
+      return NextResponse.json(response);
+    }
+
+    // Gate: reject if listeners confirmed >= 1M
     if (monthlyListeners !== null && monthlyListeners >= 1_000_000) {
       const response: ValidateResponse = {
         eligible: false,
@@ -409,6 +479,26 @@ export async function POST(req: NextRequest) {
         },
       };
       return NextResponse.json(response);
+    }
+
+    // Fallback: if scraper returned null, check Spotify followers via Web API
+    if (monthlyListeners === null) {
+      const overByFollowers = await checkPopularityFallback(identifier);
+      if (overByFollowers) {
+        const response: ValidateResponse = {
+          eligible: false,
+          rejection_reason: "over_threshold",
+          artist: {
+            name: spotifyArtist.name,
+            photo_url: spotifyArtist.photo_url,
+            platform: "spotify",
+            spotify_id: spotifyArtist.id,
+            monthly_listeners: null,
+            genres: spotifyArtist.genres,
+          },
+        };
+        return NextResponse.json(response);
+      }
     }
 
     // Check existing performer
@@ -551,6 +641,22 @@ export async function POST(req: NextRequest) {
   if (platform === "apple_music") {
     const artistName = identifier;
 
+    // Block list check first — instant rejection for known major artists
+    if (isBlockedMajorArtist(artistName)) {
+      const response: ValidateResponse = {
+        eligible: false,
+        rejection_reason: "over_threshold",
+        artist: {
+          name: artistName,
+          photo_url: null,
+          platform: "apple_music",
+          apple_music_url: resolvedUrl,
+          genres: [],
+        },
+      };
+      return NextResponse.json(response);
+    }
+
     // Cross-reference on Spotify by name
     let spotifyProbe;
     try {
@@ -559,12 +665,8 @@ export async function POST(req: NextRequest) {
       spotifyProbe = null;
     }
 
-    // If Spotify match found and over threshold → reject
-    if (
-      spotifyProbe?.monthly_listeners !== undefined &&
-      spotifyProbe.monthly_listeners !== null &&
-      spotifyProbe.monthly_listeners >= 1_000_000
-    ) {
+    // If Spotify match found and over threshold (by scraper OR followers fallback) → reject
+    if (spotifyProbe?.over_threshold) {
       const response: ValidateResponse = {
         eligible: false,
         rejection_reason: "over_threshold",

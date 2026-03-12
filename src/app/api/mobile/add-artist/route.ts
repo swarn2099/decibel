@@ -39,6 +39,27 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Server-side block list — second line of defense against major artists
+  const normalizedName = (name as string).toLowerCase().replace(/[^a-z0-9]/g, "");
+  const BLOCKED_MAJOR_ARTISTS = new Set([
+    "drake", "taylorswift", "theweeknd", "badbunny", "edsheeran",
+    "arianagrande", "billieeilish", "brunomars", "dojcat", "dualipa",
+    "postmalone", "travisscott", "sza", "beyonce", "kendricklamar",
+    "justinbieber", "rihanna", "eminem", "karolg", "harrystyles",
+    "oliviarodrigo", "mileycyrus", "adele", "imaginedragons", "coldplay",
+    "maroon5", "bts", "blackpink", "ladygaga", "kanyewest", "ye",
+    "johnsummit", "fishermusic", "fisher", "marshmello", "skrillex",
+    "zedd", "calvinharris", "martingarrix", "davidguetta", "tiesto",
+    "diplo", "kygo", "illenium", "excision", "deadmau5",
+    "charliexcx", "sabrinacarpenter", "chappellroan",
+  ]);
+  if (BLOCKED_MAJOR_ARTISTS.has(normalizedName)) {
+    return NextResponse.json(
+      { error: "This artist has over 1M monthly listeners and can't be added to Decibel." },
+      { status: 403 }
+    );
+  }
+
   // Require at least one platform identifier
   const hasSpotify = platform === "spotify" && spotifyId && spotifyId !== "";
   const hasSoundcloud = platform === "soundcloud" && soundcloudUsername && soundcloudUsername !== "";
