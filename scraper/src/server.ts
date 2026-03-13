@@ -3,10 +3,12 @@ import express, { type Request, type Response, type NextFunction } from 'express
 import { getBrowser, closeBrowser } from './browser';
 import type { ScrapeRequest } from './types';
 import { queryDB } from './layers/layer1-db';
+import { queryEventAPIs } from './layers/layer2-apis';
 import { reverseGeocode } from './layers/layer3-places';
 import { scrapeVenueWebsite } from './layers/layer5-website';
 import { queryLLMForLineup } from './layers/layer6-llm';
 import { writeSearchResult } from './write-result';
+import { mergeResults } from './confidence';
 import { createClient } from '@supabase/supabase-js';
 
 const app = express();
@@ -46,7 +48,7 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', uptime: process.uptime() });
 });
 
-// POST /scrape — main scrape waterfall (Layers 1, 3, 5, 6)
+// POST /scrape — main scrape waterfall (Layers 1, 2, 3, 5, 6)
 app.post('/scrape', requireScraperSecret, async (req: Request, res: Response) => {
   const body = req.body as Partial<ScrapeRequest>;
 
@@ -73,32 +75,59 @@ app.post('/scrape', requireScraperSecret, async (req: Request, res: Response) =>
 
 /**
  * Full scrape waterfall:
- * Layer 1 (DB) → Layer 3 (geocode) → Layer 5 (Playwright) → Layer 6 (LLM) → fallback empty
+ * Layer 1 (DB) → [Layer 3 + Layer 2 in parallel] → Layer 5 (Playwright) → Layer 6 (LLM) → fallback empty
  *
  * Every path MUST write to search_results — the mobile client is waiting on Realtime.
- * Layer 2 (external APIs: RA, DICE, etc.) to be integrated here when ready.
+ * Layers 1-3 target: respond within 10 seconds.
  */
 async function runScrapeWaterfall(req: ScrapeRequest): Promise<void> {
   const { searchId, userId, lat, lng, localDate, venueName } = req;
+  const handlerStart = Date.now();
 
+  try {
   // ─── Layer 1: DB lookup ────────────────────────────────────────────────────
+  const l1Start = Date.now();
   console.log(`[waterfall] Layer 1 starting for searchId=${searchId}`);
   const layer1Result = await queryDB(lat, lng, localDate);
+  console.log(`[waterfall] Layer 1: ${Date.now() - l1Start}ms`);
 
   if (layer1Result && layer1Result.artists.length > 0) {
-    console.log(`[waterfall] Layer 1 HIT — writing result and stopping`);
+    console.log(`[waterfall] Layer 1 HIT — writing result and stopping (${Date.now() - handlerStart}ms total)`);
     await writeSearchResult(searchId, userId, layer1Result);
     return;
   }
 
-  console.log(`[waterfall] Layer 1 MISS — continuing to Layer 3`);
+  console.log(`[waterfall] Layer 1 MISS — running Layers 2+3 in parallel`);
 
-  // ─── Layer 3: Reverse geocode (provides city context for deeper layers) ───
-  console.log(`[waterfall] Layer 3 starting for searchId=${searchId}`);
-  const { city, venueName: geocodedVenueName } = await reverseGeocode(lat, lng);
+  // ─── Layers 2+3 in parallel ────────────────────────────────────────────────
+  const l23Start = Date.now();
+  const [geocodeResult, apiResults] = await Promise.all([
+    reverseGeocode(lat, lng),
+    // Layer 2 needs at least city context — we'll pass what we have from the request
+    queryEventAPIs(venueName ?? null, null, localDate, lat, lng),
+  ]);
+  console.log(`[waterfall] Layers 2+3 parallel: ${Date.now() - l23Start}ms`);
+
+  const { city, venueName: geocodedVenueName } = geocodeResult;
   const effectiveVenueName = venueName ?? geocodedVenueName ?? null;
 
   console.log(`[waterfall] Layer 3: city="${city}" venue="${effectiveVenueName}"`);
+
+  // Layer 2: pick best result from all fulfilled API sources
+  if (apiResults.length > 0) {
+    const bestLayer2 = mergeResults(apiResults);
+    if (bestLayer2.artists.length > 0) {
+      console.log(`[waterfall] Layer 2 HIT via ${bestLayer2.source} — writing result and stopping (${Date.now() - handlerStart}ms total)`);
+      // Enrich with geocoded venue name if Layer 2 didn't return one
+      if (!bestLayer2.venue_name && effectiveVenueName) {
+        bestLayer2.venue_name = effectiveVenueName;
+      }
+      await writeSearchResult(searchId, userId, bestLayer2);
+      return;
+    }
+  }
+
+  console.log(`[waterfall] Layers 1-3 MISS — returning no_results_layers_1_3, continuing to Layers 5+6`);
 
   // ─── Layer 5: Playwright venue website scrape ─────────────────────────────
   // Only if we have a venue name and can look up its website from DB
@@ -140,14 +169,32 @@ async function runScrapeWaterfall(req: ScrapeRequest): Promise<void> {
   }
 
   // ─── All layers missed — write empty low-confidence result ────────────────
-  console.log(`[waterfall] All layers missed for searchId=${searchId} — writing empty result`);
+  console.log(`[waterfall] All layers missed for searchId=${searchId} — writing empty result (${Date.now() - handlerStart}ms total)`);
   await writeSearchResult(searchId, userId, {
     confidence: 'low',
-    venue_name: effectiveVenueName,
+    venue_name: effectiveVenueName ?? null,
     venue_id: null,
     artists: [],
     source: 'none',
   });
+
+  } catch (err: unknown) {
+    // Safety net — on any unhandled error, write a low-confidence empty result
+    // so the mobile client receives SOMETHING back rather than hanging forever
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[waterfall] Unhandled error for searchId=${searchId}: ${message}`);
+    try {
+      await writeSearchResult(searchId, userId, {
+        confidence: 'low',
+        venue_name: venueName ?? null,
+        venue_id: null,
+        artists: [],
+        source: 'error',
+      });
+    } catch (writeErr) {
+      console.error('[waterfall] Failed to write error fallback result:', writeErr);
+    }
+  }
 }
 
 /**
