@@ -1,11 +1,12 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { execFile } from 'child_process';
 import type { ScrapeResult } from '../types';
 
 /**
- * Layer 6 — Claude Haiku web search for venue lineup.
+ * Layer 6 — Claude Code CLI web search for venue lineup.
  * Last-resort layer. ALWAYS returns confidence: 'low' — LLM results require
  * user confirmation (link paste) before creating a stamp.
  *
+ * Uses the claude CLI already installed on the VM instead of a separate API key.
  * Returns null on any error.
  */
 export async function queryLLMForLineup(
@@ -15,49 +16,20 @@ export async function queryLLMForLineup(
 ): Promise<ScrapeResult | null> {
   const llmPromise = (async (): Promise<ScrapeResult | null> => {
     try {
-      const client = new Anthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY!,
-      });
-
       const humanDate = formatDateForHumans(date);
       const prompt = `What artists or DJs are performing at "${venueName}" in ${city} on ${humanDate}? Return ONLY a JSON array of artist name strings. If you cannot find specific artists, return [].`;
 
-      console.log(`[layer6] Querying Claude Haiku for "${venueName}" in ${city} on ${date}`);
+      console.log(`[layer6] Querying Claude CLI for "${venueName}" in ${city} on ${date}`);
 
-      const response = await client.messages.create({
-        model: 'claude-3-5-haiku-20241022',
-        max_tokens: 1024,
-        tools: [
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          { type: 'web_search_20250305', name: 'web_search' } as any,
-        ],
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-      });
+      const stdout = await runClaude(prompt);
+      const artistNames = tryParseArtistArray(stdout);
 
-      // Extract the final text block from the response
-      let artistNames: string[] = [];
-
-      for (const block of response.content) {
-        if (block.type === 'text') {
-          const parsed = tryParseArtistArray(block.text);
-          if (parsed !== null) {
-            artistNames = parsed;
-            break;
-          }
-        }
-      }
-
-      if (artistNames.length === 0) {
+      if (!artistNames || artistNames.length === 0) {
         console.log(`[layer6] No artists found for "${venueName}" on ${date}`);
         return null;
       }
 
-      console.log(`[layer6] Found ${artistNames.length} artists via LLM for "${venueName}"`);
+      console.log(`[layer6] Found ${artistNames.length} artists via CLI for "${venueName}"`);
 
       return {
         confidence: 'low', // ALWAYS low — LLM results require user confirmation
@@ -71,20 +43,40 @@ export async function queryLLMForLineup(
         source: 'llm',
       };
     } catch (err) {
-      console.error('[layer6] Error querying Claude:', err);
+      console.error('[layer6] Error querying Claude CLI:', err);
       return null;
     }
   })();
 
-  // Hard timeout for the LLM call
+  // Hard timeout for the CLI call
   const timeoutPromise = new Promise<null>((resolve) =>
     setTimeout(() => {
-      console.log(`[layer6] LLM query timed out for "${venueName}"`);
+      console.log(`[layer6] CLI query timed out for "${venueName}"`);
       resolve(null);
-    }, 15_000)
+    }, 20_000)
   );
 
   return Promise.race([llmPromise, timeoutPromise]);
+}
+
+/**
+ * Shell out to `claude` CLI with -p flag for a single prompt.
+ */
+function runClaude(prompt: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile(
+      'claude',
+      ['-p', prompt, '--no-input'],
+      { timeout: 18_000, maxBuffer: 1024 * 256 },
+      (err, stdout, stderr) => {
+        if (err) {
+          reject(new Error(`claude CLI error: ${err.message}${stderr ? ` — ${stderr}` : ''}`));
+          return;
+        }
+        resolve(stdout.trim());
+      }
+    );
+  });
 }
 
 /**
