@@ -94,6 +94,55 @@ export async function POST(req: NextRequest) {
       const stepResults = await runWithPg(steps);
       results.event_artists = stepResults;
     }
+
+    if (migration === "all" || migration === "search_results") {
+      // MIG-02: search_results table with Realtime + RLS (Phase 9)
+      const steps = [
+        `CREATE TABLE IF NOT EXISTS search_results (
+          id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          search_id    uuid NOT NULL,
+          user_id      uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+          confidence   text NOT NULL CHECK (confidence IN ('high', 'medium', 'low')),
+          venue_name   text,
+          venue_id     uuid REFERENCES venues(id),
+          artists      jsonb NOT NULL DEFAULT '[]',
+          source       text NOT NULL,
+          created_at   timestamptz DEFAULT now()
+        )`,
+        "CREATE INDEX IF NOT EXISTS search_results_search_id_idx ON search_results(search_id)",
+        "CREATE INDEX IF NOT EXISTS search_results_user_id_idx ON search_results(user_id)",
+        "ALTER TABLE search_results ENABLE ROW LEVEL SECURITY",
+        `CREATE POLICY IF NOT EXISTS "Users can read own search results" ON search_results FOR SELECT USING (auth.uid() = user_id)`,
+        "ALTER PUBLICATION supabase_realtime ADD TABLE search_results",
+      ];
+
+      const stepResults = await runWithPg(steps);
+      results.search_results = stepResults;
+    }
+
+    if (migration === "all" || migration === "venue_submissions") {
+      // MIG-03: venue_submissions table for crowdsource fallback (Phase 9)
+      const steps = [
+        `CREATE TABLE IF NOT EXISTS venue_submissions (
+          id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          fan_id          uuid NOT NULL REFERENCES fans(id) ON DELETE CASCADE,
+          venue_name      text NOT NULL,
+          venue_id        uuid REFERENCES venues(id),
+          lat             double precision,
+          lng             double precision,
+          performer_name  text,
+          platform_url    text,
+          event_date      date NOT NULL,
+          created_at      timestamptz DEFAULT now()
+        )`,
+        "CREATE INDEX IF NOT EXISTS venue_submissions_venue_date_idx ON venue_submissions(venue_id, event_date)",
+        "ALTER TABLE venue_submissions ENABLE ROW LEVEL SECURITY",
+        `CREATE POLICY IF NOT EXISTS "Fans can insert own submissions" ON venue_submissions FOR INSERT WITH CHECK (fan_id IN (SELECT id FROM fans WHERE email = (SELECT email FROM auth.users WHERE id = auth.uid())))`,
+      ];
+
+      const stepResults = await runWithPg(steps);
+      results.venue_submissions = stepResults;
+    }
   } catch (e) {
     results.error = String(e);
   }
