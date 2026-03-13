@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sendPushNotification } from "@/lib/pushNotifications";
 
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -47,7 +48,7 @@ export async function POST(req: NextRequest) {
   // Get or create fan
   let { data: fan } = await admin
     .from("fans")
-    .select("id")
+    .select("id, name")
     .eq("email", email)
     .single();
 
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
     const { data: newFan, error: fanErr } = await admin
       .from("fans")
       .insert({ email, name: null, city: null })
-      .select("id")
+      .select("id, name")
       .single();
     if (fanErr || !newFan) {
       return NextResponse.json({ error: "Fan profile not found" }, { status: 500 });
@@ -98,6 +99,7 @@ export async function POST(req: NextRequest) {
     fan_id: fan.id,
     performer_id: performerId,
     capture_method: "online",
+    collection_type: "discovery",
     verified: false,
   });
 
@@ -107,6 +109,52 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+
+  // Fire-and-forget: notify the original finder (JBX-10)
+  void (async () => {
+    try {
+      // 1. Find the original finder — check founder_badges first
+      let finderFanId: string | null = null;
+
+      const { data: badge } = await admin
+        .from("founder_badges")
+        .select("fan_id")
+        .eq("performer_id", performerId)
+        .maybeSingle();
+
+      if (badge?.fan_id) {
+        finderFanId = badge.fan_id;
+      } else {
+        // Fall back to earliest 'find' collection
+        const { data: firstFind } = await admin
+          .from("collections")
+          .select("fan_id")
+          .eq("performer_id", performerId)
+          .eq("collection_type", "find")
+          .order("created_at", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (firstFind?.fan_id) {
+          finderFanId = firstFind.fan_id;
+        }
+      }
+
+      // 2. Skip if no finder, or finder is the same user
+      if (!finderFanId || finderFanId === fan.id) return;
+
+      // 3. Send notification using finder's fan_id as userId (matches push_tokens.user_id pattern)
+      await sendPushNotification({
+        userId: finderFanId,
+        title: "Someone discovered your find!",
+        body: `${fan.name ?? "Someone"} discovered ${performer.name} from your find`,
+        data: { type: "artist_collected", slug: performer.slug },
+        preferenceKey: "badge_unlocks",
+      });
+    } catch (err) {
+      console.error("[discover] Finder notification failed:", err);
+    }
+  })();
 
   // Upsert fan_tiers
   await admin.from("fan_tiers").upsert(
