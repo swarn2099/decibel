@@ -166,11 +166,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Add to collection
+  // Add to collection — explicitly mark as "find" (online discovery / founder)
   await admin.from("collections").insert({
     fan_id: fan.id,
     performer_id: performer.id,
     capture_method: "online",
+    collection_type: "find",
     verified: false,
   });
 
