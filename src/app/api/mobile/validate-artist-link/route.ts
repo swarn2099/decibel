@@ -127,13 +127,19 @@ async function parseUrl(rawUrl: string): Promise<ParsedUrl | null> {
     };
   }
 
-  // Apple Music: music.apple.com/.../artist/name/id or itunes.apple.com/.../artist/name/id
+  // Apple Music: music.apple.com/.../artist/name/id or .../artist/id
   const appleMatch = url.match(/(?:music|itunes)\.apple\.com\/[^/]+\/artist\/([^/?]+)(?:\/(\d+))?/i);
   if (appleMatch) {
-    const artistName = decodeURIComponent(appleMatch[1].replace(/-/g, " "));
+    // If segment 1 is purely numeric (no name slug), it's the ID directly
+    // If segment 2 exists, it's the numeric ID and segment 1 is the name
+    const hasNameAndId = appleMatch[2] != null;
+    const artistName = hasNameAndId
+      ? decodeURIComponent(appleMatch[1].replace(/-/g, " "))
+      : null;
+    const appleId = hasNameAndId ? appleMatch[2] : appleMatch[1];
     return {
       platform: "apple_music",
-      identifier: artistName,
+      identifier: artistName || `apple_id:${appleId}`,
       resolvedUrl: url,
     };
   }
@@ -639,7 +645,32 @@ export async function POST(req: NextRequest) {
   // ── Apple Music resolution ────────────────────────────────────────────────
 
   if (platform === "apple_music") {
-    const artistName = identifier;
+    let artistName = identifier;
+
+    // If identifier is an Apple Music ID (not a name), try to resolve the name
+    if (artistName.startsWith("apple_id:")) {
+      const appleId = artistName.replace("apple_id:", "");
+      try {
+        // Use Apple Music public storefront API (no auth needed)
+        const amRes = await fetch(
+          `https://itunes.apple.com/lookup?id=${appleId}&entity=musicArtist`,
+          { signal: AbortSignal.timeout(5000) }
+        );
+        if (amRes.ok) {
+          const amData = await amRes.json();
+          const artist = amData?.results?.[0];
+          if (artist?.artistName) {
+            artistName = artist.artistName;
+          }
+        }
+      } catch {
+        // Failed to resolve — will try Spotify cross-reference with the ID as-is
+      }
+      // If still unresolved, we can't do much — return unsupported
+      if (artistName.startsWith("apple_id:")) {
+        return NextResponse.json({ eligible: false, rejection_reason: "unsupported_platform" as const });
+      }
+    }
 
     // Block list check first — instant rejection for known major artists
     if (isBlockedMajorArtist(artistName)) {
