@@ -1,75 +1,88 @@
-# Research Summary: Decibel — Fan Capture + Dashboard + Profiles
+# Research Summary: Decibel Mobile App (React Native / Expo)
 
-**Domain:** Two-sided live music fan-performer engagement platform
-**Researched:** 2026-03-06
+**Domain:** Location-based live music fan passport mobile app
+**Researched:** 2026-03-08
 **Overall confidence:** HIGH
 
 ## Executive Summary
 
-Decibel's next milestone builds the core product loop: fans scan QR codes at venues, collect performers via email, progress through tiers, and see their collection grow. Performers claim pre-built profiles, access dashboards with fan analytics, manage fan lists, and compose messages. The existing codebase (Next.js 16, React 19, Supabase, Tailwind 4) with 429 performers, 474 events, and 68 venues already in production provides a strong foundation.
+The Expo + React Native ecosystem in early 2026 is mature and well-suited for Decibel's mobile app. Expo SDK 54 (React Native 0.81) is the target -- it's the current stable release with New Architecture enabled by default, and it's battle-tested since September 2025. SDK 55 is in beta but not stable enough for a greenfield production app.
 
-The stack additions are minimal: four new packages (recharts, motion, sonner, date-fns) cover charting, animations, toast feedback, and date formatting. Everything else is already installed or handled natively by Supabase (auth, RLS, realtime). No new infrastructure is needed. The architecture follows the existing server-component-first pattern with API routes for mutations.
+The stack centers on NativeWind v4.2 for styling (preserving Swarn's Tailwind mental model from the web app), TanStack Query v5 for server state management with Supabase, Zustand for lightweight client state, and the full Expo ecosystem for native capabilities (location, push notifications, camera, haptics, maps). The critical compatibility discovery is that NativeWind v4 requires Tailwind CSS v3.4.x (NOT v4.x which the web app uses) and Reanimated v4 (which NativeWind v4.2.0+ supports). This version pinning is non-negotiable.
 
-The most critical risks are: QR codes failing in dark venue lighting, the performer claim flow having no identity verification (anyone could claim any profile), Supabase magic link emails landing in spam, and RLS policies blocking dashboard queries (policies exist for public tables but not for collections/fan_tiers/messages). All are addressable but must be handled before any performer demo.
+The most important architectural decision is the hybrid API approach: direct Supabase queries for reads (leveraging RLS and offline caching via TanStack Query) and calling the existing Next.js web API routes over HTTPS for complex mutations (collect, add-artist, badge evaluation). This avoids duplicating business logic while keeping the mobile app fast and offline-capable.
 
-The dual auth model (performers authenticate via magic link, fans just provide an email) is the right call for v1 but creates data quality risks. Email typos create orphan fan records. This is an acceptable tradeoff for demo speed, but merge tooling should be planned for post-launch.
+Session storage requires a MMKV + SecureStore combo because Supabase JWT sessions exceed expo-secure-store's 2048 byte limit. This is the official Supabase recommendation for Expo apps. The pattern is well-documented: generate an encryption key with expo-crypto, store it in SecureStore (iOS Keychain / Android Keystore), use it to encrypt MMKV which holds the actual session data.
 
 ## Key Findings
 
-**Stack:** Add recharts 3.7.0, motion 12.35.0, sonner 2.0.7, date-fns 4.x. Four packages total. No state management, form libraries, or UI component libraries needed.
+**Stack:** Expo SDK 54 + NativeWind v4.2 (Tailwind 3.4.17) + TanStack Query v5 + Zustand + Supabase JS + MMKV/SecureStore. ~25 packages total, all version-verified.
 
-**Architecture:** Server components for data fetching, client components for interactivity, API routes with admin client for writes. Dual auth: Supabase magic link for performers, email-only identification for fans. Single auth callback with role detection for routing.
+**Architecture:** Expo Router v4 file-based routing, 5-tab layout (Passport/Explore/Scan/Activity/Profile), direct Supabase reads + web API for mutations. Auth via magic link deep links with SecureStore persistence.
 
-**Critical pitfall:** The performer claim flow (`/api/claim`) accepts any user_id + performer_id without verification. Must be locked down before any performer sees the product. Also: RLS policies are missing for collections/fan_tiers/messages tables, which will cause the dashboard to return empty data.
+**Critical pitfall:** NativeWind v4 + Tailwind v4.x incompatibility. The web app uses Tailwind v4, but the mobile app MUST use Tailwind v3.4.17. This is a known constraint. Also: push notifications and many native modules don't work in Expo Go on SDK 54 -- must use Development Builds from day one.
 
 ## Implications for Roadmap
 
 Based on research, suggested phase structure:
 
-1. **Auth + Security Hardening** - Fix claim flow verification, implement middleware, add missing RLS policies
-   - Addresses: Performer auth, protected routes, claim security
-   - Avoids: Identity theft pitfall, empty dashboard pitfall (RLS)
-   - Rationale: Everything downstream depends on auth working correctly
+1. **Foundation + Auth** - Project init, NativeWind config, Supabase client with MMKV adapter, magic link auth with deep linking, tab navigation shell
+   - Addresses: Project setup, auth flow, session persistence
+   - Avoids: NativeWind/Tailwind version mismatch, Expo Go limitations (use dev builds immediately)
+   - Rationale: Everything downstream depends on auth and the styling system working correctly
 
-2. **Fan Capture Flow** - Complete `/collect/[slug]` with email capture, tier display, repeat scan handling, OG tags
-   - Addresses: Core product loop, the "aha moment"
-   - Avoids: Ghost accounts (email normalization), dark venue QR failure (high-contrast codes)
-   - Rationale: This is what performers will test first -- "does the QR code work?"
+2. **Core Screens (Read-Only)** - Passport timeline, artist profiles, search with autocomplete, explore/discover
+   - Addresses: The hero screen (passport), content browsing, TanStack Query integration
+   - Avoids: Empty state confusion (design intentional empty states from the start)
+   - Rationale: Read-only screens are lowest risk, highest value for early TestFlight testing
 
-3. **Performer Dashboard** - Stats cards, fan list, scan chart, message composer, QR download, Go Live
-   - Addresses: Performer value prop ("why should I use this?")
-   - Avoids: Empty state confusion (intentional empty states), stubbed messaging confusion (label as draft/preview)
-   - Rationale: Depends on capture flow producing data; is the demo centerpiece
+3. **QR Scan + Collection** - Camera-based QR scanner, collection creation via web API, optimistic updates, offline queue
+   - Addresses: Core product action, the "aha moment" on mobile
+   - Avoids: Offline collection failures (queue in MMKV, sync on reconnect)
+   - Rationale: Depends on auth + display layer from Phases 1-2
 
-4. **Fan Profile + Settings** - Collection grid, tier badges, scan history, account management, logout
-   - Addresses: Fan retention ("why should I scan again?")
-   - Avoids: Data privacy leaks (scope all queries to authenticated fan)
-   - Rationale: Fan-side is secondary to performer-side for demo; can ship after dashboard
+4. **Location + Maps** - Foreground location permission, venue proximity detection, dark-styled map, venue markers
+   - Addresses: THE killer native feature, the reason to build a mobile app
+   - Avoids: Background location pitfall (foreground-only for v1), geofence limit overflow (max 20 iOS / 100 Android)
+   - Rationale: Most complex native integration, most permission-sensitive, needs collection flow working end-to-end
+
+5. **Push Notifications** - Expo Push Service setup, FCM/APNs config, token registration, notification handling + deep linking
+   - Addresses: Re-engagement, contextual "artist playing near you" alerts
+   - Avoids: Notification fatigue (frequency capping, per-type toggles from day one)
+   - Rationale: Independent of location but needs auth for token registration
+
+6. **Polish + Animations** - Lottie micro-animations, haptic feedback, share cards, badge unlock celebrations, onboarding flow
+   - Addresses: Emotional engagement, shareability, delight moments
+   - Avoids: Over-engineering animations before core flows work
+   - Rationale: Polish layer on top of working features, can ship incrementally
 
 **Phase ordering rationale:**
-- Auth must come first because dashboard and fan profile both require it
-- Fan capture before dashboard because dashboard needs collection data to display
-- Dashboard before fan profile because performers are the revenue side and need to be demo-ready first
-- Fan capture and dashboard are on the critical path; fan profile is a parallel track that can lag
+- Auth + styling foundation must come first because every screen depends on them
+- Read-only screens before write operations to validate data layer with low risk
+- QR scan before location because QR is simpler and the primary capture method
+- Location is the most complex native integration -- defer until collection flow is proven
+- Push notifications are parallel-trackable but need dev builds which Phase 1 establishes
+- Polish is last because premature animation work on unstable screens wastes effort
 
 **Research flags for phases:**
-- Phase 1 (Auth): Likely needs testing of magic link deliverability to Gmail/Outlook before demo
-- Phase 2 (Capture): Needs real-world QR testing in low-light conditions
-- Phase 3 (Dashboard): Standard patterns, unlikely to need research. RLS policy setup is the main risk
-- Phase 4 (Fan Profile): Standard patterns, no research flags
+- Phase 1: NativeWind v4.2 + Reanimated v4 compat needs careful testing. Deep link callback for magic link needs platform-specific testing (iOS universal links vs Android app links).
+- Phase 3: Offline queue sync strategy needs design. What happens when queued collections conflict with server state?
+- Phase 4: Geofence registration strategy (which venues to monitor, how to rotate) needs deeper research during that phase.
+- Phase 5: Expo Push Service receipt handling and retry logic needs phase-specific research.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All versions verified against npm, React 19 compatibility confirmed, minimal additions |
-| Features | HIGH | Clear table stakes from competitor analysis, well-defined PRD, features already scoped |
-| Architecture | HIGH | Extends existing patterns already working in production, no new infrastructure |
-| Pitfalls | HIGH | Based on direct codebase analysis, known Supabase behaviors, and venue environment realities |
+| Stack | HIGH | All versions verified via npm, Expo changelog, and official docs. NativeWind + Reanimated compat confirmed via GitHub discussions. |
+| Features | HIGH | Feature landscape based on competitor analysis of Beli, Strava, Swarm, Momento, Spotify Wrapped. Clear table stakes vs differentiators. |
+| Architecture | HIGH | Expo Router + TanStack Query + Zustand pattern is well-documented with official quickstarts from Expo and Supabase. |
+| Pitfalls | HIGH | NativeWind/Tailwind version trap, SecureStore size limit, Expo Go limitations, geofence limits all verified from official docs and GitHub issues. |
 
 ## Gaps to Address
 
-- **Magic link deliverability:** Must test before demo. If Supabase default email fails, configure custom SMTP (Resend or SendGrid). This is a Phase 1 validation task.
-- **RLS policies for collections/fan_tiers/messages:** Missing from current schema. Either add policies or use admin client for dashboard server queries. Must decide during Phase 1.
-- **Fan account merge tooling:** Email typos will create duplicates. Not blocking for demo, but plan tooling for post-launch.
-- **Recharts + React 19 peer deps:** May need `--legacy-peer-deps` flag at install time. Check during Phase 1 setup.
+- **NativeWind v4.2 + Reanimated v4 real-world stability:** GitHub discussions confirm compatibility, but production reports are limited. Phase 1 should include a stress test of NativeWind animations with Reanimated v4.
+- **Monorepo vs separate repo:** Research recommends starting as a separate `decibel-mobile/` directory and extracting shared types later. But if the web app moves to a monorepo first, the mobile setup changes.
+- **Expo Push Service quotas:** Free tier limits are generous but not documented with exact numbers. May need phase-specific research if user count grows quickly.
+- **Apple App Store review for location:** Foreground-only location is lower friction but Apple still requires clear usage description. Review the exact wording needed during Phase 4.
+- **Share extension (expo-share-intent):** Listed as a differentiator in FEATURES.md but has Apple review complexity. Needs phase-specific feasibility check.

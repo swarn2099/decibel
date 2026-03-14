@@ -65,7 +65,16 @@ async function resolveSoundCloudShortLink(url: string): Promise<string | null> {
 }
 
 async function parseUrl(rawUrl: string): Promise<ParsedUrl | null> {
-  const url = rawUrl.trim();
+  let url = rawUrl.trim();
+
+  // If the input contains surrounding text (e.g. "Listen to X on Apple Music. https://..."),
+  // extract just the URL portion
+  if (url.includes(" ") || !url.startsWith("http")) {
+    const urlMatch = url.match(/https?:\/\/[^\s<>"{}|\\^`[\]]+/i);
+    if (urlMatch) {
+      url = urlMatch[0];
+    }
+  }
 
   // Spotify URI format: spotify:artist:ARTIST_ID
   const uriMatch = url.match(/^spotify:artist:([a-zA-Z0-9]+)$/);

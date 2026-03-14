@@ -1,0 +1,225 @@
+# DECIBEL WEBSITE — CONVERSION FUNNEL PRD
+
+> **Purpose:** The website exists for ONE reason: convert visitors into app downloads. Every page has exactly one CTA — get the app. No web app, no sign-ups, no login.
+>
+> **Repo:** `~/decibel` (Next.js on Vercel)
+>
+> **Data:** All content pulls from existing Supabase tables (performers, events, venues, fans, collections, founder_badges). No new data needed.
+>
+> **Timeline:** Must be deployable in < 3 hours.
+>
+> **Design:** Dark-first. Decibel brand colors. Mobile-optimized (90%+ of traffic will be phones scanning QR codes or tapping Instagram links).
+
+---
+
+## PAGE 1: Landing Page (`decible.live` / `/`)
+
+**Who lands here:** Instagram bio clicks, word of mouth, direct traffic, anyone who hears about Decibel.
+
+**Job:** Explain what Decibel is in 5 seconds. Create desire. Send to App Store.
+
+### Layout (single scrollable page, mobile-first)
+
+**Section 1: Hero**
+- Background: #0B0B0F (dark)
+- "DECIBEL" in pink (#FF4D6A), Poppins Bold, large (48px mobile / 72px desktop)
+- Subtitle: "Your Live Music Passport" — white, Poppins Regular 18px
+- One-liner hook below: "Track every show. Collect every artist. Compete with your friends." — textSecondary, 16px
+- **App Store badge** — Apple "Download on the App Store" black badge, centered, links to App Store listing
+- Below the badge: small text "Available on iOS" (Android coming soon if applicable)
+
+**Section 2: Phone Mockup + Features**
+- Angled phone mockup showing the passport screen (use a screenshot from the app)
+- OR skip the mockup and just do 3 feature cards:
+  - 🎵 **Discover** — "Find artists before anyone else. Claim your Founder badge."
+  - 📍 **Collect** — "Show up to a show. Verify your attendance. Earn your stamp."
+  - 🏆 **Compete** — "See who's discovered the most. Climb the leaderboard."
+- Each card: icon + title (SemiBold 18px, white) + one-line description (Regular 14px, textSecondary)
+- Cards on dark card background (#15151C) with subtle border
+
+**Section 3: Social Proof / Stats**
+- Pull live numbers from Supabase:
+  - "[X] artists" (count of performers table)
+  - "[X] venues" (count of venues table)
+  - "[X] events this week" (count of events with date >= today)
+  - "Chicago" (city label)
+- Display as a horizontal row of stats, pink accent numbers, white labels
+- Below: "Join the movement" or "Your scene. Your passport." tagline
+
+**Section 4: Founder FOMO**
+- "2,000+ artists. Most don't have a Founder yet."
+- "Be the first to claim your favorite DJ. One-of-one. Forever."
+- App Store badge again (repeat CTA — people scroll, give them another chance)
+
+**Section 5: Footer**
+- Minimal: "© 2026 Decibel" + links to Privacy Policy, Terms, Instagram
+- Dark background, subtle text
+
+### Technical Notes
+- Server-side render the stats (ISR with 1 hour revalidation so it's fast but not stale)
+- Meta tags for social sharing: og:title "Decibel — Your Live Music Passport", og:description "Track shows, collect artists, compete with friends", og:image (branded share image)
+- Favicon: use the volume knob logo
+
+---
+
+## PAGE 2: Artist Profile (`/artist/[slug]`)
+
+**Who lands here:** QR code scans at venues, Google searches for "[artist name] shows", shared artist links.
+
+**Job:** Show the artist. Create FOMO (Founder badge unclaimed OR show who founded them). Send to App Store.
+
+### Layout
+
+**Section 1: Artist Hero**
+- Full-width artist photo (if available) with gradient fade to #0B0B0F at bottom
+- If no photo: purple-to-pink gradient background
+- Artist name: Poppins Bold 32px, white, left-aligned over the gradient
+- Genre tags: small pills below the name (same styling as mobile app)
+
+**Section 2: Stats Row**
+- Horizontal row: "[X] fans" + "[X] shows" + "[X] genres"
+- Pink accent numbers, white labels, centered
+
+**Section 3: Founder Badge / FOMO Hook (THIS IS THE KEY SECTION)**
+- **If this artist has NOT been founded yet:**
+  - Gold-bordered card
+  - "⭐ This artist hasn't been claimed yet"
+  - "Be the first to add [Artist Name] to Decibel and earn a one-of-one Founder badge. Once it's taken, it's gone forever."
+  - **"Claim Founder Badge →" button** (gold background, dark text) → links to App Store
+  - This is the highest-converting element on the page. Make it prominent.
+
+- **If this artist HAS been founded:**
+  - Gold card: "⭐ Founded by [founder_display_name]" with their avatar
+  - "[X] fans are tracking this artist"
+  - **"Track [Artist Name] on Decibel →" button** (pink background, white text) → App Store
+
+**Section 4: Upcoming Shows (if any)**
+- "UPCOMING SHOWS" header
+- List of events: date + venue name
+- Max 5, ordered by date
+- If no upcoming shows: hide this section
+
+**Section 5: Listen Links (if any)**
+- Platform buttons: "Listen on SoundCloud", "Listen on Mixcloud", etc.
+- Only show platforms that have links in the data
+
+**Section 6: Download CTA (repeated)**
+- "Track this artist on Decibel"
+- App Store badge
+- Dark card with pink accent
+
+**Section 7: Footer**
+- Same as landing page
+
+### Technical Notes
+- Dynamic route: `pages/artist/[slug].tsx` or `app/artist/[slug]/page.tsx`
+- Data: query `performers` table by slug, JOIN events, JOIN founder_badges, JOIN collections (count for fan count)
+- SSG with ISR (revalidate every hour) — these pages should be fast for SEO
+- Meta tags per artist: og:title "[Artist Name] on Decibel", og:description "[X] fans tracking [Artist Name]. Upcoming shows in Chicago.", og:image (artist photo or fallback)
+- **Generate pages for ALL performers in the database** — this is your SEO long-tail play. 2,164 pages indexed by Google.
+
+### URL Structure
+- Primary: `decible.live/artist/dj-heather`
+- Slug: use the existing `slug` field from the performers table
+- If slug doesn't exist, generate from name: lowercase, hyphenated, stripped of special chars
+
+---
+
+## PAGE 3: Public Passport (`/[username]`)
+
+**Who lands here:** Someone tapped a shared passport link from Instagram Stories, iMessage, etc.
+
+**Job:** Show off the user's collection. Create envy. Send to App Store.
+
+### Layout
+
+**Section 1: Passport Header**
+- User avatar (80px circle) + display name (Bold 24px) + "Member since [Month Year]"
+- Stats row: "[X] stamps" + "[X] badges" + "[X] shows"
+
+**Section 2: Collection Grid**
+- Grid of artist photos (3 columns on mobile, 4 on desktop)
+- Each cell: artist photo (circle, 80px), artist name below (Medium 12px)
+- Colored border on photo matching collection type: gold (Founded), pink (Collected), purple (Discovered)
+- Tapping an artist photo → navigate to `/artist/[slug]` (the artist's web page, which then funnels to App Store)
+- Show ALL stamps, ordered by most recent
+
+**Section 3: Badges Earned**
+- "Badges ([X]/18)" header
+- Grid of earned badge icons (use the same visuals as the mobile app)
+- Unearned badges NOT shown (keep it clean — only show what they've achieved)
+
+**Section 4: Download CTA**
+- "Get your own passport"
+- "Track the artists you see live. Earn badges. Compete with friends."
+- App Store badge → App Store link
+- Make this big and obvious — it's the conversion point
+
+**Section 5: Footer**
+- Same as other pages
+
+### Technical Notes
+- Dynamic route: `pages/[username].tsx` or `app/[username]/page.tsx`
+- Data: query `fans` by display_name (or fan_id), JOIN collections + performers + badges
+- **Conflict avoidance:** Make sure the `[username]` route doesn't conflict with `/artist/[slug]`. Use a lookup: check `fans` table first for the slug, if no match check `performers`. Or prefix artist routes with `/artist/` (already done).
+- Meta tags: og:title "[Username]'s Decibel Passport", og:description "[X] artists collected. [X] badges earned.", og:image (passport share card image if available)
+- This page must be PUBLIC (no auth required) — it's meant to be shared
+
+---
+
+## GLOBAL REQUIREMENTS
+
+### App Store Link
+- Use the App Store URL once the app is approved: `https://apps.apple.com/app/decibel/id[YOUR_APP_ID]`
+- Before approval, link to `decible.live` with a "Coming soon to the App Store" message
+- Store the App Store URL in a single config/env variable so it can be updated in one place
+
+### Design Tokens (match the mobile app)
+```
+Background: #0B0B0F
+Card: #15151C
+Card border: rgba(255,255,255,0.06)
+Text primary: #FFFFFF
+Text secondary: rgba(255,255,255,0.6)
+Pink: #FF4D6A
+Purple: #9B6DFF
+Gold: #FFD700
+Teal: #00D4AA
+Font: Poppins (Google Fonts)
+```
+
+### Mobile-First
+- 90%+ of traffic will be mobile (QR scans, Instagram taps, iMessage links)
+- Design for 375px width first, scale up for desktop
+- Large tap targets on all buttons (minimum 48px height)
+- Fast load times — no heavy images, use next/image with optimization
+- Test on iPhone Safari before deploying
+
+### SEO
+- Every artist page should have unique meta tags (title, description, og:image)
+- Add a sitemap.xml that includes all artist pages and the landing page
+- Add structured data (JSON-LD) for artist pages: MusicGroup schema with name, genre, event info
+- Submit sitemap to Google Search Console after deploying
+
+### Analytics
+- Add a simple analytics solution (Vercel Analytics is free and already integrated, or add Plausible/PostHog)
+- Track: page views per artist page, App Store link clicks, QR scan landing counts
+- This data tells you which artists/venues are driving the most traffic
+
+---
+
+## EXECUTION ORDER
+
+1. **Artist pages first** (`/artist/[slug]`) — these are what QR codes point to and have the highest immediate value for this weekend
+2. **Landing page second** (`/`) — polish what exists, add the App Store link and stats
+3. **Public passport pages third** (`/[username]`) — these matter once people start sharing, which happens after they have the app
+
+---
+
+## EXECUTION NOTES
+
+- Work in `~/decibel` repo
+- These are Next.js pages pulling from existing Supabase data — no new backend needed
+- Deploy to Vercel after each page is complete (auto-deploys on push to main)
+- Test every page on mobile Safari before marking complete
+- Total estimated time: 2-3 hours for all three pages

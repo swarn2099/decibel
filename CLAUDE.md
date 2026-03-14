@@ -41,6 +41,10 @@ Dark, underground, not corporate. Think Nerve movie aesthetic.
 - messages (performer_id, subject, body, stats)
 - fan_tiers (fan_id, performer_id, scan_count, current_tier)
 
+## Context Management
+When you notice context usage above 50%, run /compact immediately.
+Do not wait until 70%+. Quality degrades above 50%.
+
 ## Commands
 - `npm run dev` — Start Next.js dev server
 - `npm run build` — Production build

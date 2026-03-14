@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "post_tool_use": [
+      {
+        "command": "bash -c 'if claude context-usage 2>/dev/null | grep -q \"[7-9][0-9]%\\|100%\"; then echo \"CONTEXT HIGH - run /compact\"; fi'",
+        "description": "Warn when context is high"
+      }
+    ]
+  }
+}
